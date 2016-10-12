@@ -10,6 +10,7 @@ import com.sogou.iplus.model.*;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
+
   @ExceptionHandler(RuntimeException.class)
   @ResponseBody
   public ApiResult<?> internalServerError(Exception e) {
@@ -35,7 +36,7 @@ public class GlobalExceptionHandler {
   public ApiResult<?> apiResultAsException(ApiResult.AsException e) {
     return e.get();
   }
-    
+
   @ExceptionHandler(Errno.BadRequestException.class)
   @ResponseBody
   public ApiResult<?> badRequestException(Exception e) {
