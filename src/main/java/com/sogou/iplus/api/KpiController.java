@@ -48,8 +48,8 @@ public class KpiController {
   @ApiMethod(description = "add kpi record")
   @RequestMapping(value = "/kpi", method = RequestMethod.PUT)
   public ApiResult<?> add(HttpServletRequest request,
-      @ApiPathParam(name = "xmId", description = "项目id") @RequestParam int xmId,
-      @ApiPathParam(name = "xmKey", description = "项目秘钥") @RequestParam String xmKey,
+      @ApiQueryParam(name = "xmId", description = "项目id") @RequestParam int xmId,
+      @ApiQueryParam(name = "xmKey", description = "项目秘钥") @RequestParam String xmKey,
       @ApiQueryParam(name = "date", description = "kpi日期", format = "yyyy-MM-dd", required = false) @RequestParam @DateTimeFormat(iso = ISO.DATE) Optional<LocalDate> date) {
     Map<String, Project> map = Project.PROJECT_MAP.get(xmId);
     if (MapUtils.isEmpty(map)) return ApiResult.badRequest("invalid xmId");
