@@ -5,6 +5,9 @@
  */
 package com.sogou.iplus.mapper;
 
+import java.time.LocalDate;
+import java.util.List;
+
 import org.apache.ibatis.annotations.InsertProvider;
 import org.apache.ibatis.annotations.Options;
 import org.apache.ibatis.annotations.SelectProvider;
@@ -24,8 +27,10 @@ public interface KpiMapper {
 
     public static final String TABLE = "`kpi`";
 
+    public static final String ITEMS = "`xmId`, `kpiId`, `createDate`, `kpi`";
+
     public static String select(Kpi kpi) {
-      return new SQL().SELECT("xmId,kpiId,createDate,kpi").FROM(TABLE).WHERE("xmId = #{xmId}").WHERE("kpiId = #{kpiId}")
+      return new SQL().SELECT(ITEMS).FROM(TABLE).WHERE("xmId = #{xmId}").WHERE("kpiId = #{kpiId}")
           .WHERE("createDate = #{createDate}").toString();
     }
 
@@ -39,6 +44,10 @@ public interface KpiMapper {
           .WHERE("createDate = #{createDate}").toString();
     }
 
+    public static String selectKpisWithDate(LocalDate createDate) {
+      return new SQL().SELECT(ITEMS).FROM(TABLE).WHERE("createDate = #{createDate}").toString();
+    }
+
   }
 
   @InsertProvider(type = Sql.class, method = "add")
@@ -50,5 +59,8 @@ public interface KpiMapper {
 
   @UpdateProvider(type = Sql.class, method = "update")
   int update(Kpi kpi);
+
+  @SelectProvider(type = Sql.class, method = "selectKpisWithDate")
+  List<Kpi> selectKpisWithDate(LocalDate date);
 
 }
