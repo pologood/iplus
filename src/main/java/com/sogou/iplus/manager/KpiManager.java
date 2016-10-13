@@ -6,7 +6,6 @@
 package com.sogou.iplus.manager;
 
 import java.time.LocalDate;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -36,8 +35,6 @@ public class KpiManager {
   @Autowired
   private KpiMapper kpiMapper;
 
-  private static final Set<Kpi> EMPTY = new HashSet<>();
-
   @Transactional
   public ApiResult<?> addOrUpdate(Set<Kpi> kpis) {
     if (CollectionUtils.isEmpty(kpis)) return ApiResult.badRequest("no valid kpi records");
@@ -55,13 +52,12 @@ public class KpiManager {
   }
 
   public ApiResult<?> selectProjectsDoNotSubmitKpiOnNamedDate(LocalDate date) {
-    Map<Integer, Set<Kpi>> kpiMap = Project.getKpiMap();
+    Map<Integer, Project> projectMap = Project.getProjectMap();
     List<Kpi> kpis = kpiMapper.selectKpisWithDate(date);
-    kpis.forEach(already -> kpiMap.getOrDefault(already.getXmId(), EMPTY)
+    kpis.forEach(already -> projectMap.get(already.getXmId()).getKpis()
         .removeIf(kpi -> Objects.equals(already.getKpiId(), kpi.getKpiId())));
-    return new ApiResult<>(kpiMap.entrySet().stream().filter(e -> !e.getValue().isEmpty())
-        .map(e -> Project.getProject(e.getKey(), e.getValue(), true)).filter(Objects::nonNull)
-        .collect(Collectors.toList()));
+    return new ApiResult<>(
+        projectMap.values().stream().filter(project -> !project.getKpis().isEmpty()).collect(Collectors.toList()));
   }
 
 }
