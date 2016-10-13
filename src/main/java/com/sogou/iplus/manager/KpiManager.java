@@ -60,7 +60,8 @@ public class KpiManager {
     kpis.forEach(already -> kpiMap.getOrDefault(already.getXmId(), EMPTY)
         .removeIf(kpi -> Objects.equals(already.getKpiId(), kpi.getKpiId())));
     return new ApiResult<>(kpiMap.entrySet().stream().filter(e -> !e.getValue().isEmpty())
-        .collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue())));
+        .map(e -> Project.getProject(e.getKey(), e.getValue(), true)).filter(Objects::nonNull)
+        .collect(Collectors.toList()));
   }
 
 }
