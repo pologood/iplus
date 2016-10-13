@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.jsondoc.core.annotation.ApiObject;
 import org.jsondoc.core.annotation.ApiObjectField;
@@ -90,6 +91,12 @@ public class Project {
 
   @JsonIgnore
   public transient static final Map<Integer, Map<String, Project>> PROJECT_MAP = new HashMap<>();
+
+  @JsonIgnore
+  public transient static final Map<Integer, Set<Kpi>> KPI_MAP = new HashMap<>();
+
+  @JsonIgnore
+  public transient static final Map<Integer, Project> KPI_PROJECT_MAP = new HashMap<>();
 
   static {
     //desktop
@@ -173,7 +180,7 @@ public class Project {
         BusinessUnit.marketing));
     PROJECTS.add(new Project(
         36, "p1n4c7b51qnqqcx8", "RPM", Sets.newHashSet(new Kpi(73, "PC搜狗浏览器起始页RPM(元/千次)"),
-            new Kpi(74, "无线QQ浏览器RPM(元/千次)"), new Kpi(74, "PC搜索RPM(优质)(元/千次)"), new Kpi(76, "无线搜索RPM(元/千次)")),
+            new Kpi(74, "无线QQ浏览器RPM(元/千次)"), new Kpi(75, "PC搜索RPM(优质)(元/千次)"), new Kpi(76, "无线搜索RPM(元/千次)")),
         BusinessUnit.marketing));
 
     //sugar cat
@@ -185,5 +192,26 @@ public class Project {
 
     PROJECTS.forEach(project -> PROJECT_MAP.computeIfAbsent(project.getProjectId(), key -> new HashMap<>())
         .put(project.getProjectKey(), project));
+
+    PROJECTS.forEach(
+        project -> KPI_MAP.computeIfAbsent(project.getProjectId(), key -> new HashSet<>()).addAll(project.getKpis()));
+
+    PROJECTS.forEach(project -> project.kpis.forEach(kpi -> KPI_PROJECT_MAP.put(kpi.getKpiId(), project)));
+  }
+
+  public static Map<Integer, Set<Kpi>> getKpiMap() {
+    Map<Integer, Set<Kpi>> result = new HashMap<>();
+    KPI_MAP.entrySet().stream().forEach(
+        e -> result.put(e.getKey(), e.getValue().stream().map(kpi -> kpi.clone()).collect(Collectors.toSet())));
+    return result;
+  }
+
+  public static Set<Project> getProjects() {
+    return PROJECTS.stream().map(project -> project.clone()).collect(Collectors.toSet());
+  }
+
+  public Project clone() {
+    return new Project(projectId, projectKey, projectName,
+        kpis.stream().map(kpi -> kpi.clone()).collect(Collectors.toSet()), businessUnit);
   }
 }

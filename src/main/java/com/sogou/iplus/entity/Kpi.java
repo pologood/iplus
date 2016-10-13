@@ -9,12 +9,12 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Objects;
 
-import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.apache.commons.lang3.builder.ToStringStyle;
 import org.jsondoc.core.annotation.ApiObject;
 import org.jsondoc.core.annotation.ApiObjectField;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import commons.utils.JsonHelper;
 
 //--------------------- Change Logs----------------------
 //@author wangwenlong Initial Created at 2016年10月11日;
@@ -109,7 +109,12 @@ public class Kpi {
 
   @Override
   public String toString() {
-    return ToStringBuilder.reflectionToString(this, ToStringStyle.SHORT_PREFIX_STYLE);
+    return JsonHelper.writeValueAsString(this);
+  }
+
+  @Override
+  public int hashCode() {
+    return kpiId.hashCode();
   }
 
   @Override
@@ -118,6 +123,10 @@ public class Kpi {
     Kpi another = (Kpi) o;
     return Objects.equals(this.kpiId, another.getKpiId()) && Objects.equals(this.kpi, another.getKpi())
         && Objects.equals(this.createDate, another.getCreateDate());
+  }
+
+  public Kpi clone() {
+    return new Kpi(xmId, kpiId, kpiName, kpi, createDate);
   }
 
 }
