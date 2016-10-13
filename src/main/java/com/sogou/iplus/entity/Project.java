@@ -8,6 +8,7 @@ package com.sogou.iplus.entity;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -31,10 +32,16 @@ public class Project {
     this.businessUnit = businessUnit;
   }
 
+  public Project(Project project) {
+    this(project.getProjectId(), project.getProjectKey(), project.getProjectName(),
+        project.getKpis().stream().map(kpi -> new Kpi(kpi)).collect(Collectors.toSet()), project.getBusinessUnit());
+  }
+
   @ApiObjectField(description = "项目id", required = true)
   private Integer projectId;
 
   @ApiObjectField(description = "项目秘钥", required = true)
+  @JsonIgnore
   private String projectKey;
 
   @ApiObjectField(description = "项目名称")
@@ -94,9 +101,6 @@ public class Project {
 
   @JsonIgnore
   public transient static final Map<Integer, Set<Kpi>> KPI_MAP = new HashMap<>();
-
-  @JsonIgnore
-  public transient static final Map<Integer, Project> KPI_PROJECT_MAP = new HashMap<>();
 
   static {
     //desktop
@@ -195,23 +199,21 @@ public class Project {
 
     PROJECTS.forEach(
         project -> KPI_MAP.computeIfAbsent(project.getProjectId(), key -> new HashSet<>()).addAll(project.getKpis()));
-
-    PROJECTS.forEach(project -> project.kpis.forEach(kpi -> KPI_PROJECT_MAP.put(kpi.getKpiId(), project)));
   }
 
   public static Map<Integer, Set<Kpi>> getKpiMap() {
     Map<Integer, Set<Kpi>> result = new HashMap<>();
     KPI_MAP.entrySet().stream().forEach(
-        e -> result.put(e.getKey(), e.getValue().stream().map(kpi -> kpi.clone()).collect(Collectors.toSet())));
+        e -> result.put(e.getKey(), e.getValue().stream().map(kpi -> new Kpi(kpi)).collect(Collectors.toSet())));
     return result;
   }
 
-  public static Set<Project> getProjects() {
-    return PROJECTS.stream().map(project -> project.clone()).collect(Collectors.toSet());
-  }
-
-  public Project clone() {
-    return new Project(projectId, projectKey, projectName,
-        kpis.stream().map(kpi -> kpi.clone()).collect(Collectors.toSet()), businessUnit);
+  public static Project getProject(Integer projectId, Set<Kpi> kpis, boolean withNewKpis) {
+    Optional<Project> optionalProject = PROJECT_MAP.getOrDefault(projectId, new HashMap<>()).values().stream()
+        .filter(project -> project.getKpis().containsAll(kpis)).findFirst();
+    if (!optionalProject.isPresent()) return null;
+    Project result = new Project(optionalProject.get());
+    if (withNewKpis) result.setKpis(kpis);
+    return result;
   }
 }
