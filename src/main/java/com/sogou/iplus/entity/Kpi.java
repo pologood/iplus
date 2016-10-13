@@ -117,11 +117,6 @@ public class Kpi {
   }
 
   @Override
-  public int hashCode() {
-    return kpiId.hashCode();
-  }
-
-  @Override
   public boolean equals(Object o) {
     if (Objects.isNull(o) || !(o instanceof Kpi)) return false;
     Kpi another = (Kpi) o;
