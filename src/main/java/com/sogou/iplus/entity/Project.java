@@ -5,7 +5,6 @@
  */
 package com.sogou.iplus.entity;
 
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -31,10 +30,16 @@ public class Project {
     this.businessUnit = businessUnit;
   }
 
+  public Project(Project project) {
+    this(project.getProjectId(), project.getProjectKey(), project.getProjectName(),
+        project.getKpis().stream().map(kpi -> new Kpi(kpi)).collect(Collectors.toSet()), project.getBusinessUnit());
+  }
+
   @ApiObjectField(description = "项目id", required = true)
   private Integer projectId;
 
   @ApiObjectField(description = "项目秘钥", required = true)
+  @JsonIgnore
   private String projectKey;
 
   @ApiObjectField(description = "项目名称")
@@ -90,13 +95,7 @@ public class Project {
   public transient static final Set<Project> PROJECTS = new HashSet<>();
 
   @JsonIgnore
-  public transient static final Map<Integer, Map<String, Project>> PROJECT_MAP = new HashMap<>();
-
-  @JsonIgnore
-  public transient static final Map<Integer, Set<Kpi>> KPI_MAP = new HashMap<>();
-
-  @JsonIgnore
-  public transient static final Map<Integer, Project> KPI_PROJECT_MAP = new HashMap<>();
+  public transient static final Map<Integer, Project> PROJECT_MAP;
 
   static {
     //desktop
@@ -174,12 +173,9 @@ public class Project {
         BusinessUnit.search));
 
     //marketing
-    PROJECTS.add(new Project(36,
-        "1ou8k1pdoe4ac3lz", "消耗", Sets.newHashSet(new Kpi(68, "全部竞价日均消耗(万元)"), new Kpi(69, "PC搜索日均消耗(万元)"),
-            new Kpi(70, "无线搜索日均消耗(万元)"), new Kpi(71, "网盟日均消耗(万元)"), new Kpi(72, "银河皓月日均消耗(万元)")),
-        BusinessUnit.marketing));
-    PROJECTS.add(new Project(
-        36, "p1n4c7b51qnqqcx8", "RPM", Sets.newHashSet(new Kpi(73, "PC搜狗浏览器起始页RPM(元/千次)"),
+    PROJECTS.add(new Project(36, "1ou8k1pdoe4ac3lz", "消耗&RPM",
+        Sets.newHashSet(new Kpi(68, "全部竞价日均消耗(万元)"), new Kpi(69, "PC搜索日均消耗(万元)"), new Kpi(70, "无线搜索日均消耗(万元)"),
+            new Kpi(71, "网盟日均消耗(万元)"), new Kpi(72, "银河皓月日均消耗(万元)"), new Kpi(73, "PC搜狗浏览器起始页RPM(元/千次)"),
             new Kpi(74, "无线QQ浏览器RPM(元/千次)"), new Kpi(75, "PC搜索RPM(优质)(元/千次)"), new Kpi(76, "无线搜索RPM(元/千次)")),
         BusinessUnit.marketing));
 
@@ -190,28 +186,10 @@ public class Project {
                 new Kpi(80, "糖猫APP次日留存率"), new Kpi(81, "糖猫APP7日留存率"), new Kpi(82, "糖猫APP30日留存率")),
         BusinessUnit.sugarcat));
 
-    PROJECTS.forEach(project -> PROJECT_MAP.computeIfAbsent(project.getProjectId(), key -> new HashMap<>())
-        .put(project.getProjectKey(), project));
-
-    PROJECTS.forEach(
-        project -> KPI_MAP.computeIfAbsent(project.getProjectId(), key -> new HashSet<>()).addAll(project.getKpis()));
-
-    PROJECTS.forEach(project -> project.kpis.forEach(kpi -> KPI_PROJECT_MAP.put(kpi.getKpiId(), project)));
+    PROJECT_MAP = getProjectMap();
   }
 
-  public static Map<Integer, Set<Kpi>> getKpiMap() {
-    Map<Integer, Set<Kpi>> result = new HashMap<>();
-    KPI_MAP.entrySet().stream().forEach(
-        e -> result.put(e.getKey(), e.getValue().stream().map(kpi -> kpi.clone()).collect(Collectors.toSet())));
-    return result;
-  }
-
-  public static Set<Project> getProjects() {
-    return PROJECTS.stream().map(project -> project.clone()).collect(Collectors.toSet());
-  }
-
-  public Project clone() {
-    return new Project(projectId, projectKey, projectName,
-        kpis.stream().map(kpi -> kpi.clone()).collect(Collectors.toSet()), businessUnit);
+  public static Map<Integer, Project> getProjectMap() {
+    return PROJECTS.stream().collect(Collectors.toMap(p -> p.getProjectId(), p -> new Project(p)));
   }
 }

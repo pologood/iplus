@@ -33,6 +33,10 @@ public class Kpi {
     this.createDate = createDate;
   }
 
+  public Kpi(Kpi kpi) {
+    this(kpi.getXmId(), kpi.getKpiId(), kpi.getKpiName(), kpi.getKpi(), kpi.getCreateDate());
+  }
+
   public Kpi(int kpiId, String kpiName) {
     this(null, kpiId, kpiName, null, null);
   }
@@ -113,20 +117,10 @@ public class Kpi {
   }
 
   @Override
-  public int hashCode() {
-    return kpiId.hashCode();
-  }
-
-  @Override
   public boolean equals(Object o) {
     if (Objects.isNull(o) || !(o instanceof Kpi)) return false;
     Kpi another = (Kpi) o;
     return Objects.equals(this.kpiId, another.getKpiId()) && Objects.equals(this.kpi, another.getKpi())
         && Objects.equals(this.createDate, another.getCreateDate());
   }
-
-  public Kpi clone() {
-    return new Kpi(xmId, kpiId, kpiName, kpi, createDate);
-  }
-
 }

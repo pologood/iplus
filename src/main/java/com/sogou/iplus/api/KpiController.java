@@ -8,14 +8,12 @@ package com.sogou.iplus.api;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jsondoc.core.annotation.Api;
 import org.jsondoc.core.annotation.ApiMethod;
@@ -50,10 +48,9 @@ public class KpiController {
       @ApiQueryParam(name = "xmId", description = "项目id") @RequestParam int xmId,
       @ApiQueryParam(name = "xmKey", description = "项目秘钥") @RequestParam String xmKey,
       @ApiQueryParam(name = "date", description = "kpi日期", format = "yyyy-MM-dd", required = false) @RequestParam @DateTimeFormat(iso = ISO.DATE) Optional<LocalDate> date) {
-    Map<String, Project> map = Project.PROJECT_MAP.get(xmId);
-    if (MapUtils.isEmpty(map)) return ApiResult.badRequest("invalid xmId");
-    Project project = map.get(xmKey);
-    if (Objects.isNull(project)) return ApiResult.badRequest("invalid xmkey");
+    Project project = Project.PROJECT_MAP.get(xmId);
+    if (Objects.isNull(project)) return ApiResult.badRequest("invalid xmId");
+    if (!Objects.equals(project.getProjectKey(), xmKey)) return ApiResult.forbidden();
     LocalDate time = date.orElse(LocalDate.now().minusDays(1));
     Set<Kpi> kpis = new HashSet<>();
     String kpiStr;
@@ -65,7 +62,7 @@ public class KpiController {
 
   @ApiMethod(description = "select projects do not submit kpi on named date")
   @RequestMapping(value = "/kpi/null", method = RequestMethod.GET)
-  public ApiResult<?> add(
+  public ApiResult<?> selectProjectsDoNotSubmitKpiOnNamedDate(
       @ApiQueryParam(name = "date", description = "kpi日期", format = "yyyy-MM-dd", required = false) @RequestParam @DateTimeFormat(iso = ISO.DATE) Optional<LocalDate> date) {
     return kpiManager.selectProjectsDoNotSubmitKpiOnNamedDate(date.orElse(LocalDate.now().minusDays(1)));
   }
