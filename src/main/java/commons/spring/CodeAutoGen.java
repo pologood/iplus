@@ -6,9 +6,7 @@ import org.jsondoc.core.annotation.*;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.datasource.SingleConnectionDataSource;
-import org.springframework.validation.*;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.http.*;
 import static org.springframework.util.StringUtils.*;
 
 @Api(name = "CodeAutoGen API",

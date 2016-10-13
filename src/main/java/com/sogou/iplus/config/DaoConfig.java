@@ -1,6 +1,5 @@
 package com.sogou.iplus.config;
 
-import java.util.*;
 import javax.sql.DataSource;
 import com.alibaba.druid.pool.DruidDataSource;
 import org.mybatis.spring.annotation.MapperScan;
@@ -22,7 +21,9 @@ import commons.utils.*;
 @EnableTransactionManagement
 @MapperScan(basePackages = ProjectInfo.MAPPER_PKG, sqlSessionFactoryRef = "sqlSessionFactory")
 public class DaoConfig {
-  @Autowired Environment env;
+
+  @Autowired
+  Environment env;
 
   @Bean(initMethod = "init", destroyMethod = "close")
   public DataSource dataSource() {
@@ -46,12 +47,9 @@ public class DaoConfig {
     SqlSessionFactoryBean sqlSessionFactoryBean = new SqlSessionFactoryBean();
     sqlSessionFactoryBean.setDataSource(dataSource());
 
-    TypeHandler[] handlers = new TypeHandler[] {
-      new LocalDateTimeTypeHandler(),
-      new LocalDateTypeHandler(),
-    };
+    TypeHandler<?>[] handlers = new TypeHandler[] { new LocalDateTimeTypeHandler(), new LocalDateTypeHandler() };
     sqlSessionFactoryBean.setTypeHandlers(handlers);
-    
+
     SqlSessionFactory sqlSessionFactory = (SqlSessionFactory) sqlSessionFactoryBean.getObject();
 
     org.apache.ibatis.session.Configuration configuration = sqlSessionFactory.getConfiguration();
@@ -61,8 +59,8 @@ public class DaoConfig {
     configuration.setLazyLoadingEnabled(false);
     configuration.setAggressiveLazyLoading(true);
     configuration.setDefaultStatementTimeout(300);
-    MyBatisHelper.registerEnumHandler(
-      configuration.getTypeHandlerRegistry(), EnumValueTypeHandler.class, ProjectInfo.PKG_PREFIX);
+    MyBatisHelper.registerEnumHandler(configuration.getTypeHandlerRegistry(), EnumValueTypeHandler.class,
+        ProjectInfo.PKG_PREFIX);
 
     return sqlSessionFactory;
   }
@@ -72,7 +70,8 @@ public class DaoConfig {
     return new DataSourceTransactionManager(dataSource());
   }
 
-  @Bean SimpleTransactionTemplate simpleTransactionTemplate() {
+  @Bean
+  SimpleTransactionTemplate simpleTransactionTemplate() {
     TransactionTemplate tt = new TransactionTemplate(transactionManager());
     return new SimpleTransactionTemplate(tt);
   }

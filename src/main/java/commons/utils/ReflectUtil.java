@@ -17,7 +17,7 @@ public class ReflectUtil {
 
       List<Class<? extends Enum<?>>> enums = new ArrayList<>();
       for (BeanDefinition bean: classSet) {
-        Class clazz = Class.forName(bean.getBeanClassName());
+        Class<?> clazz = Class.forName(bean.getBeanClassName());
         if (clazz.isEnum()) {
           enums.add((Class<? extends Enum<?>>) clazz);
         }

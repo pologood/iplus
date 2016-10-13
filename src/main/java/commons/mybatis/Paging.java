@@ -172,10 +172,9 @@ public class Paging extends HashMap<String, Object> {
     }
   }
 
-  public static <T extends Comparable> List<Page<T>> pages(List<T> list, int count) {
+  public static <T extends Comparable<T>> List<Page<T>> pages(List<T> list, int count) {
     List<Page<T>> pageList = new ArrayList<>();
     if (list.size() >= 2) {
-      @SuppressWarnings("unchecked")
       int r = list.get(0).compareTo(list.get(1));
       if (r < 0) Collections.reverse(list);
     }
