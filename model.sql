@@ -7,5 +7,5 @@ CREATE TABLE `kpi` (
   `kpiId` INT(10) NOT NULL COMMENT 'kpiId',
   `kpi` DECIMAL(12,2) NOT NULL COMMENT 'kpi',
   `createDate` DATE NOT NULL DEFAULT 0 COMMENT 'kpi时间',
-  UNIQUE KEY `xmid_kpiid_createdate_idx` (`xmId`, `kpiId`, `createDate`),
+  UNIQUE KEY `xmid_kpiid_createdate_idx` (`xmId`, `kpiId`, `createDate`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=COMPACT;
