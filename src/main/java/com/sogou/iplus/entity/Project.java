@@ -102,9 +102,11 @@ public class Project {
     PROJECTS.add(new Project(70, "j0a37izra1v4n4k0", "输入法-PC输入法",
         Sets.newHashSet(new Kpi(1, "PC输入法日活跃用户数(万)"), new Kpi(2, "PC输入法灵犀日搜索量(万)")), BusinessUnit.desktop));
     PROJECTS.add(new Project(78, "mxvqf109b7kbyfad", "输入法-手机输入法",
-        Sets.newHashSet(new Kpi(3, "手机输入法日活跃用户数(万)"), new Kpi(4, "手机输入法ios版日活跃用户数(万)"),
+        Sets.newHashSet(new Kpi(3, "手机输入法日活跃用户数(万)"), new Kpi(4, "手机输入法iOS版日活跃用户数(万)"),
             new Kpi(5, "手机输入法Android版日活跃用户数(万)"), new Kpi(6, "手机输入法灵犀日搜索量(万)"), new Kpi(7, "手机输入法日激活量(万)"),
-            new Kpi(8, "手机输入法次日留存率"), new Kpi(9, "手机输入法7日留存率"), new Kpi(10, "手机输入法30日留存率")),
+            new Kpi(101, "手机输入法Android版次日留存率"), new Kpi(102, "手机输入法Android版第7日留存率"),
+            new Kpi(103, "手机输入法Android版第30日留存率"), new Kpi(104, "手机输入法iOS版次日留存率"), new Kpi(105, "手机输入法iOS版第7日留存率"),
+            new Kpi(106, "手机输入法iOS版第30日留存率")),
         BusinessUnit.desktop));
     PROJECTS.add(new Project(157, "u9h63f6k3kxy1qfc", "输入法-QQ输入法",
         Sets.newHashSet(new Kpi(11, "QQ输入法Windows版日活跃用户数(万)"), new Kpi(12, "QQ输入法Android版日活跃用户数(万)")),
@@ -112,12 +114,12 @@ public class Project {
     PROJECTS.add(new Project(68, "2ej50d9vfy9aa486", "浏览器-PC浏览器",
         Sets.newHashSet(new Kpi(13, "PC浏览器日主动活跃用户数(万)"), new Kpi(14, "PC浏览器给搜索带来的自有网页PC搜索日搜索量(万)")),
         BusinessUnit.desktop));
-    PROJECTS
-        .add(new Project(76, "423ftqdz3cyjpa14", "浏览器-手机浏览器",
-            Sets.newHashSet(new Kpi(15, "手机浏览器日活跃用户数(万)"), new Kpi(16, "手机浏览器给搜索带去的日搜索量(万)"),
-                new Kpi(17, "手机浏览器日激活量(万)"), new Kpi(18, "手机浏览器次日留存率"), new Kpi(19, "手机浏览器7日留存率"),
-                new Kpi(20, "手机浏览器30日留存率")),
-            BusinessUnit.desktop));
+    PROJECTS.add(new Project(76, "423ftqdz3cyjpa14", "浏览器-手机浏览器",
+        Sets.newHashSet(new Kpi(15, "手机浏览器日活跃用户数(万)"), new Kpi(16, "手机浏览器给搜索带去的日搜索量(万)"), new Kpi(17, "手机浏览器日激活量(万)"),
+            new Kpi(107, "手机浏览器Android版次日留存率"), new Kpi(108, "手机浏览器Android版第7日留存率"),
+            new Kpi(109, "手机浏览器Android版第30日留存率"), new Kpi(110, "手机浏览器iOS版次日留存率"), new Kpi(111, "手机浏览器iOS版第7日留存率"),
+            new Kpi(112, "手机浏览器iOS版第30日留存率")),
+        BusinessUnit.desktop));
     PROJECTS.add(new Project(260,
         "zmit8fzhdlyqj5hd", "导航", Sets.newHashSet(new Kpi(21, "导航合计用户数(万)"), new Kpi(22, "搜狗导航自有活跃用户数(万)"),
             new Kpi(23, "搜狗导航外购活跃用户数(万)"), new Kpi(24, "QQ独立导航活跃用户数(万)"), new Kpi(25, "QQ浏览器中QQ导航活跃用户数(万)")),
@@ -127,14 +129,13 @@ public class Project {
     PROJECTS
         .add(new Project(322, "hw9cfh7zaor7kuwd",
             "个性化", Sets.newHashSet(new Kpi(27, "个性化阅读日活跃用户数(万)"), new Kpi(28, "个性化阅读日激活量(万)"),
-                new Kpi(29, "个性化阅读次日留存率"), new Kpi(30, "个性化阅读7日留存率"), new Kpi(31, "个性化阅读30日留存率")),
+                new Kpi(29, "个性化阅读次日留存率"), new Kpi(30, "个性化阅读第7日留存率"), new Kpi(31, "个性化阅读第30日留存率")),
         BusinessUnit.desktop));
-    PROJECTS
-        .add(
-            new Project(148, "h0wb4btxx2xm56xp",
-                "手机地图", Sets.newHashSet(new Kpi(32, "手机地图日活跃用户数(万)"), new Kpi(33, "手机地图日激活量(万)"),
-                    new Kpi(34, "手机地图次日留存率"), new Kpi(35, "手机地图7日留存率"), new Kpi(36, "手机地图30日留存率")),
-            BusinessUnit.desktop));
+    PROJECTS.add(new Project(148, "h0wb4btxx2xm56xp", "手机地图",
+        Sets.newHashSet(new Kpi(32, "手机地图日活跃用户数(万)"), new Kpi(33, "手机地图日激活量(万)"), new Kpi(113, "手机地图Android版次日留存率"),
+            new Kpi(114, "手机地图Android版7日留存率"), new Kpi(115, "手机地图Android版30日留存率"), new Kpi(116, "手机地图iOS版次日留存率"),
+            new Kpi(117, "手机地图iOS版7日留存率"), new Kpi(118, "手机地图iOS版30日留存率")),
+        BusinessUnit.desktop));
 
     //search
     PROJECTS.add(new Project(137, "sp6jmm92s2p1u8qn", "PC网页搜索",
@@ -173,7 +174,7 @@ public class Project {
         BusinessUnit.search));
 
     //marketing
-    PROJECTS.add(new Project(36, "1ou8k1pdoe4ac3lz", "消耗&RPM",
+    PROJECTS.add(new Project(36, "1ou8k1pdoe4ac3lz", "消耗、RPM",
         Sets.newHashSet(new Kpi(68, "全部竞价日均消耗(万元)"), new Kpi(69, "PC搜索日均消耗(万元)"), new Kpi(70, "无线搜索日均消耗(万元)"),
             new Kpi(71, "网盟日均消耗(万元)"), new Kpi(72, "银河皓月日均消耗(万元)"), new Kpi(73, "PC搜狗浏览器起始页RPM(元/千次)"),
             new Kpi(74, "无线QQ浏览器RPM(元/千次)"), new Kpi(75, "PC搜索RPM(优质)(元/千次)"), new Kpi(76, "无线搜索RPM(元/千次)")),
