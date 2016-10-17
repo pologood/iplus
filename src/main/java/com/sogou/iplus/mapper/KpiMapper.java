@@ -8,6 +8,7 @@ package com.sogou.iplus.mapper;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import org.apache.ibatis.annotations.InsertProvider;
 import org.apache.ibatis.annotations.Options;
@@ -53,7 +54,7 @@ public interface KpiMapper {
     public static String selectKpisWithDateAndProjectId(Map<String, Object> map) {
       SQL sql = new SQL().SELECT(ITEMS).FROM(TABLE).WHERE("createDate >= #{beginDate}")
           .WHERE("createDate <= #{endDate}");
-      if (map.containsKey("projectId")) sql.WHERE("xmId = #{projectId}");
+      if (Objects.nonNull(map.get("projectId"))) sql.WHERE("xmId = #{projectId}");
       return sql.toString();
     }
   }
