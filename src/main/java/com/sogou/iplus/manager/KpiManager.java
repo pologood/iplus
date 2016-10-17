@@ -6,9 +6,11 @@
 package com.sogou.iplus.manager;
 
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -58,6 +60,20 @@ public class KpiManager {
         .removeIf(kpi -> Objects.equals(already.getKpiId(), kpi.getKpiId())));
     return new ApiResult<>(
         projectMap.values().stream().filter(project -> !project.getKpis().isEmpty()).collect(Collectors.toList()));
+  }
+
+  public ApiResult<?> selectKpisWithDateAndProjectId(Optional<Integer> projectId, LocalDate beginDate,
+      LocalDate endDate) {
+    Map<LocalDate, Map<Integer, Project>> map = new HashMap<>();
+    List<Kpi> kpis = kpiMapper.selectKpisWithDateAndProjectId(projectId.orElse(null), beginDate, endDate);
+    kpis.forEach(
+        kpi -> map.computeIfAbsent(kpi.getCreateDate(), k -> new HashMap<>()).computeIfAbsent(kpi.getXmId(), k -> {
+          Project project = Project.getProjectByKpiId(kpi.getKpiId());
+          project.getKpis().clear();
+          return project;
+        }).getKpis().add(kpi));
+    return new ApiResult<>(
+        map.entrySet().stream().collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue().values())));
   }
 
 }

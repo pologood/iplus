@@ -5,8 +5,10 @@
  */
 package com.sogou.iplus.entity;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -15,6 +17,8 @@ import org.jsondoc.core.annotation.ApiObjectField;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.common.collect.Sets;
+
+import commons.utils.JsonHelper;
 
 //--------------------- Change Logs----------------------
 //@author wangwenlong Initial Created at 2016年10月11日;
@@ -96,6 +100,9 @@ public class Project {
 
   @JsonIgnore
   public transient static final Map<Integer, Project> PROJECT_MAP;
+
+  @JsonIgnore
+  public transient static final Map<Integer, Project> KPI_MAP = new HashMap<>();
 
   static {
     //desktop
@@ -188,9 +195,21 @@ public class Project {
         BusinessUnit.sugarcat));
 
     PROJECT_MAP = getProjectMap();
+
+    PROJECTS.forEach(project -> project.kpis.forEach(kpi -> KPI_MAP.put(kpi.getKpiId(), project)));
+  }
+
+  public static Project getProjectByKpiId(int kpiId) {
+    Project project = KPI_MAP.get(kpiId);
+    return Objects.isNull(project) ? null : new Project(project);
   }
 
   public static Map<Integer, Project> getProjectMap() {
     return PROJECTS.stream().collect(Collectors.toMap(p -> p.getProjectId(), p -> new Project(p)));
+  }
+
+  @Override
+  public String toString() {
+    return JsonHelper.writeValueAsString(this);
   }
 }
