@@ -20,4 +20,12 @@ EXPECT {
   json.code = 0
 }
 
+GET("/api/kpi") {
+  r.body = [beginDate: '2015-11-11', endDate:'2015-11-11']
+}
+EXPECT {
+  json.code = 0
+  json.data = NotEmpty
+}
+
 STAT()
