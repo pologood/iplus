@@ -66,4 +66,13 @@ public class KpiController {
       @ApiQueryParam(name = "date", description = "kpi日期", format = "yyyy-MM-dd", required = false) @RequestParam @DateTimeFormat(iso = ISO.DATE) Optional<LocalDate> date) {
     return kpiManager.selectProjectsDoNotSubmitKpiOnNamedDate(date.orElse(LocalDate.now().minusDays(1)));
   }
+
+  @ApiMethod(description = "select kpis")
+  @RequestMapping(value = "/kpi", method = RequestMethod.GET)
+  public ApiResult<?> selectKpisWithDateAndProjectId(
+      @ApiQueryParam(name = "projectId", description = "项目Id") @RequestParam Optional<Integer> projectId,
+      @ApiQueryParam(name = "beginDate", description = "起始日期", format = "yyyy-MM-dd") @RequestParam @DateTimeFormat(iso = ISO.DATE) LocalDate beginDate,
+      @ApiQueryParam(name = "endDate", description = "结束日期", format = "yyyy-MM-dd") @RequestParam @DateTimeFormat(iso = ISO.DATE) LocalDate endDate) {
+    return kpiManager.selectKpisWithDateAndProjectId(projectId, beginDate, endDate);
+  }
 }

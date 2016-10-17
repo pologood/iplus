@@ -7,9 +7,11 @@ package com.sogou.iplus.mapper;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.ibatis.annotations.InsertProvider;
 import org.apache.ibatis.annotations.Options;
+import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.annotations.UpdateProvider;
 import org.apache.ibatis.jdbc.SQL;
@@ -48,6 +50,12 @@ public interface KpiMapper {
       return new SQL().SELECT(ITEMS).FROM(TABLE).WHERE("createDate = #{createDate}").toString();
     }
 
+    public static String selectKpisWithDateAndProjectId(Map<String, Object> map) {
+      SQL sql = new SQL().SELECT(ITEMS).FROM(TABLE).WHERE("createDate >= #{beginDate}")
+          .WHERE("createDate <= #{endDate}");
+      if (map.containsKey("projectId")) sql.WHERE("xmId = #{projectId}");
+      return sql.toString();
+    }
   }
 
   @InsertProvider(type = Sql.class, method = "add")
@@ -62,5 +70,9 @@ public interface KpiMapper {
 
   @SelectProvider(type = Sql.class, method = "selectKpisWithDate")
   List<Kpi> selectKpisWithDate(LocalDate date);
+
+  @SelectProvider(type = Sql.class, method = "selectKpisWithDateAndProjectId")
+  List<Kpi> selectKpisWithDateAndProjectId(@Param("projectId") Integer projectId,
+      @Param("beginDate") LocalDate beginDate, @Param("endDate") LocalDate endDate);
 
 }

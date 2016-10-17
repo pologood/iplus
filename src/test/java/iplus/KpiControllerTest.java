@@ -81,4 +81,13 @@ public class KpiControllerTest {
         .filter(project -> Objects.equals(testProjectId, project.getProjectId())).count());
   }
 
+  @Test
+  public void select() {
+    ApiResult<?> result = controller.selectKpisWithDateAndProjectId(Optional.of(70), date, LocalDate.now());
+    Assert.assertEquals(result.getCode(), ApiResult.ok().getCode());
+    Map<?, ?> map = (Map<?, ?>) result.getData();
+    System.out.println(map);
+    Assert.assertFalse(map.isEmpty());
+  }
+
 }
