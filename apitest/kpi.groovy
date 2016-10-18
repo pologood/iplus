@@ -14,14 +14,14 @@ EXPECT {
 }
 
 GET("/api/kpi/null") {
-  r.body = [date: '2015-11-11']
+  r.query = [date: '2015-11-11']
 }
 EXPECT {
   json.code = 0
 }
 
 GET("/api/kpi") {
-  r.body = [beginDate: '2015-11-11', endDate:'2015-11-11']
+  r.query = [beginDate: '2015-11-11', endDate:'2015-11-11']
 }
 EXPECT {
   json.code = 0
