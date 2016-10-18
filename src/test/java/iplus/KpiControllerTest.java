@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
@@ -83,7 +84,34 @@ public class KpiControllerTest {
 
   @Test
   public void select() {
-    ApiResult<?> result = controller.selectKpisWithDateAndProjectId(Optional.of(70), date, LocalDate.now());
+    ApiResult<?> result = controller.selectKpisWithDateAndProjectId(Optional.of(testProjectId), date, LocalDate.now());
+    Assert.assertEquals(result.getCode(), ApiResult.ok().getCode());
+    Map<?, ?> map = (Map<?, ?>) result.getData();
+    System.out.println(map);
+    Assert.assertFalse(map.isEmpty());
+  }
+
+  @Test
+  public void listProjects() {
+    ApiResult<?> result = controller.listProjects();
+    Assert.assertEquals(result.getCode(), ApiResult.ok().getCode());
+    Set<?> set = (Set<?>) result.getData();
+    System.out.println(set);
+    Assert.assertFalse(set.isEmpty());
+  }
+
+  @Test
+  public void listProjectKpis() {
+    ApiResult<?> result = controller.listKpis(70);
+    Assert.assertEquals(result.getCode(), ApiResult.ok().getCode());
+    Set<?> set = (Set<?>) result.getData();
+    System.out.println(set);
+    Assert.assertFalse(set.isEmpty());
+  }
+
+  @Test
+  public void select2() {
+    ApiResult<?> result = controller.selectKpisWithDateAndProjectId(testProjectId, date);
     Assert.assertEquals(result.getCode(), ApiResult.ok().getCode());
     Map<?, ?> map = (Map<?, ?>) result.getData();
     System.out.println(map);

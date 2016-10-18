@@ -70,7 +70,7 @@ public class KpiController {
   @ApiMethod(description = "select kpis")
   @RequestMapping(value = "/kpi", method = RequestMethod.GET)
   public ApiResult<?> selectKpisWithDateAndProjectId(
-      @ApiQueryParam(name = "projectId", description = "项目Id") @RequestParam Optional<Integer> projectId,
+      @ApiQueryParam(name = "projectId", description = "项目Id", required = false) @RequestParam Optional<Integer> projectId,
       @ApiQueryParam(name = "beginDate", description = "起始日期", format = "yyyy-MM-dd") @RequestParam @DateTimeFormat(iso = ISO.DATE) LocalDate beginDate,
       @ApiQueryParam(name = "endDate", description = "结束日期", format = "yyyy-MM-dd") @RequestParam @DateTimeFormat(iso = ISO.DATE) LocalDate endDate) {
     return kpiManager.selectKpisWithDateAndProjectId(projectId, beginDate, endDate);
@@ -80,5 +80,19 @@ public class KpiController {
   @RequestMapping(value = "/project", method = RequestMethod.GET)
   public ApiResult<?> listProjects() {
     return new ApiResult<>(Project.PROJECTS);
+  }
+
+  @ApiMethod(description = "list kpis")
+  @RequestMapping(value = "/project/kpi", method = RequestMethod.GET)
+  public ApiResult<?> listKpis(@ApiQueryParam(name = "projectId", description = "项目Id") @RequestParam int projectId) {
+    return new ApiResult<>(Project.PROJECT_MAP.get(projectId).getKpis());
+  }
+
+  @ApiMethod(description = "select kpis on named date")
+  @RequestMapping(value = "/kpi/project", method = RequestMethod.GET)
+  public ApiResult<?> selectKpisWithDateAndProjectId(
+      @ApiQueryParam(name = "projectId", description = "项目Id") @RequestParam int projectId,
+      @ApiQueryParam(name = "date", description = "起始日期", format = "yyyy-MM-dd") @RequestParam @DateTimeFormat(iso = ISO.DATE) LocalDate date) {
+    return kpiManager.selectKpisWithDateAndProjectId(projectId, date);
   }
 }
