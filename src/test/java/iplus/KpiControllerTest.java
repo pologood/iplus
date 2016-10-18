@@ -64,7 +64,7 @@ public class KpiControllerTest {
     project.getKpis().forEach(
         kpi -> Mockito.when(mockRequest.getParameter(kpi.getKpiId().toString())).thenReturn(kpi.getKpiId().toString()));
     controller.add(mockRequest, project.getProjectId(), project.getProjectKey(), Optional.of(date));
-    Map<Integer, Kpi> kpiMap = mapper.selectKpisWithDate(date).stream()
+    Map<Integer, Kpi> kpiMap = mapper.selectKpisWithKpiDate(date).stream()
         .collect(Collectors.toMap(kpi -> kpi.getKpiId(), kpi -> kpi));
     Assert.assertEquals(project.getKpis().size(), kpiMap.size());
     project.getKpis()
@@ -73,7 +73,7 @@ public class KpiControllerTest {
 
   @Test
   public void selectNull() {
-    ApiResult<?> result = controller.selectProjectsDoNotSubmitKpiOnNamedDate(Optional.of(date));
+    ApiResult<?> result = controller.selectProjectsDoNotSubmitKpiOnNamedDate(Optional.of(LocalDate.now()));
     Assert.assertEquals(result.getCode(), ApiResult.ok().getCode());
     List<?> objects = (List<?>) result.getData();
     Assert.assertFalse(objects.isEmpty());

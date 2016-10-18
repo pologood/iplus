@@ -55,7 +55,7 @@ public class KpiManager {
 
   public ApiResult<?> selectProjectsDoNotSubmitKpiOnNamedDate(LocalDate date) {
     Map<Integer, Project> projectMap = Project.getProjectMap();
-    List<Kpi> kpis = kpiMapper.selectKpisWithDate(date);
+    List<Kpi> kpis = kpiMapper.selectKpisWithCreateDate(date);
     kpis.forEach(already -> projectMap.get(already.getXmId()).getKpis()
         .removeIf(kpi -> Objects.equals(already.getKpiId(), kpi.getKpiId())));
     return new ApiResult<>(
@@ -65,9 +65,9 @@ public class KpiManager {
   public ApiResult<?> selectKpisWithDateAndProjectId(Optional<Integer> projectId, LocalDate beginDate,
       LocalDate endDate) {
     Map<LocalDate, Map<Integer, Project>> map = new HashMap<>();
-    List<Kpi> kpis = kpiMapper.selectKpisWithDateAndProjectId(projectId.orElse(null), beginDate, endDate);
+    List<Kpi> kpis = kpiMapper.selectKpisWithKpiDateAndProjectId(projectId.orElse(null), beginDate, endDate);
     kpis.forEach(
-        kpi -> map.computeIfAbsent(kpi.getCreateDate(), k -> new HashMap<>()).computeIfAbsent(kpi.getXmId(), k -> {
+        kpi -> map.computeIfAbsent(kpi.getKpiDate(), k -> new HashMap<>()).computeIfAbsent(kpi.getXmId(), k -> {
           Project project = Project.getProjectByKpiId(kpi.getKpiId());
           project.getKpis().clear();
           return project;
