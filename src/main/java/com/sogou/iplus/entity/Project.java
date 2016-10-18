@@ -42,7 +42,6 @@ public class Project {
   @ApiObjectField(description = "项目id", required = true)
   private Integer projectId;
 
-  @ApiObjectField(description = "项目秘钥", required = true)
   @JsonIgnore
   private String projectKey;
 
@@ -105,7 +104,6 @@ public class Project {
   public transient static final Map<Integer, Project> KPI_MAP = new HashMap<>();
 
   static {
-    //desktop
     PROJECTS.add(new Project(70, "j0a37izra1v4n4k0", "输入法-PC输入法",
         Sets.newHashSet(new Kpi(1, "PC输入法日活跃用户数(万)"), new Kpi(2, "PC输入法灵犀日搜索量(万)")), BusinessUnit.desktop));
     PROJECTS.add(new Project(78, "mxvqf109b7kbyfad", "输入法-手机输入法",
@@ -143,8 +141,6 @@ public class Project {
             new Kpi(114, "手机地图Android版7日留存率"), new Kpi(115, "手机地图Android版30日留存率"), new Kpi(116, "手机地图iOS版次日留存率"),
             new Kpi(117, "手机地图iOS版7日留存率"), new Kpi(118, "手机地图iOS版30日留存率")),
         BusinessUnit.desktop));
-
-    //search
     PROJECTS.add(new Project(137, "sp6jmm92s2p1u8qn", "PC网页搜索",
         Sets.newHashSet(new Kpi(37, "PC搜狗自有渠道日搜索量(万)"), new Kpi(38, "PC腾讯渠道日搜索量(万)"), new Kpi(39, "PC外购网页日搜索量(万)")),
         BusinessUnit.search));
@@ -164,10 +160,10 @@ public class Project {
         Sets.newHashSet(new Kpi(51, "应用搜索日分发量(万)"), new Kpi(52, "软件搜索日分发量(万)")), BusinessUnit.search));
     PROJECTS.add(new Project(142, "hxuuaa7ylg2tizpp", "购物搜索", Sets.newHashSet(new Kpi(53, "PC+无线购物搜索用户量(万)")),
         BusinessUnit.search));
-    PROJECTS
-        .add(new Project(31, "1k5rg0vny4y1htl2", "小说搜索",
-            Sets.newHashSet(new Kpi(54, "小说搜索搜索量(万)"), new Kpi(55, "阅读APP(iOS+Android)日活跃用户数(万)"),
-                new Kpi(56, "阅读APP次日留存率"), new Kpi(57, "阅读APP7日留存率"), new Kpi(58, "阅读APP30日留存率")),
+    PROJECTS.add(new Project(31, "1k5rg0vny4y1htl2", "小说搜索",
+        Sets.newHashSet(new Kpi(54, "小说搜索搜索量(万)"), new Kpi(55, "阅读APP(iOS+Android)日活跃用户数(万)"),
+            new Kpi(201, "阅读APPAndroid版次日留存率"), new Kpi(202, "阅读APPAndroid版7日留存率"), new Kpi(203, "阅读APPAndroid版30日留存率"),
+            new Kpi(204, "阅读APPiOS版次日留存率"), new Kpi(205, "阅读APPiOS版7日留存率"), new Kpi(206, "阅读APPiOS版30日留存率")),
         BusinessUnit.search));
     PROJECTS
         .add(
@@ -179,15 +175,11 @@ public class Project {
         "zvn6s7zwq56ri18y", "中医项目", Sets.newHashSet(new Kpi(63, "中医项目App日活"), new Kpi(64, "中医项目App次日留存率"),
             new Kpi(65, "中医项目App7日留存率"), new Kpi(66, "中医项目App30日留存率"), new Kpi(67, "中医项目App总激活数")),
         BusinessUnit.search));
-
-    //marketing
     PROJECTS.add(new Project(36, "1ou8k1pdoe4ac3lz", "消耗、RPM",
         Sets.newHashSet(new Kpi(68, "全部竞价日均消耗(万元)"), new Kpi(69, "PC搜索日均消耗(万元)"), new Kpi(70, "无线搜索日均消耗(万元)"),
             new Kpi(71, "网盟日均消耗(万元)"), new Kpi(72, "银河皓月日均消耗(万元)"), new Kpi(73, "PC搜狗浏览器起始页RPM(元/千次)"),
             new Kpi(74, "无线QQ浏览器RPM(元/千次)"), new Kpi(75, "PC搜索RPM(优质)(元/千次)"), new Kpi(76, "无线搜索RPM(元/千次)")),
         BusinessUnit.marketing));
-
-    //sugar cat
     PROJECTS
         .add(new Project(42, "qfysv8ha64crrdsc", "糖猫",
             Sets.newHashSet(new Kpi(77, "糖猫日新激活(个)"), new Kpi(78, "糖猫日活跃用户(个)"), new Kpi(79, "糖猫日活跃APP用户(个)"),
