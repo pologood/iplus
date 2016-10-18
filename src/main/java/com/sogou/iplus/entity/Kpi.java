@@ -7,6 +7,7 @@ package com.sogou.iplus.entity;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 import org.jsondoc.core.annotation.ApiObject;
@@ -25,24 +26,24 @@ public class Kpi {
   public Kpi() {
   }
 
-  public Kpi(Integer xmId, Integer kpiId, String kpiName, BigDecimal kpi, LocalDate createDate) {
+  public Kpi(Integer xmId, Integer kpiId, String kpiName, BigDecimal kpi, LocalDate kpiDate) {
     this.xmId = xmId;
     this.kpiId = kpiId;
     this.kpiName = kpiName;
     this.kpi = kpi;
-    this.createDate = createDate;
+    this.kpiDate = kpiDate;
   }
 
   public Kpi(Kpi kpi) {
-    this(kpi.getXmId(), kpi.getKpiId(), kpi.getKpiName(), kpi.getKpi(), kpi.getCreateDate());
+    this(kpi.getXmId(), kpi.getKpiId(), kpi.getKpiName(), kpi.getKpi(), kpi.getKpiDate());
   }
 
   public Kpi(int kpiId, String kpiName) {
     this(null, kpiId, kpiName, null, null);
   }
 
-  public Kpi(int xmId, Integer kpiId, BigDecimal kpi, LocalDate createDate) {
-    this(xmId, kpiId, null, kpi, createDate);
+  public Kpi(int xmId, Integer kpiId, BigDecimal kpi, LocalDate kpiDate) {
+    this(xmId, kpiId, null, kpi, kpiDate);
   }
 
   @JsonIgnore
@@ -61,7 +62,13 @@ public class Kpi {
   private BigDecimal kpi;
 
   @ApiObjectField(description = "日期")
-  private LocalDate createDate;
+  private LocalDate kpiDate;
+
+  @JsonIgnore
+  private LocalDateTime createTime;
+
+  @JsonIgnore
+  private LocalDateTime updateTime;
 
   public Integer getId() {
     return id;
@@ -103,12 +110,28 @@ public class Kpi {
     this.kpi = value;
   }
 
-  public LocalDate getCreateDate() {
-    return createDate;
+  public LocalDate getKpiDate() {
+    return kpiDate;
   }
 
-  public void setCreateDate(LocalDate createDate) {
-    this.createDate = createDate;
+  public void setKpiDate(LocalDate kpiDate) {
+    this.kpiDate = kpiDate;
+  }
+
+  public LocalDateTime getCreateTime() {
+    return createTime;
+  }
+
+  public void setCreateTime(LocalDateTime createTime) {
+    this.createTime = createTime;
+  }
+
+  public LocalDateTime getUpdateTime() {
+    return updateTime;
+  }
+
+  public void setUpdateTime(LocalDateTime updateTime) {
+    this.updateTime = updateTime;
   }
 
   @Override
@@ -121,6 +144,6 @@ public class Kpi {
     if (Objects.isNull(o) || !(o instanceof Kpi)) return false;
     Kpi another = (Kpi) o;
     return Objects.equals(this.kpiId, another.getKpiId()) && Objects.equals(this.kpi, another.getKpi())
-        && Objects.equals(this.createDate, another.getCreateDate());
+        && Objects.equals(this.kpiDate, another.getKpiDate());
   }
 }

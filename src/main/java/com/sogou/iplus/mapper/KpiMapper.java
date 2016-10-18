@@ -6,6 +6,7 @@
 package com.sogou.iplus.mapper;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -30,30 +31,37 @@ public interface KpiMapper {
 
     public static final String TABLE = "`kpi`";
 
-    public static final String ITEMS = "`xmId`, `kpiId`, `createDate`, `kpi`";
+    public static final String ITEMS = "`xmId`, `kpiId`, `kpiDate`, `kpi`, `createTime`, `updateTime`";
 
     public static String select(Kpi kpi) {
       return new SQL().SELECT(ITEMS).FROM(TABLE).WHERE("xmId = #{xmId}").WHERE("kpiId = #{kpiId}")
-          .WHERE("createDate = #{createDate}").toString();
+          .WHERE("kpiDate = #{kpiDate}").toString();
     }
 
     public static String add(Kpi kpi) {
+      kpi.setCreateTime(LocalDateTime.now());
       return new SQL().INSERT_INTO(TABLE).VALUES("xmId", "#{xmId}").VALUES("kpiId", "#{kpiId}")
-          .VALUES("createDate", "#{createDate}").VALUES("kpi", "#{kpi}").toString();
+          .VALUES("kpiDate", "#{kpiDate}").VALUES("kpi", "#{kpi}").VALUES("createTime", "#{createTime}").toString();
     }
 
     public static String update(Kpi kpi) {
       return new SQL().UPDATE(TABLE).SET("kpi = #{kpi}").WHERE("xmId = #{xmId}").WHERE("kpiId = #{kpiId}")
-          .WHERE("createDate = #{createDate}").toString();
+          .WHERE("kpiDate = #{kpiDate}").toString();
     }
 
-    public static String selectKpisWithDate(LocalDate createDate) {
-      return new SQL().SELECT(ITEMS).FROM(TABLE).WHERE("createDate = #{createDate}").toString();
+    public static String selectKpisWithKpiDate(LocalDate kpiDate) {
+      return new SQL().SELECT(ITEMS).FROM(TABLE).WHERE("kpiDate = #{kpiDate}").toString();
     }
 
-    public static String selectKpisWithDateAndProjectId(Map<String, Object> map) {
-      SQL sql = new SQL().SELECT(ITEMS).FROM(TABLE).WHERE("createDate >= #{beginDate}")
-          .WHERE("createDate <= #{endDate}");
+    public static String selectKpisWithCreateTime(LocalDate date) {
+      SQL sql = new SQL().SELECT(ITEMS).FROM(TABLE).WHERE("createTime >= #{date}");
+      LocalDate tomorrow = date.plusDays(1);
+      sql.WHERE(String.format("createTime < '%s'", tomorrow));
+      return sql.toString();
+    }
+
+    public static String selectKpisWithKpiDateAndProjectId(Map<String, Object> map) {
+      SQL sql = new SQL().SELECT(ITEMS).FROM(TABLE).WHERE("kpiDate >= #{beginDate}").WHERE("kpiDate <= #{endDate}");
       if (Objects.nonNull(map.get("projectId"))) sql.WHERE("xmId = #{projectId}");
       return sql.toString();
     }
@@ -69,11 +77,14 @@ public interface KpiMapper {
   @UpdateProvider(type = Sql.class, method = "update")
   int update(Kpi kpi);
 
-  @SelectProvider(type = Sql.class, method = "selectKpisWithDate")
-  List<Kpi> selectKpisWithDate(LocalDate date);
+  @SelectProvider(type = Sql.class, method = "selectKpisWithKpiDate")
+  List<Kpi> selectKpisWithKpiDate(LocalDate date);
 
-  @SelectProvider(type = Sql.class, method = "selectKpisWithDateAndProjectId")
-  List<Kpi> selectKpisWithDateAndProjectId(@Param("projectId") Integer projectId,
+  @SelectProvider(type = Sql.class, method = "selectKpisWithCreateTime")
+  List<Kpi> selectKpisWithCreateDate(LocalDate date);
+
+  @SelectProvider(type = Sql.class, method = "selectKpisWithKpiDateAndProjectId")
+  List<Kpi> selectKpisWithKpiDateAndProjectId(@Param("projectId") Integer projectId,
       @Param("beginDate") LocalDate beginDate, @Param("endDate") LocalDate endDate);
 
 }
