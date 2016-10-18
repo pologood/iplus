@@ -42,7 +42,6 @@ public class Project {
   @ApiObjectField(description = "项目id", required = true)
   private Integer projectId;
 
-  @ApiObjectField(description = "项目秘钥", required = true)
   @JsonIgnore
   private String projectKey;
 

@@ -75,4 +75,10 @@ public class KpiController {
       @ApiQueryParam(name = "endDate", description = "结束日期", format = "yyyy-MM-dd") @RequestParam @DateTimeFormat(iso = ISO.DATE) LocalDate endDate) {
     return kpiManager.selectKpisWithDateAndProjectId(projectId, beginDate, endDate);
   }
+
+  @ApiMethod(description = "list projects")
+  @RequestMapping(value = "/project", method = RequestMethod.GET)
+  public ApiResult<?> listProjects() {
+    return new ApiResult<>(Project.PROJECTS);
+  }
 }
