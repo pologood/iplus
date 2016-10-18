@@ -7,7 +7,9 @@ package com.sogou.iplus.api;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -79,7 +81,9 @@ public class KpiController {
   @ApiMethod(description = "list projects")
   @RequestMapping(value = "/project", method = RequestMethod.GET)
   public ApiResult<?> listProjects() {
-    return new ApiResult<>(Project.PROJECTS);
+    Map<String, Set<Project>> map = new HashMap<>();
+    Project.PROJECTS.forEach(p -> map.computeIfAbsent(p.getBusinessUnit().getValue(), k -> new HashSet<>()).add(p));
+    return new ApiResult<>(map);
   }
 
   @ApiMethod(description = "list kpis")

@@ -51,7 +51,7 @@ public class Project {
   @ApiObjectField(description = "kpi", required = true)
   private Set<Kpi> kpis;
 
-  @ApiObjectField(description = "业务线")
+  @JsonIgnore
   private BusinessUnit businessUnit;
 
   public Integer getProjectId() {
@@ -87,7 +87,7 @@ public class Project {
   }
 
   public BusinessUnit getBusinessUnit() {
-    return businessUnit;
+    return this.businessUnit;
   }
 
   public void setBusinessUnit(BusinessUnit businessUnit) {
