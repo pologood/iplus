@@ -96,7 +96,7 @@ public class KpiController {
   @RequestMapping(value = "/kpi/project", method = RequestMethod.GET)
   public ApiResult<?> selectKpisWithDateAndProjectId(
       @ApiQueryParam(name = "projectId", description = "项目Id") @RequestParam int projectId,
-      @ApiQueryParam(name = "date", description = "起始日期", format = "yyyy-MM-dd") @RequestParam @DateTimeFormat(iso = ISO.DATE) LocalDate date) {
+      @ApiQueryParam(name = "date", description = "kpi日期", format = "yyyy-MM-dd") @RequestParam @DateTimeFormat(iso = ISO.DATE) LocalDate date) {
     return kpiManager.selectKpisWithDateAndProjectId(projectId, date);
   }
 }
