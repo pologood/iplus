@@ -25,6 +25,7 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.sogou.iplus.api.KpiController;
 import com.sogou.iplus.config.DaoConfig;
@@ -39,6 +40,7 @@ import com.sogou.iplus.model.ApiResult;
 //-------------------------------------------------------
 @ContextConfiguration(classes = { RootConfig.class, DaoConfig.class })
 @RunWith(SpringJUnit4ClassRunner.class)
+@Transactional
 public class KpiControllerTest {
 
   @Mock
@@ -60,6 +62,15 @@ public class KpiControllerTest {
   }
 
   @Test
+  public void test() {
+    add();
+    selectNull();
+    select();
+    select2();
+    listProjects();
+    listProjectKpis();
+  }
+
   public void add() {
     Project project = Project.PROJECT_MAP.get(testProjectId);
     project.getKpis().forEach(
@@ -72,7 +83,6 @@ public class KpiControllerTest {
         .forEach(kpi -> Assert.assertEquals(kpi.getKpiId().intValue(), kpiMap.get(kpi.getKpiId()).getKpi().intValue()));
   }
 
-  @Test
   public void selectNull() {
     ApiResult<?> result = controller.selectProjectsDoNotSubmitKpiOnNamedDate(Optional.of(LocalDate.now()));
     Assert.assertEquals(result.getCode(), ApiResult.ok().getCode());
@@ -82,7 +92,6 @@ public class KpiControllerTest {
         .filter(project -> Objects.equals(testProjectId, project.getProjectId())).count());
   }
 
-  @Test
   public void select() {
     ApiResult<?> result = controller.selectKpisWithDateAndProjectId(Optional.of(testProjectId), date, LocalDate.now());
     Assert.assertEquals(result.getCode(), ApiResult.ok().getCode());
@@ -91,16 +100,14 @@ public class KpiControllerTest {
     Assert.assertFalse(map.isEmpty());
   }
 
-  @Test
   public void listProjects() {
     ApiResult<?> result = controller.listProjects();
     Assert.assertEquals(result.getCode(), ApiResult.ok().getCode());
-    Set<?> set = (Set<?>) result.getData();
-    System.out.println(set);
-    Assert.assertFalse(set.isEmpty());
+    Map<?, ?> map = (Map<?, ?>) result.getData();
+    System.out.println(map);
+    Assert.assertFalse(map.isEmpty());
   }
 
-  @Test
   public void listProjectKpis() {
     ApiResult<?> result = controller.listKpis(70);
     Assert.assertEquals(result.getCode(), ApiResult.ok().getCode());
@@ -109,7 +116,6 @@ public class KpiControllerTest {
     Assert.assertFalse(set.isEmpty());
   }
 
-  @Test
   public void select2() {
     ApiResult<?> result = controller.selectKpisWithDateAndProjectId(testProjectId, date);
     Assert.assertEquals(result.getCode(), ApiResult.ok().getCode());
