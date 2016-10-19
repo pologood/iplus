@@ -51,7 +51,7 @@ public class Project {
   @ApiObjectField(description = "kpi", required = true)
   private Set<Kpi> kpis;
 
-  @ApiObjectField(description = "业务线")
+  @JsonIgnore
   private BusinessUnit businessUnit;
 
   public Integer getProjectId() {
@@ -87,7 +87,7 @@ public class Project {
   }
 
   public BusinessUnit getBusinessUnit() {
-    return businessUnit;
+    return this.businessUnit;
   }
 
   public void setBusinessUnit(BusinessUnit businessUnit) {
@@ -161,9 +161,10 @@ public class Project {
     PROJECTS.add(new Project(142, "hxuuaa7ylg2tizpp", "购物搜索", Sets.newHashSet(new Kpi(53, "PC+无线购物搜索用户量(万)")),
         BusinessUnit.search));
     PROJECTS.add(new Project(31, "1k5rg0vny4y1htl2", "小说搜索",
-        Sets.newHashSet(new Kpi(54, "小说搜索搜索量(万)"), new Kpi(55, "阅读APP(iOS+Android)日活跃用户数(万)"),
-            new Kpi(201, "阅读APPAndroid版次日留存率"), new Kpi(202, "阅读APPAndroid版7日留存率"), new Kpi(203, "阅读APPAndroid版30日留存率"),
-            new Kpi(204, "阅读APPiOS版次日留存率"), new Kpi(205, "阅读APPiOS版7日留存率"), new Kpi(206, "阅读APPiOS版30日留存率")),
+        Sets.newHashSet(new Kpi(54, "小说搜索搜索量(万)"), new Kpi(207, "阅读APPAndroid版日活跃用户数(万)"),
+            new Kpi(208, "阅读APPiOS版日活跃用户数(万)"), new Kpi(201, "阅读APPAndroid版次日留存率"), new Kpi(202, "阅读APPAndroid版7日留存率"),
+            new Kpi(203, "阅读APPAndroid版30日留存率"), new Kpi(204, "阅读APPiOS版次日留存率"), new Kpi(205, "阅读APPiOS版7日留存率"),
+            new Kpi(206, "阅读APPiOS版30日留存率")),
         BusinessUnit.search));
     PROJECTS
         .add(
@@ -176,8 +177,8 @@ public class Project {
             new Kpi(65, "中医项目App7日留存率"), new Kpi(66, "中医项目App30日留存率"), new Kpi(67, "中医项目App总激活数")),
         BusinessUnit.search));
     PROJECTS.add(new Project(36, "1ou8k1pdoe4ac3lz", "消耗、RPM",
-        Sets.newHashSet(new Kpi(68, "全部竞价日均消耗(万元)"), new Kpi(69, "PC搜索日均消耗(万元)"), new Kpi(70, "无线搜索日均消耗(万元)"),
-            new Kpi(71, "网盟日均消耗(万元)"), new Kpi(72, "银河皓月日均消耗(万元)"), new Kpi(73, "PC搜狗浏览器起始页RPM(元/千次)"),
+        Sets.newHashSet(new Kpi(68, "全部竞价日消耗(万元)"), new Kpi(69, "PC搜索日消耗(万元)"), new Kpi(70, "无线搜索日消耗(万元)"),
+            new Kpi(71, "网盟日消耗(万元)"), new Kpi(72, "银河皓月日消耗(万元)"), new Kpi(73, "PC搜狗浏览器起始页RPM(元/千次)"),
             new Kpi(74, "无线QQ浏览器RPM(元/千次)"), new Kpi(75, "PC搜索RPM(优质)(元/千次)"), new Kpi(76, "无线搜索RPM(元/千次)")),
         BusinessUnit.marketing));
     PROJECTS

@@ -13,6 +13,15 @@ import org.jsondoc.core.annotation.ApiObject;
 @ApiObject(name = "BusinessUnit", description = "业务线")
 public enum BusinessUnit {
 
-  desktop, search, marketing, sugarcat;
+  desktop("桌面"), search("搜索"), marketing("营销"), sugarcat("糖猫");
 
+  String value;
+
+  private BusinessUnit(String value) {
+    this.value = value;
+  }
+
+  public String getValue() {
+    return this.value;
+  }
 }
