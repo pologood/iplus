@@ -119,12 +119,12 @@ public class KpiControllerTest {
 
   public void select2() {
     ApiResult<?> result = controller.selectKpisWithDateAndProjectId(null, testProjectId,
-        Optional.of(Project.PROJECT_MAP.get(testProjectId).getProjectKey()), date);
+        Project.PROJECT_MAP.get(testProjectId).getProjectKey(), date);
     Assert.assertEquals(result.getCode(), ApiResult.ok().getCode());
     Map<?, ?> map = (Map<?, ?>) result.getData();
     System.out.println(map);
     Assert.assertFalse(map.isEmpty());
-    result = controller.selectKpisWithDateAndProjectId(null, 0, Optional.empty(), date);
+    result = controller.selectKpisWithDateAndProjectId(null, 0, Project.PROJECT_MAP.get(0).getProjectKey(), date);
     Assert.assertEquals(result.getCode(), ApiResult.ok().getCode());
     map = (Map<?, ?>) result.getData();
     System.out.println(map);

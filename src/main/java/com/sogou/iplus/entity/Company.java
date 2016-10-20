@@ -10,6 +10,8 @@ import java.util.Set;
 import org.jsondoc.core.annotation.ApiObject;
 import org.jsondoc.core.annotation.ApiObjectField;
 
+import com.google.common.collect.Sets;
+
 import commons.utils.JsonHelper;
 
 //--------------------- Change Logs----------------------
@@ -22,6 +24,7 @@ public class Company {
 
   static {
     SOGOU.setName("搜狗");
+    SOGOU.setKpis(Sets.newHashSet(1, 3, 13, 15, 21, 26, 37, 38, 39, 40, 41, 42, 43, 68));
   }
 
   @ApiObjectField(description = "公司id")
@@ -31,7 +34,7 @@ public class Company {
   private String name;
 
   @ApiObjectField(description = "公司kpi")
-  private Set<Kpi> kpis;
+  private Set<Integer> kpis;
 
   @ApiObjectField(description = "公司事业部")
   private Set<BusinessUnit> businessUnits;
@@ -52,11 +55,11 @@ public class Company {
     this.name = name;
   }
 
-  public Set<Kpi> getKpis() {
+  public Set<Integer> getKpis() {
     return kpis;
   }
 
-  public void setKpis(Set<Kpi> kpis) {
+  public void setKpis(Set<Integer> kpis) {
     this.kpis = kpis;
   }
 

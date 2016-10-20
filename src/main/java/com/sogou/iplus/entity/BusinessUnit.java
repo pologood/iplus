@@ -26,7 +26,9 @@ public class BusinessUnit {
 
   static {
     SEARCH.setName("搜索事业部");
+    SEARCH.setKpis(Sets.newHashSet(37, 38, 39, 40, 41, 42, 43, 49, 50, 51, 52, 53, 54, 59, 63));
     DESKTOP.setName("桌面事业部");
+    DESKTOP.setKpis(Sets.newHashSet(1, 3, 13, 15, 21, 26, 27, 32));
     SUGARCAT.setName("糖猫事业部");
     MARKETING.setName("营销事业部");
     Company.SOGOU.setBusinessUnits(Sets.newHashSet(SEARCH, DESKTOP, SUGARCAT, MARKETING));
@@ -39,7 +41,7 @@ public class BusinessUnit {
   private String name;
 
   @ApiObjectField(description = "事业部kpi")
-  private Set<Kpi> kpis;
+  private Set<Integer> kpis;
 
   @ApiObjectField(description = "事业部项目")
   private Set<Project> projects = new HashSet<>();
@@ -60,11 +62,11 @@ public class BusinessUnit {
     this.name = name;
   }
 
-  public Set<Kpi> getKpis() {
+  public Set<Integer> getKpis() {
     return kpis;
   }
 
-  public void setKpis(Set<Kpi> kpis) {
+  public void setKpis(Set<Integer> kpis) {
     this.kpis = kpis;
   }
 

@@ -104,6 +104,7 @@ public class Project {
   public transient static final Map<Integer, Project> KPI_MAP = new HashMap<>();
 
   static {
+    PROJECTS.add(new Project(0, "i4zqbwchh23igzwe", "test", new HashSet<>(), null));
     PROJECTS.add(new Project(70, "j0a37izra1v4n4k0", "输入法-PC输入法",
         Sets.newHashSet(new Kpi(1, "PC输入法日活跃用户数(万)"), new Kpi(2, "PC输入法灵犀日搜索量(万)")), BusinessUnit.DESKTOP));
     PROJECTS.add(new Project(78, "mxvqf109b7kbyfad", "输入法-手机输入法",
@@ -191,7 +192,8 @@ public class Project {
 
     PROJECTS.forEach(project -> project.kpis.forEach(kpi -> KPI_MAP.put(kpi.getKpiId(), project)));
 
-    PROJECTS.forEach(project -> project.getBusinessUnit().getProjects().add(project));
+    PROJECTS.stream().filter(p -> Objects.nonNull(p.getBusinessUnit()))
+        .forEach(project -> project.getBusinessUnit().getProjects().add(project));
   }
 
   public static Project getProjectByKpiId(int kpiId) {
