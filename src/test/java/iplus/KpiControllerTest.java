@@ -63,12 +63,12 @@ public class KpiControllerTest {
 
   @Test
   public void test() {
-    /*add();
+    add();
     selectNull();
     select();
-    select2();*/
+    select2();
     listProjects();
-    /*listProjectKpis();*/
+    listProjectKpis();
   }
 
   public void add() {
