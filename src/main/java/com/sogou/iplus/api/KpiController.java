@@ -96,7 +96,20 @@ public class KpiController {
   @RequestMapping(value = "/kpi/project", method = RequestMethod.GET)
   public ApiResult<?> selectKpisWithDateAndProjectId(
       @ApiQueryParam(name = "projectId", description = "项目Id") @RequestParam int projectId,
+      @ApiQueryParam(name = "projectKey", description = "项目秘钥") @RequestParam Optional<String> projectKey,
       @ApiQueryParam(name = "date", description = "kpi日期", format = "yyyy-MM-dd") @RequestParam @DateTimeFormat(iso = ISO.DATE) LocalDate date) {
+    if (!isDebugProjectId(projectId) && !isValidKey(projectId, projectKey)) return ApiResult.forbidden();
     return kpiManager.selectKpisWithDateAndProjectId(projectId, date);
+  }
+
+  private boolean isDebugProjectId(int projectId) {
+    return projectId == 0;
+  }
+
+  private boolean isValidKey(int projectId, Optional<String> projectKey) {
+    if (!projectKey.isPresent()) return false;
+    Project project = Project.PROJECT_MAP.get(projectId);
+    if (Objects.isNull(project)) return false;
+    return Objects.equals(project.getProjectKey(), projectKey.get());
   }
 }

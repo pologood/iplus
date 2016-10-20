@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import org.apache.commons.collections4.MapUtils;
 import org.apache.ibatis.annotations.InsertProvider;
 import org.apache.ibatis.annotations.Options;
 import org.apache.ibatis.annotations.Param;
@@ -67,7 +68,9 @@ public interface KpiMapper {
     }
 
     public static String selectKpisWithKpiDateAndProjectId(Map<String, Object> map) {
-      return new SQL().SELECT(ITEMS).FROM(TABLE).WHERE("kpiDate = #{date}").WHERE("xmId = #{projectId}").toString();
+      SQL sql = new SQL().SELECT(ITEMS).FROM(TABLE).WHERE("kpiDate = #{date}");
+      if (0 != MapUtils.getIntValue(map, "projectId")) sql.WHERE("xmId = #{projectId}");
+      return sql.toString();
     }
   }
 
