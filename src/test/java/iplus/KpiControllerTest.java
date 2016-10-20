@@ -30,6 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.sogou.iplus.api.KpiController;
 import com.sogou.iplus.config.DaoConfig;
 import com.sogou.iplus.config.RootConfig;
+import com.sogou.iplus.entity.Company;
 import com.sogou.iplus.entity.Kpi;
 import com.sogou.iplus.entity.Project;
 import com.sogou.iplus.mapper.KpiMapper;
@@ -103,9 +104,9 @@ public class KpiControllerTest {
   public void listProjects() {
     ApiResult<?> result = controller.listProjects();
     Assert.assertEquals(result.getCode(), ApiResult.ok().getCode());
-    Map<?, ?> map = (Map<?, ?>) result.getData();
-    System.out.println(map);
-    Assert.assertFalse(map.isEmpty());
+    Company sogou = (Company) result.getData();
+    System.out.println(sogou);
+    Assert.assertFalse(sogou.getBusinessUnits().isEmpty());
   }
 
   public void listProjectKpis() {

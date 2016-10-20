@@ -49,16 +49,16 @@ public class Kpi {
   @JsonIgnore
   private Integer id;
 
-  @ApiObjectField(description = "xmId", required = true)
+  @ApiObjectField(description = "xmId")
   private Integer xmId;
 
-  @ApiObjectField(description = "kpiId", required = true)
+  @ApiObjectField(description = "kpiId")
   private Integer kpiId;
 
   @ApiObjectField(description = "kpiName")
   private String kpiName;
 
-  @ApiObjectField(description = "value", required = true)
+  @ApiObjectField(description = "value")
   private BigDecimal kpi;
 
   @ApiObjectField(description = "日期")
