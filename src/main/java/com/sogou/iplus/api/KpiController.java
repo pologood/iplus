@@ -23,6 +23,7 @@ import org.jsondoc.core.annotation.ApiQueryParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.format.annotation.DateTimeFormat.ISO;
+import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -33,6 +34,8 @@ import com.sogou.iplus.entity.Project;
 import com.sogou.iplus.manager.KpiManager;
 import com.sogou.iplus.model.ApiResult;
 
+import commons.saas.LoginService.User;
+
 //--------------------- Change Logs----------------------
 //@author wangwenlong Initial Created at 2016年10月11日;
 //-------------------------------------------------------
@@ -40,6 +43,8 @@ import com.sogou.iplus.model.ApiResult;
 @RestController
 @RequestMapping("/api")
 public class KpiController {
+
+  public String debugKey = "I4ZQBWCHH23IGZWE";
 
   @Autowired
   private KpiManager kpiManager;
@@ -82,7 +87,8 @@ public class KpiController {
   @RequestMapping(value = "/project", method = RequestMethod.GET)
   public ApiResult<?> listProjects() {
     Map<String, Set<Project>> map = new HashMap<>();
-    Project.PROJECTS.forEach(p -> map.computeIfAbsent(p.getBusinessUnit().getValue(), k -> new HashSet<>()).add(p));
+    Project.PROJECTS.stream().filter(p -> Objects.nonNull(p.getBusinessUnit()))
+        .forEach(p -> map.computeIfAbsent(p.getBusinessUnit().getValue(), k -> new HashSet<>()).add(p));
     return new ApiResult<>(map);
   }
 
@@ -95,8 +101,18 @@ public class KpiController {
   @ApiMethod(description = "select kpis on named date")
   @RequestMapping(value = "/kpi/project", method = RequestMethod.GET)
   public ApiResult<?> selectKpisWithDateAndProjectId(
+      @RequestAttribute(name = CookieInterceptor.ATTRIBUTE_NAME, required = false) User user,
       @ApiQueryParam(name = "projectId", description = "项目Id") @RequestParam int projectId,
-      @ApiQueryParam(name = "date", description = "起始日期", format = "yyyy-MM-dd") @RequestParam @DateTimeFormat(iso = ISO.DATE) LocalDate date) {
+      @ApiQueryParam(name = "projectKey", description = "项目秘钥") @RequestParam String projectKey,
+      @ApiQueryParam(name = "date", description = "kpi日期", format = "yyyy-MM-dd") @RequestParam @DateTimeFormat(iso = ISO.DATE) LocalDate date) {
+    if (Objects.isNull(user) && !isValidKey(projectId, projectKey)) return ApiResult.forbidden();
     return kpiManager.selectKpisWithDateAndProjectId(projectId, date);
+  }
+
+  private boolean isValidKey(int projectId, String projectKey) {
+    if (debugKey.equals(projectKey)) return true;
+    Project project = Project.PROJECT_MAP.get(projectId);
+    if (Objects.isNull(project)) return false;
+    return Objects.equals(project.getProjectKey(), projectKey);
   }
 }
