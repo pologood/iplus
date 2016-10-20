@@ -63,12 +63,12 @@ public class KpiControllerTest {
 
   @Test
   public void test() {
-    /*add();
+    add();
     selectNull();
     select();
-    select2();*/
+    select2();
     listProjects();
-    /*listProjectKpis();*/
+    listProjectKpis();
   }
 
   public void add() {
@@ -104,7 +104,7 @@ public class KpiControllerTest {
     ApiResult<?> result = controller.listProjects();
     Assert.assertEquals(result.getCode(), ApiResult.ok().getCode());
     Map<?, ?> map = (Map<?, ?>) result.getData();
-    System.out.println(result.getData());
+    System.out.println(map);
     Assert.assertFalse(map.isEmpty());
   }
 
