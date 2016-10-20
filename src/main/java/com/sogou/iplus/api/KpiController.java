@@ -44,6 +44,8 @@ import commons.saas.LoginService.User;
 @RequestMapping("/api")
 public class KpiController {
 
+  public String debugKey = "I4ZQBWCHH23IGZWE";
+
   @Autowired
   private KpiManager kpiManager;
 
@@ -101,21 +103,16 @@ public class KpiController {
   public ApiResult<?> selectKpisWithDateAndProjectId(
       @RequestAttribute(name = CookieInterceptor.ATTRIBUTE_NAME, required = false) User user,
       @ApiQueryParam(name = "projectId", description = "项目Id") @RequestParam int projectId,
-      @ApiQueryParam(name = "projectKey", description = "项目秘钥") @RequestParam Optional<String> projectKey,
+      @ApiQueryParam(name = "projectKey", description = "项目秘钥") @RequestParam String projectKey,
       @ApiQueryParam(name = "date", description = "kpi日期", format = "yyyy-MM-dd") @RequestParam @DateTimeFormat(iso = ISO.DATE) LocalDate date) {
-    if (Objects.isNull(user) && !isDebugProjectId(projectId) && !isValidKey(projectId, projectKey))
-      return ApiResult.forbidden();
+    if (Objects.isNull(user) && !isValidKey(projectId, projectKey)) return ApiResult.forbidden();
     return kpiManager.selectKpisWithDateAndProjectId(projectId, date);
   }
 
-  private boolean isDebugProjectId(int projectId) {
-    return projectId == 0;
-  }
-
-  private boolean isValidKey(int projectId, Optional<String> projectKey) {
-    if (!projectKey.isPresent()) return false;
+  private boolean isValidKey(int projectId, String projectKey) {
+    if (debugKey.equals(projectKey)) return true;
     Project project = Project.PROJECT_MAP.get(projectId);
     if (Objects.isNull(project)) return false;
-    return Objects.equals(project.getProjectKey(), projectKey.get());
+    return Objects.equals(project.getProjectKey(), projectKey);
   }
 }
