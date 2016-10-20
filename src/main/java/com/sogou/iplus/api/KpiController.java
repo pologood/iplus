@@ -85,7 +85,8 @@ public class KpiController {
   @RequestMapping(value = "/project", method = RequestMethod.GET)
   public ApiResult<?> listProjects() {
     Map<String, Set<Project>> map = new HashMap<>();
-    Project.PROJECTS.forEach(p -> map.computeIfAbsent(p.getBusinessUnit().getValue(), k -> new HashSet<>()).add(p));
+    Project.PROJECTS.stream().filter(p -> Objects.nonNull(p.getBusinessUnit()))
+        .forEach(p -> map.computeIfAbsent(p.getBusinessUnit().getValue(), k -> new HashSet<>()).add(p));
     return new ApiResult<>(map);
   }
 
