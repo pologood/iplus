@@ -98,7 +98,7 @@ public class KpiController {
   @ApiMethod(description = "select kpis on named date")
   @RequestMapping(value = "/kpi/project", method = RequestMethod.GET)
   public ApiResult<?> selectKpisWithDateAndProjectId(
-      @RequestAttribute(name = CookieInterceptor.ATTRIBUTE_NAME) User user,
+      @RequestAttribute(name = CookieInterceptor.ATTRIBUTE_NAME, required = false) User user,
       @ApiQueryParam(name = "projectId", description = "项目Id") @RequestParam int projectId,
       @ApiQueryParam(name = "projectKey", description = "项目秘钥") @RequestParam Optional<String> projectKey,
       @ApiQueryParam(name = "date", description = "kpi日期", format = "yyyy-MM-dd") @RequestParam @DateTimeFormat(iso = ISO.DATE) LocalDate date) {
