@@ -5,15 +5,7 @@
  */
 package com.sogou.iplus.entity;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import org.jsondoc.core.annotation.ApiObject;
-import org.jsondoc.core.annotation.ApiObjectField;
-
-import com.google.common.collect.Sets;
-
-import commons.utils.JsonHelper;
 
 //--------------------- Change Logs----------------------
 //@author wangwenlong Initial Created at 2016年10月11日;
@@ -34,8 +26,7 @@ public class BusinessUnit {
     Company.SOGOU.setBusinessUnits(Sets.newHashSet(SEARCH, DESKTOP, SUGARCAT, MARKETING));
   }
 
-  @ApiObjectField(description = "事业部id")
-  private Integer id;
+  desktop("桌面"), search("搜索"), marketing("营销"), sugarcat("糖猫");
 
   @ApiObjectField(description = "事业部名称")
   private String name;
@@ -52,14 +43,6 @@ public class BusinessUnit {
 
   public void setId(Integer id) {
     this.id = id;
-  }
-
-  public String getName() {
-    return name;
-  }
-
-  public void setName(String name) {
-    this.name = name;
   }
 
   public Set<Integer> getKpis() {
