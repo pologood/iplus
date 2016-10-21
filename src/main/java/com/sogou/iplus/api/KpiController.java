@@ -21,7 +21,7 @@ import org.jsondoc.core.annotation.ApiQueryParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.format.annotation.DateTimeFormat.ISO;
-import org.springframework.web.bind.annotation.RequestAttribute;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -33,7 +33,7 @@ import com.sogou.iplus.entity.Project;
 import com.sogou.iplus.manager.KpiManager;
 import com.sogou.iplus.model.ApiResult;
 
-import commons.saas.LoginService.User;
+import commons.spring.RedisRememberMeService.User;
 
 //--------------------- Change Logs----------------------
 //@author wangwenlong Initial Created at 2016年10月11日;
@@ -94,12 +94,11 @@ public class KpiController {
 
   @ApiMethod(description = "select kpis on named date")
   @RequestMapping(value = "/kpi/project", method = RequestMethod.GET)
-  public ApiResult<?> selectKpisWithDateAndXmId(
-      @RequestAttribute(name = CookieInterceptor.ATTRIBUTE_NAME, required = false) User user,
+  public ApiResult<?> selectKpisWithDateAndXmId(@AuthenticationPrincipal Optional<User> user,
       @ApiQueryParam(name = "xmId", description = "项目Id") @RequestParam int xmId,
       @ApiQueryParam(name = "xmKey", description = "项目秘钥") @RequestParam String xmKey,
       @ApiQueryParam(name = "date", description = "kpi日期", format = "yyyy-MM-dd") @RequestParam @DateTimeFormat(iso = ISO.DATE) LocalDate date) {
-    if (Objects.isNull(user) && !isValidKey(xmId, xmKey)) return ApiResult.forbidden();
+    if (!user.isPresent() && !isValidKey(xmId, xmKey)) return ApiResult.forbidden();
     return kpiManager.selectKpisWithDateAndXmId(xmId, date);
   }
 

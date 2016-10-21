@@ -89,8 +89,8 @@ public class KpiControllerTest {
     Assert.assertEquals(result.getCode(), ApiResult.ok().getCode());
     List<?> objects = (List<?>) result.getData();
     Assert.assertFalse(objects.isEmpty());
-    Assert.assertEquals(0, objects.stream().map(o -> (Project) o)
-        .filter(project -> Objects.equals(testXmId, project.getXmId())).count());
+    Assert.assertEquals(0,
+        objects.stream().map(o -> (Project) o).filter(project -> Objects.equals(testXmId, project.getXmId())).count());
   }
 
   public void select() {
@@ -118,13 +118,13 @@ public class KpiControllerTest {
   }
 
   public void select2() {
-    ApiResult<?> result = controller.selectKpisWithDateAndXmId(null, testXmId,
+    ApiResult<?> result = controller.selectKpisWithDateAndXmId(Optional.empty(), testXmId,
         Project.PROJECT_MAP.get(testXmId).getXmKey(), date);
     Assert.assertEquals(result.getCode(), ApiResult.ok().getCode());
     Map<?, ?> map = (Map<?, ?>) result.getData();
     System.out.println(map);
     Assert.assertFalse(map.isEmpty());
-    result = controller.selectKpisWithDateAndXmId(null, 0, Project.PROJECT_MAP.get(0).getXmKey(), date);
+    result = controller.selectKpisWithDateAndXmId(Optional.empty(), 0, Project.PROJECT_MAP.get(0).getXmKey(), date);
     Assert.assertEquals(result.getCode(), ApiResult.ok().getCode());
     map = (Map<?, ?>) result.getData();
     System.out.println(map);

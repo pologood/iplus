@@ -18,7 +18,6 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandl
 import commons.utils.LocalDateTimeJsonSerializer;
 import commons.utils.LocalDateJsonSerializer;
 
-import com.sogou.iplus.api.CookieInterceptor;
 import com.sogou.iplus.api.TokenInterceptor;
 import com.sogou.iplus.config.*;
 
@@ -26,9 +25,6 @@ import com.sogou.iplus.config.*;
 @EnableWebMvc
 @ComponentScan({ ProjectInfo.API_PKG })
 public class WebConfig extends WebMvcConfigurerAdapter {
-
-  @Autowired
-  private CookieInterceptor cookieInterceptor;
 
   @Autowired
   private TokenInterceptor tokenInterceptor;
@@ -59,8 +55,7 @@ public class WebConfig extends WebMvcConfigurerAdapter {
     r.setUseTrailingSlashMatch(false);
     r.setUseSuffixPatternMatch(false);
     r.setRemoveSemicolonContent(false);
-    r.setInterceptors(new Object[] { new MappedInterceptor(new String[] { "/api/kpi/project" }, cookieInterceptor),
-        new MappedInterceptor(new String[] { "/api/kpi/project" }, tokenInterceptor) });
+    r.setInterceptors(new Object[] { new MappedInterceptor(new String[] { "/api/kpi/project" }, tokenInterceptor) });
     r.setOrder(0);
     return r;
   }
