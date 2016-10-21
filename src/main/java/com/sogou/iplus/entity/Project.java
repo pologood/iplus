@@ -26,24 +26,24 @@ import commons.utils.JsonHelper;
 @ApiObject(name = "project", description = "项目")
 public class Project {
 
-  public Project(Integer projectId, String projectKey, String projectName, Set<Kpi> kpis, BusinessUnit businessUnit) {
-    this.projectId = projectId;
-    this.projectKey = projectKey;
+  public Project(Integer xmId, String xmKey, String projectName, Set<Kpi> kpis, BusinessUnit businessUnit) {
+    this.xmId = xmId;
+    this.xmKey = xmKey;
     this.projectName = projectName;
     this.kpis = kpis;
     this.businessUnit = businessUnit;
   }
 
   public Project(Project project) {
-    this(project.getProjectId(), project.getProjectKey(), project.getProjectName(),
+    this(project.getXmId(), project.getXmKey(), project.getProjectName(),
         project.getKpis().stream().map(kpi -> new Kpi(kpi)).collect(Collectors.toSet()), project.getBusinessUnit());
   }
 
   @ApiObjectField(description = "项目id", required = true)
-  private Integer projectId;
+  private Integer xmId;
 
   @JsonIgnore
-  private String projectKey;
+  private String xmKey;
 
   @ApiObjectField(description = "项目名称")
   private String projectName;
@@ -54,20 +54,20 @@ public class Project {
   @JsonIgnore
   private BusinessUnit businessUnit;
 
-  public Integer getProjectId() {
-    return projectId;
+  public Integer getXmId() {
+    return xmId;
   }
 
-  public void setProjectId(Integer projectId) {
-    this.projectId = projectId;
+  public void setXmId(Integer xmId) {
+    this.xmId = xmId;
   }
 
-  public String getProjectKey() {
-    return projectKey;
+  public String getXmKey() {
+    return xmKey;
   }
 
-  public void setProjectKey(String projectKey) {
-    this.projectKey = projectKey;
+  public void setXmKey(String xmKey) {
+    this.xmKey = xmKey;
   }
 
   public String getProjectName() {
@@ -202,7 +202,7 @@ public class Project {
   }
 
   public static Map<Integer, Project> getProjectMap() {
-    return PROJECTS.stream().collect(Collectors.toMap(p -> p.getProjectId(), p -> new Project(p)));
+    return PROJECTS.stream().collect(Collectors.toMap(p -> p.getXmId(), p -> new Project(p)));
   }
 
   @Override

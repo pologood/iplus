@@ -49,7 +49,7 @@ public class KpiControllerTest {
 
   private LocalDate date = LocalDate.of(2015, 11, 11);
 
-  private final int testProjectId = 70;
+  private final int testXmId = 70;
 
   @Autowired
   private KpiController controller;
@@ -73,10 +73,10 @@ public class KpiControllerTest {
   }
 
   public void add() {
-    Project project = Project.PROJECT_MAP.get(testProjectId);
+    Project project = Project.PROJECT_MAP.get(testXmId);
     project.getKpis().forEach(
         kpi -> Mockito.when(mockRequest.getParameter(kpi.getKpiId().toString())).thenReturn(kpi.getKpiId().toString()));
-    controller.add(mockRequest, project.getProjectId(), project.getProjectKey(), Optional.of(date));
+    controller.add(mockRequest, project.getXmId(), project.getXmKey(), Optional.of(date));
     Map<Integer, Kpi> kpiMap = mapper.selectKpisWithKpiDate(date).stream()
         .collect(Collectors.toMap(kpi -> kpi.getKpiId(), kpi -> kpi));
     Assert.assertEquals(project.getKpis().size(), kpiMap.size());
@@ -90,11 +90,11 @@ public class KpiControllerTest {
     List<?> objects = (List<?>) result.getData();
     Assert.assertFalse(objects.isEmpty());
     Assert.assertEquals(0, objects.stream().map(o -> (Project) o)
-        .filter(project -> Objects.equals(testProjectId, project.getProjectId())).count());
+        .filter(project -> Objects.equals(testXmId, project.getXmId())).count());
   }
 
   public void select() {
-    ApiResult<?> result = controller.selectKpisWithDateAndProjectId(Optional.of(testProjectId), date, LocalDate.now());
+    ApiResult<?> result = controller.selectKpisWithDateAndXmId(Optional.of(testXmId), date, LocalDate.now());
     Assert.assertEquals(result.getCode(), ApiResult.ok().getCode());
     Map<?, ?> map = (Map<?, ?>) result.getData();
     System.out.println(map);
@@ -118,13 +118,13 @@ public class KpiControllerTest {
   }
 
   public void select2() {
-    ApiResult<?> result = controller.selectKpisWithDateAndProjectId(null, testProjectId,
-        Project.PROJECT_MAP.get(testProjectId).getProjectKey(), date);
+    ApiResult<?> result = controller.selectKpisWithDateAndXmId(null, testXmId,
+        Project.PROJECT_MAP.get(testXmId).getXmKey(), date);
     Assert.assertEquals(result.getCode(), ApiResult.ok().getCode());
     Map<?, ?> map = (Map<?, ?>) result.getData();
     System.out.println(map);
     Assert.assertFalse(map.isEmpty());
-    result = controller.selectKpisWithDateAndProjectId(null, 0, Project.PROJECT_MAP.get(0).getProjectKey(), date);
+    result = controller.selectKpisWithDateAndXmId(null, 0, Project.PROJECT_MAP.get(0).getXmKey(), date);
     Assert.assertEquals(result.getCode(), ApiResult.ok().getCode());
     map = (Map<?, ?>) result.getData();
     System.out.println(map);

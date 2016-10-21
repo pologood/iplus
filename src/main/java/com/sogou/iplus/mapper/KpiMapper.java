@@ -61,15 +61,15 @@ public interface KpiMapper {
       return sql.toString();
     }
 
-    public static String selectKpisWithKpiDateRangeAndProjectId(Map<String, Object> map) {
+    public static String selectKpisWithKpiDateRangeAndXmId(Map<String, Object> map) {
       SQL sql = new SQL().SELECT(ITEMS).FROM(TABLE).WHERE("kpiDate >= #{beginDate}").WHERE("kpiDate <= #{endDate}");
-      if (Objects.nonNull(map.get("projectId"))) sql.WHERE("xmId = #{projectId}");
+      if (Objects.nonNull(map.get("xmId"))) sql.WHERE("xmId = #{xmId}");
       return sql.toString();
     }
 
-    public static String selectKpisWithKpiDateAndProjectId(Map<String, Object> map) {
+    public static String selectKpisWithKpiDateAndXmId(Map<String, Object> map) {
       SQL sql = new SQL().SELECT(ITEMS).FROM(TABLE).WHERE("kpiDate = #{date}");
-      if (0 != MapUtils.getIntValue(map, "projectId")) sql.WHERE("xmId = #{projectId}");
+      if (0 != MapUtils.getIntValue(map, "xmId")) sql.WHERE("xmId = #{xmId}");
       return sql.toString();
     }
   }
@@ -90,11 +90,11 @@ public interface KpiMapper {
   @SelectProvider(type = Sql.class, method = "selectKpisWithCreateTime")
   List<Kpi> selectKpisWithCreateDate(LocalDate date);
 
-  @SelectProvider(type = Sql.class, method = "selectKpisWithKpiDateRangeAndProjectId")
-  List<Kpi> selectKpisWithKpiDateRangeAndProjectId(@Param("projectId") Integer projectId,
+  @SelectProvider(type = Sql.class, method = "selectKpisWithKpiDateRangeAndXmId")
+  List<Kpi> selectKpisWithKpiDateRangeAndXmId(@Param("xmId") Integer xmId,
       @Param("beginDate") LocalDate beginDate, @Param("endDate") LocalDate endDate);
 
-  @SelectProvider(type = Sql.class, method = "selectKpisWithKpiDateAndProjectId")
-  List<Kpi> selectKpisWithKpiDateAndProjectId(@Param("projectId") int projectId, @Param("date") LocalDate date);
+  @SelectProvider(type = Sql.class, method = "selectKpisWithKpiDateAndXmId")
+  List<Kpi> selectKpisWithKpiDateAndXmId(@Param("xmId") int xmId, @Param("date") LocalDate date);
 
 }

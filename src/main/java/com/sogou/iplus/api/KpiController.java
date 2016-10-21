@@ -54,7 +54,7 @@ public class KpiController {
       @ApiQueryParam(name = "date", description = "kpi日期", format = "yyyy-MM-dd", required = false) @RequestParam @DateTimeFormat(iso = ISO.DATE) Optional<LocalDate> date) {
     Project project = Project.PROJECT_MAP.get(xmId);
     if (Objects.isNull(project)) return ApiResult.badRequest("invalid xmId");
-    if (!Objects.equals(project.getProjectKey(), xmKey)) return ApiResult.forbidden();
+    if (!Objects.equals(project.getXmKey(), xmKey)) return ApiResult.forbidden();
     LocalDate time = date.orElse(LocalDate.now().minusDays(1));
     Set<Kpi> kpis = new HashSet<>();
     String kpiStr;
@@ -73,11 +73,11 @@ public class KpiController {
 
   @ApiMethod(description = "select kpis")
   @RequestMapping(value = "/kpi", method = RequestMethod.GET)
-  public ApiResult<?> selectKpisWithDateAndProjectId(
-      @ApiQueryParam(name = "projectId", description = "项目Id", required = false) @RequestParam Optional<Integer> projectId,
+  public ApiResult<?> selectKpisWithDateAndXmId(
+      @ApiQueryParam(name = "xmId", description = "项目Id", required = false) @RequestParam Optional<Integer> xmId,
       @ApiQueryParam(name = "beginDate", description = "起始日期", format = "yyyy-MM-dd") @RequestParam @DateTimeFormat(iso = ISO.DATE) LocalDate beginDate,
       @ApiQueryParam(name = "endDate", description = "结束日期", format = "yyyy-MM-dd") @RequestParam @DateTimeFormat(iso = ISO.DATE) LocalDate endDate) {
-    return kpiManager.selectKpisWithDateAndProjectId(projectId, beginDate, endDate);
+    return kpiManager.selectKpisWithDateAndXmId(xmId, beginDate, endDate);
   }
 
   @ApiMethod(description = "list projects")
@@ -88,24 +88,24 @@ public class KpiController {
 
   @ApiMethod(description = "list kpis")
   @RequestMapping(value = "/project/kpi", method = RequestMethod.GET)
-  public ApiResult<?> listKpis(@ApiQueryParam(name = "projectId", description = "项目Id") @RequestParam int projectId) {
-    return new ApiResult<>(Project.PROJECT_MAP.get(projectId).getKpis());
+  public ApiResult<?> listKpis(@ApiQueryParam(name = "xmId", description = "项目Id") @RequestParam int xmId) {
+    return new ApiResult<>(Project.PROJECT_MAP.get(xmId).getKpis());
   }
 
   @ApiMethod(description = "select kpis on named date")
   @RequestMapping(value = "/kpi/project", method = RequestMethod.GET)
-  public ApiResult<?> selectKpisWithDateAndProjectId(
+  public ApiResult<?> selectKpisWithDateAndXmId(
       @RequestAttribute(name = CookieInterceptor.ATTRIBUTE_NAME, required = false) User user,
-      @ApiQueryParam(name = "projectId", description = "项目Id") @RequestParam int projectId,
-      @ApiQueryParam(name = "projectKey", description = "项目秘钥") @RequestParam String projectKey,
+      @ApiQueryParam(name = "xmId", description = "项目Id") @RequestParam int xmId,
+      @ApiQueryParam(name = "xmKey", description = "项目秘钥") @RequestParam String xmKey,
       @ApiQueryParam(name = "date", description = "kpi日期", format = "yyyy-MM-dd") @RequestParam @DateTimeFormat(iso = ISO.DATE) LocalDate date) {
-    if (Objects.isNull(user) && !isValidKey(projectId, projectKey)) return ApiResult.forbidden();
-    return kpiManager.selectKpisWithDateAndProjectId(projectId, date);
+    if (Objects.isNull(user) && !isValidKey(xmId, xmKey)) return ApiResult.forbidden();
+    return kpiManager.selectKpisWithDateAndXmId(xmId, date);
   }
 
-  private boolean isValidKey(int projectId, String projectKey) {
-    Project project = Project.PROJECT_MAP.get(projectId);
+  private boolean isValidKey(int xmId, String xmKey) {
+    Project project = Project.PROJECT_MAP.get(xmId);
     if (Objects.isNull(project)) return false;
-    return Objects.equals(project.getProjectKey(), projectKey);
+    return Objects.equals(project.getXmKey(), xmKey);
   }
 }
