@@ -11,16 +11,20 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.jmx.export.annotation.AnnotationMBeanExporter;
 import org.springframework.jmx.support.MBeanServerFactoryBean;
 import redis.clients.jedis.JedisPool;
+import redis.clients.jedis.JedisPoolConfig;
 import commons.spring.*;
 import commons.saas.RestNameService;
+import commons.saas.XiaopLoginService;
 
 @Configuration
 @EnableScheduling
-@ComponentScan({ProjectInfo.PKG_PREFIX + ".api", ProjectInfo.PKG_PREFIX + ".manager"})
+@ComponentScan({ ProjectInfo.PKG_PREFIX + ".api", ProjectInfo.PKG_PREFIX + ".manager" })
 @PropertySource(value = "classpath:application-default.properties", ignoreResourceNotFound = true)
 @PropertySource("classpath:application-${spring.profiles.active}.properties")
 public class RootConfig {
-  @Autowired Environment env;
+
+  @Autowired
+  Environment env;
 
   @Bean
   public MBeanServerFactoryBean mbeanServer() {
@@ -47,9 +51,23 @@ public class RootConfig {
 
   @Bean
   public JedisPool jedisPool() {
-    return new JedisPool(
-      env.getRequiredProperty("redis.url"),
-      env.getRequiredProperty("redis.port", Integer.class));
+    String pass = env.getProperty("redis.pass");
+    if (pass != null) {
+      return new JedisPool(new JedisPoolConfig(), env.getRequiredProperty("redis.url"),
+          env.getRequiredProperty("redis.port", Integer.class), 2, pass); // 2 second
+    } else {
+      return new JedisPool(env.getRequiredProperty("redis.url"), env.getRequiredProperty("redis.port", Integer.class));
+    }
+  }
+
+  @Bean
+  public RedisRememberMeService rememberMeServices() {
+    return new RedisRememberMeService(jedisPool(), env.getProperty("rest.tokenpool", ""), "", 86400 * 7);
+  }
+
+  @Bean
+  public XiaopLoginService xiaopLoginService() {
+    return new XiaopLoginService(jedisPool());
   }
 
   @Bean
@@ -67,8 +85,7 @@ public class RootConfig {
 
   @Bean
   public RestTemplate restTemplate() {
-    HttpComponentsClientHttpRequestFactory factory =
-      new HttpComponentsClientHttpRequestFactory();
+    HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory();
     factory.setConnectTimeout(Integer.parseInt(env.getProperty("rest.timeout.connect", "1000")));
     factory.setReadTimeout(Integer.parseInt(env.getProperty("rest.timeout.read", "10000")));
 
@@ -76,8 +93,7 @@ public class RootConfig {
     rest.setInterceptors(Arrays.asList(new RestTemplateFilter()));
     rest.getMessageConverters().add(new LooseGsonHttpMessageConverter());
 
-    return rest;    
+    return rest;
   }
-  
-  
+
 }

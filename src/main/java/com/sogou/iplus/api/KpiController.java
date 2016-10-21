@@ -21,15 +21,19 @@ import org.jsondoc.core.annotation.ApiQueryParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.format.annotation.DateTimeFormat.ISO;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.sogou.iplus.entity.Company;
 import com.sogou.iplus.entity.Kpi;
 import com.sogou.iplus.entity.Project;
 import com.sogou.iplus.manager.KpiManager;
 import com.sogou.iplus.model.ApiResult;
+
+import commons.spring.RedisRememberMeService.User;
 
 //--------------------- Change Logs----------------------
 //@author wangwenlong Initial Created at 2016年10月11日;
@@ -50,7 +54,7 @@ public class KpiController {
       @ApiQueryParam(name = "date", description = "kpi日期", format = "yyyy-MM-dd", required = false) @RequestParam @DateTimeFormat(iso = ISO.DATE) Optional<LocalDate> date) {
     Project project = Project.PROJECT_MAP.get(xmId);
     if (Objects.isNull(project)) return ApiResult.badRequest("invalid xmId");
-    if (!Objects.equals(project.getProjectKey(), xmKey)) return ApiResult.forbidden();
+    if (!Objects.equals(project.getXmKey(), xmKey)) return ApiResult.forbidden();
     LocalDate time = date.orElse(LocalDate.now().minusDays(1));
     Set<Kpi> kpis = new HashSet<>();
     String kpiStr;
@@ -69,10 +73,38 @@ public class KpiController {
 
   @ApiMethod(description = "select kpis")
   @RequestMapping(value = "/kpi", method = RequestMethod.GET)
-  public ApiResult<?> selectKpisWithDateAndProjectId(
-      @ApiQueryParam(name = "projectId", description = "项目Id") @RequestParam Optional<Integer> projectId,
+  public ApiResult<?> selectKpisWithDateAndXmId(
+      @ApiQueryParam(name = "xmId", description = "项目Id", required = false) @RequestParam Optional<Integer> xmId,
       @ApiQueryParam(name = "beginDate", description = "起始日期", format = "yyyy-MM-dd") @RequestParam @DateTimeFormat(iso = ISO.DATE) LocalDate beginDate,
       @ApiQueryParam(name = "endDate", description = "结束日期", format = "yyyy-MM-dd") @RequestParam @DateTimeFormat(iso = ISO.DATE) LocalDate endDate) {
-    return kpiManager.selectKpisWithDateAndProjectId(projectId, beginDate, endDate);
+    return kpiManager.selectKpisWithDateAndXmId(xmId, beginDate, endDate);
+  }
+
+  @ApiMethod(description = "list projects")
+  @RequestMapping(value = "/project", method = RequestMethod.GET)
+  public ApiResult<?> listProjects() {
+    return new ApiResult<>(Company.SOGOU);
+  }
+
+  @ApiMethod(description = "list kpis")
+  @RequestMapping(value = "/project/kpi", method = RequestMethod.GET)
+  public ApiResult<?> listKpis(@ApiQueryParam(name = "xmId", description = "项目Id") @RequestParam int xmId) {
+    return new ApiResult<>(Project.PROJECT_MAP.get(xmId).getKpis());
+  }
+
+  @ApiMethod(description = "select kpis on named date")
+  @RequestMapping(value = "/kpi/project", method = RequestMethod.GET)
+  public ApiResult<?> selectKpisWithDateAndXmId(@AuthenticationPrincipal Optional<User> user,
+      @ApiQueryParam(name = "xmId", description = "项目Id") @RequestParam int xmId,
+      @ApiQueryParam(name = "xmKey", description = "项目秘钥") @RequestParam String xmKey,
+      @ApiQueryParam(name = "date", description = "kpi日期", format = "yyyy-MM-dd") @RequestParam @DateTimeFormat(iso = ISO.DATE) LocalDate date) {
+    if (!user.isPresent() && !isValidKey(xmId, xmKey)) return ApiResult.forbidden();
+    return kpiManager.selectKpisWithDateAndXmId(xmId, date);
+  }
+
+  private boolean isValidKey(int xmId, String xmKey) {
+    Project project = Project.PROJECT_MAP.get(xmId);
+    if (Objects.isNull(project)) return false;
+    return Objects.equals(project.getXmKey(), xmKey);
   }
 }

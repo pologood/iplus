@@ -62,10 +62,10 @@ public class KpiManager {
         projectMap.values().stream().filter(project -> !project.getKpis().isEmpty()).collect(Collectors.toList()));
   }
 
-  public ApiResult<?> selectKpisWithDateAndProjectId(Optional<Integer> projectId, LocalDate beginDate,
+  public ApiResult<?> selectKpisWithDateAndXmId(Optional<Integer> xmId, LocalDate beginDate,
       LocalDate endDate) {
     Map<LocalDate, Map<Integer, Project>> map = new HashMap<>();
-    List<Kpi> kpis = kpiMapper.selectKpisWithKpiDateAndProjectId(projectId.orElse(null), beginDate, endDate);
+    List<Kpi> kpis = kpiMapper.selectKpisWithKpiDateRangeAndXmId(xmId.orElse(null), beginDate, endDate);
     kpis.forEach(
         kpi -> map.computeIfAbsent(kpi.getKpiDate(), k -> new HashMap<>()).computeIfAbsent(kpi.getXmId(), k -> {
           Project project = Project.getProjectByKpiId(kpi.getKpiId());
@@ -74,6 +74,11 @@ public class KpiManager {
         }).getKpis().add(kpi));
     return new ApiResult<>(
         map.entrySet().stream().collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue().values())));
+  }
+
+  public ApiResult<?> selectKpisWithDateAndXmId(int xmId, LocalDate date) {
+    List<Kpi> kpis = kpiMapper.selectKpisWithKpiDateAndXmId(xmId, date);
+    return new ApiResult<>(kpis.stream().collect(Collectors.toMap(kpi -> kpi.getKpiId(), kpi -> kpi.getKpi())));
   }
 
 }
