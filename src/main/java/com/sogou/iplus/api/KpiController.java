@@ -7,9 +7,7 @@ package com.sogou.iplus.api;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -29,6 +27,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.sogou.iplus.entity.Company;
 import com.sogou.iplus.entity.Kpi;
 import com.sogou.iplus.entity.Project;
 import com.sogou.iplus.manager.KpiManager;
@@ -43,8 +42,6 @@ import commons.spring.RedisRememberMeService.User;
 @RestController
 @RequestMapping("/api")
 public class KpiController {
-
-  public String debugKey = "I4ZQBWCHH23IGZWE";
 
   @Autowired
   private KpiManager kpiManager;
@@ -86,10 +83,7 @@ public class KpiController {
   @ApiMethod(description = "list projects")
   @RequestMapping(value = "/project", method = RequestMethod.GET)
   public ApiResult<?> listProjects() {
-    Map<String, Set<Project>> map = new HashMap<>();
-    Project.PROJECTS.stream().filter(p -> Objects.nonNull(p.getBusinessUnit()))
-        .forEach(p -> map.computeIfAbsent(p.getBusinessUnit().getValue(), k -> new HashSet<>()).add(p));
-    return new ApiResult<>(map);
+    return new ApiResult<>(Company.SOGOU);
   }
 
   @ApiMethod(description = "list kpis")
