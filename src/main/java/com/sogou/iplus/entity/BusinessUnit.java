@@ -26,7 +26,7 @@ public class BusinessUnit {
 
   static {
     SEARCH.setName("搜索事业部");
-    SEARCH.setKpis(Sets.newHashSet(37, 38, 39, 40, 41, 42, 43, 49, 50, 51, 52, 53, 54, 59, 63));
+    SEARCH.setKpis(Sets.newHashSet(37, 38, 39, 40, 41, 42, 43, 49, 50, 51, 52, 53, 54, 59, 63, 207, 208));
     DESKTOP.setName("桌面事业部");
     DESKTOP.setKpis(Sets.newHashSet(1, 3, 13, 15, 21, 26, 27, 32));
     SUGARCAT.setName("糖猫事业部");
