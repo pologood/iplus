@@ -55,7 +55,7 @@ public class WebConfig extends WebMvcConfigurerAdapter {
     r.setUseTrailingSlashMatch(false);
     r.setUseSuffixPatternMatch(false);
     r.setRemoveSemicolonContent(false);
-    r.setInterceptors(new Object[] { new MappedInterceptor(new String[] { "/api/kpi/project" }, tokenInterceptor) });
+    r.setInterceptors(new Object[] { new MappedInterceptor(new String[] { "/api/kpi" }, tokenInterceptor) });
     r.setOrder(0);
     return r;
   }
