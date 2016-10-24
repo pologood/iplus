@@ -118,6 +118,10 @@ public class ApiResult<Data> {
     return new ApiResult<>(Errno.BAD_REQUEST, map);
   }
 
+  public static boolean isOk(ApiResult<?> apiResult) {
+    return Objects.nonNull(apiResult) && apiResult.getCode() == Errno.OK;
+  }
+
   public ApiResult(int code, String message, Data data) {
     this.code = code;
     this.message = message;

@@ -9,9 +9,6 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -31,9 +28,7 @@ import com.sogou.iplus.api.KpiController;
 import com.sogou.iplus.config.DaoConfig;
 import com.sogou.iplus.config.RootConfig;
 import com.sogou.iplus.entity.Company;
-import com.sogou.iplus.entity.Kpi;
 import com.sogou.iplus.entity.Project;
-import com.sogou.iplus.mapper.KpiMapper;
 import com.sogou.iplus.model.ApiResult;
 
 //--------------------- Change Logs----------------------
@@ -47,15 +42,16 @@ public class KpiControllerTest {
   @Mock
   private HttpServletRequest mockRequest;
 
-  private LocalDate date = LocalDate.of(2015, 11, 11);
-
   private final int testXmId = 70;
+
+  private final Project testProject = Project.PROJECT_MAP.get(testXmId);
+
+  private final String testXmKey = testProject.getXmKey();
+
+  private final int testKpiId = testProject.getKpis().iterator().next().getKpiId();
 
   @Autowired
   private KpiController controller;
-
-  @Autowired
-  private KpiMapper mapper;
 
   @Before
   public void setup() {
@@ -64,69 +60,62 @@ public class KpiControllerTest {
 
   @Test
   public void test() {
+    getCompany();
     add();
+    update();
     selectNull();
-    select();
-    select2();
-    listProjects();
-    listProjectKpis();
+    selectKpisWithDateAndXmId();
+    selectKpisWithDateRangeAndKpiId();
+  }
+
+  public void getCompany() {
+    ApiResult<?> result = controller.getCompany();
+    Assert.assertTrue(ApiResult.isOk(result));
+    Company sogou = (Company) result.getData();
+    System.out.println(sogou);
+    Assert.assertFalse(sogou.getBusinessUnits().isEmpty());
   }
 
   public void add() {
-    Project project = Project.PROJECT_MAP.get(testXmId);
-    project.getKpis().forEach(
+    Assert.assertTrue(ApiResult.isOk(controller.add()));
+  }
+
+  public void update() {
+    testProject.getKpis().forEach(
         kpi -> Mockito.when(mockRequest.getParameter(kpi.getKpiId().toString())).thenReturn(kpi.getKpiId().toString()));
-    controller.add(mockRequest, project.getXmId(), project.getXmKey(), Optional.of(date));
-    Map<Integer, Kpi> kpiMap = mapper.selectKpisWithKpiDate(date).stream()
-        .collect(Collectors.toMap(kpi -> kpi.getKpiId(), kpi -> kpi));
-    Assert.assertEquals(project.getKpis().size(), kpiMap.size());
-    project.getKpis()
-        .forEach(kpi -> Assert.assertEquals(kpi.getKpiId().intValue(), kpiMap.get(kpi.getKpiId()).getKpi().intValue()));
+    Assert
+        .assertTrue(ApiResult.isOk(controller.update(mockRequest, testXmId, testXmKey, LocalDate.now().minusDays(1))));
   }
 
   public void selectNull() {
-    ApiResult<?> result = controller.selectProjectsDoNotSubmitKpiOnNamedDate(Optional.of(LocalDate.now()));
-    Assert.assertEquals(result.getCode(), ApiResult.ok().getCode());
+    ApiResult<?> result = controller.selectProjectsDoNotSubmitKpiOnNamedDate(LocalDate.now());
+    Assert.assertTrue(ApiResult.isOk(result));
     List<?> objects = (List<?>) result.getData();
     Assert.assertFalse(objects.isEmpty());
     Assert.assertEquals(0,
         objects.stream().map(o -> (Project) o).filter(project -> Objects.equals(testXmId, project.getXmId())).count());
   }
 
-  public void select() {
-    ApiResult<?> result = controller.selectKpisWithDateAndXmId(Optional.of(testXmId), date, LocalDate.now());
-    Assert.assertEquals(result.getCode(), ApiResult.ok().getCode());
+  public void selectKpisWithDateAndXmId() {
+    ApiResult<?> result = controller.selectKpisWithDateAndXmId(null, testXmId, testXmKey, LocalDate.now());
+    Assert.assertTrue(ApiResult.isOk(result));
     Map<?, ?> map = (Map<?, ?>) result.getData();
     System.out.println(map);
     Assert.assertFalse(map.isEmpty());
-  }
 
-  public void listProjects() {
-    ApiResult<?> result = controller.listProjects();
-    Assert.assertEquals(result.getCode(), ApiResult.ok().getCode());
-    Company sogou = (Company) result.getData();
-    System.out.println(sogou);
-    Assert.assertFalse(sogou.getBusinessUnits().isEmpty());
-  }
-
-  public void listProjectKpis() {
-    ApiResult<?> result = controller.listKpis(70);
-    Assert.assertEquals(result.getCode(), ApiResult.ok().getCode());
-    Set<?> set = (Set<?>) result.getData();
-    System.out.println(set);
-    Assert.assertFalse(set.isEmpty());
-  }
-
-  public void select2() {
-    ApiResult<?> result = controller.selectKpisWithDateAndXmId(Optional.empty(), testXmId,
-        Project.PROJECT_MAP.get(testXmId).getXmKey(), date);
-    Assert.assertEquals(result.getCode(), ApiResult.ok().getCode());
-    Map<?, ?> map = (Map<?, ?>) result.getData();
-    System.out.println(map);
-    Assert.assertFalse(map.isEmpty());
-    result = controller.selectKpisWithDateAndXmId(Optional.empty(), 0, Project.PROJECT_MAP.get(0).getXmKey(), date);
-    Assert.assertEquals(result.getCode(), ApiResult.ok().getCode());
+    //debug project
+    result = controller.selectKpisWithDateAndXmId(null, 0, Project.PROJECT_MAP.get(0).getXmKey(), LocalDate.now());
+    Assert.assertTrue(ApiResult.isOk(result));
     map = (Map<?, ?>) result.getData();
+    System.out.println(map);
+    Assert.assertFalse(map.isEmpty());
+  }
+
+  public void selectKpisWithDateRangeAndKpiId() {
+    ApiResult<?> result = controller.selectKpisWithDateRangeAndKpiId(testXmId, testXmKey, testKpiId, LocalDate.now(),
+        LocalDate.now().plusDays(1));
+    Assert.assertTrue(ApiResult.isOk(result));
+    Map<?, ?> map = (Map<?, ?>) result.getData();
     System.out.println(map);
     Assert.assertFalse(map.isEmpty());
   }
