@@ -49,9 +49,10 @@ public class KpiController {
 
   @ApiMethod(description = "update kpi record")
   @RequestMapping(value = "/kpi", method = RequestMethod.PUT)
-  public ApiResult<?> update(HttpServletRequest request, @ApiQueryParam(description = "项目id") @RequestParam int xmId,
-      @ApiQueryParam(description = "项目秘钥") @RequestParam String xmKey,
-      @ApiQueryParam(description = "kpi日期", format = "yyyy-MM-dd") @RequestParam @DateTimeFormat(iso = ISO.DATE) LocalDate date) {
+  public ApiResult<?> update(HttpServletRequest request,
+      @ApiQueryParam(name = "xmId", description = "项目id") @RequestParam int xmId,
+      @ApiQueryParam(name = "xmKey", description = "项目秘钥") @RequestParam String xmKey,
+      @ApiQueryParam(name = "date", description = "kpi日期", format = "yyyy-MM-dd") @RequestParam @DateTimeFormat(iso = ISO.DATE) LocalDate date) {
     Project project = getProject(xmId, xmKey);
     if (Objects.isNull(project)) return ApiResult.forbidden();
     Set<Kpi> kpis = new HashSet<>();
@@ -65,17 +66,18 @@ public class KpiController {
   @ApiMethod(description = "select projects do not submit kpi on named date")
   @RequestMapping(value = "/kpi/null", method = RequestMethod.GET)
   public ApiResult<?> selectProjectsDoNotSubmitKpiOnNamedDate(
-      @ApiQueryParam(description = "kpi日期", format = "yyyy-MM-dd") @RequestParam @DateTimeFormat(iso = ISO.DATE) LocalDate date) {
+      @ApiQueryParam(name = "date", description = "kpi日期", format = "yyyy-MM-dd") @RequestParam @DateTimeFormat(iso = ISO.DATE) LocalDate date) {
     return kpiManager.selectProjectsDoNotSubmitKpiOnNamedDate(date);
   }
 
   @ApiMethod(description = "select kpis with date range and kpiId")
   @RequestMapping(value = "/kpi/range", method = RequestMethod.GET)
-  public ApiResult<?> selectKpisWithDateRangeAndKpiId(@ApiQueryParam(description = "项目Id") @RequestParam int xmId,
-      @ApiQueryParam(description = "项目秘钥") @RequestParam String xmKey,
-      @ApiQueryParam(description = "kpiId") @RequestParam int kpiId,
-      @ApiQueryParam(description = "起始日期", format = "yyyy-MM-dd") @RequestParam @DateTimeFormat(iso = ISO.DATE) LocalDate beginDate,
-      @ApiQueryParam(description = "结束日期", format = "yyyy-MM-dd") @RequestParam @DateTimeFormat(iso = ISO.DATE) LocalDate endDate) {
+  public ApiResult<?> selectKpisWithDateRangeAndKpiId(
+      @ApiQueryParam(name = "xmId", description = "项目Id") @RequestParam int xmId,
+      @ApiQueryParam(name = "xmKey", description = "项目秘钥") @RequestParam String xmKey,
+      @ApiQueryParam(name = "kpiId", description = "kpiId") @RequestParam int kpiId,
+      @ApiQueryParam(name = "beginDate", description = "起始日期", format = "yyyy-MM-dd") @RequestParam @DateTimeFormat(iso = ISO.DATE) LocalDate beginDate,
+      @ApiQueryParam(name = "endDate", description = "结束日期", format = "yyyy-MM-dd") @RequestParam @DateTimeFormat(iso = ISO.DATE) LocalDate endDate) {
     Project project = getProject(xmId, xmKey);
     if (Objects.isNull(project)
         || !project.getKpis().stream().map(kpi -> kpi.getKpiId()).collect(Collectors.toSet()).contains(kpiId))
