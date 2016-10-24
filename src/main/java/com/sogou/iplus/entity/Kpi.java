@@ -26,24 +26,25 @@ public class Kpi {
   public Kpi() {
   }
 
-  public Kpi(Integer xmId, Integer kpiId, String kpiName, BigDecimal kpi, LocalDate kpiDate) {
+  public Kpi(Integer xmId, Integer kpiId, String kpiName, BigDecimal kpi, LocalDate kpiDate, Integer day) {
     this.xmId = xmId;
     this.kpiId = kpiId;
     this.kpiName = kpiName;
     this.kpi = kpi;
     this.kpiDate = kpiDate;
+    this.day = day;
   }
 
   public Kpi(Kpi kpi) {
-    this(kpi.getXmId(), kpi.getKpiId(), kpi.getKpiName(), kpi.getKpi(), kpi.getKpiDate());
+    this(kpi.getXmId(), kpi.getKpiId(), kpi.getKpiName(), kpi.getKpi(), kpi.getKpiDate(), kpi.getDay());
   }
 
-  public Kpi(int kpiId, String kpiName) {
-    this(null, kpiId, kpiName, null, null);
+  public Kpi(int kpiId, String kpiName, int day) {
+    this(null, kpiId, kpiName, null, null, day);
   }
 
   public Kpi(int xmId, Integer kpiId, BigDecimal kpi, LocalDate kpiDate) {
-    this(xmId, kpiId, null, kpi, kpiDate);
+    this(xmId, kpiId, null, kpi, kpiDate, 1);
   }
 
   @JsonIgnore
@@ -69,6 +70,9 @@ public class Kpi {
 
   @JsonIgnore
   private LocalDateTime updateTime;
+
+  @JsonIgnore
+  private transient Integer day = 1;
 
   public Integer getId() {
     return id;
@@ -132,6 +136,14 @@ public class Kpi {
 
   public void setUpdateTime(LocalDateTime updateTime) {
     this.updateTime = updateTime;
+  }
+
+  public int getDay() {
+    return Objects.isNull(day) ? 1 : day;
+  }
+
+  public void setDay(int day) {
+    this.day = day;
   }
 
   @Override

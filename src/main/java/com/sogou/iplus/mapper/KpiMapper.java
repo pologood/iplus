@@ -34,13 +34,8 @@ public interface KpiMapper {
 
     public static final String ITEMS = "`xmId`, `kpiId`, `kpiDate`, `kpi`, `createTime`, `updateTime`";
 
-    public static String select(Kpi kpi) {
-      return new SQL().SELECT(ITEMS).FROM(TABLE).WHERE("xmId = #{xmId}").WHERE("kpiId = #{kpiId}")
-          .WHERE("kpiDate = #{kpiDate}").toString();
-    }
-
     public static String add(Kpi kpi) {
-      kpi.setCreateTime(LocalDateTime.now());
+      if (Objects.isNull(kpi.getCreateTime())) kpi.setCreateTime(LocalDateTime.now());
       return new SQL().INSERT_INTO(TABLE).VALUES("xmId", "#{xmId}").VALUES("kpiId", "#{kpiId}")
           .VALUES("kpiDate", "#{kpiDate}").VALUES("kpi", "#{kpi}").VALUES("createTime", "#{createTime}").toString();
     }
@@ -50,51 +45,52 @@ public interface KpiMapper {
           .WHERE("kpiDate = #{kpiDate}").toString();
     }
 
-    public static String selectKpisWithKpiDate(LocalDate kpiDate) {
-      return new SQL().SELECT(ITEMS).FROM(TABLE).WHERE("kpiDate = #{kpiDate}").toString();
-    }
-
-    public static String selectKpisWithCreateTime(LocalDate date) {
-      SQL sql = new SQL().SELECT(ITEMS).FROM(TABLE).WHERE("createTime >= #{date}");
-      LocalDate tomorrow = date.plusDays(1);
-      sql.WHERE(String.format("createTime < '%s'", tomorrow));
-      return sql.toString();
-    }
-
-    public static String selectKpisWithKpiDateRangeAndXmId(Map<String, Object> map) {
-      SQL sql = new SQL().SELECT(ITEMS).FROM(TABLE).WHERE("kpiDate >= #{beginDate}").WHERE("kpiDate <= #{endDate}");
-      if (Objects.nonNull(map.get("xmId"))) sql.WHERE("xmId = #{xmId}");
-      return sql.toString();
-    }
-
-    public static String selectKpisWithKpiDateAndXmId(Map<String, Object> map) {
-      SQL sql = new SQL().SELECT(ITEMS).FROM(TABLE).WHERE("kpiDate = #{date}");
+    public static String select(Map<String, Object> map) {
+      SQL sql = new SQL().SELECT(ITEMS).FROM(TABLE);
       if (0 != MapUtils.getIntValue(map, "xmId")) sql.WHERE("xmId = #{xmId}");
+      if (0 != MapUtils.getIntValue(map, "kpiId")) sql.WHERE("kpiId = #{kpiId}");
+      LocalDate date = (LocalDate) map.get("date");
+      if (Objects.nonNull(date))
+        sql.WHERE("createTime >= #{date}").WHERE(String.format("createTime < '%s'", date.plusDays(1)));
+      if (MapUtils.getBooleanValue(map, "isValid")) sql.WHERE(String.format("kpi != %s", Integer.MIN_VALUE));
       return sql.toString();
     }
+
+    public static String selectWithDateRangeAndKpiId(Map<String, Object> map) {
+      SQL sql = new SQL().SELECT(ITEMS).FROM(TABLE).WHERE("kpiId = #{kpiId}").WHERE("createTime >= #{beginDate}")
+          .WHERE("createTime <= #{endDate}");
+      if (Objects.nonNull(map.get("xmId"))) sql.WHERE("xmId = #{xmId}");
+      if (MapUtils.getBooleanValue(map, "isValid")) sql.WHERE(String.format("kpi != %s", Integer.MIN_VALUE));
+      return sql.toString();
+    }
+
+    public static String selectWithDateAndXmId(Map<String, Object> map) {
+      SQL sql = new SQL().SELECT(ITEMS).FROM(TABLE).WHERE("createTime >= #{date}")
+          .WHERE(String.format("createTime < '%s'", ((LocalDate) map.get("date")).plusDays(1)));
+      if (0 != MapUtils.getIntValue(map, "xmId")) sql.WHERE("xmId = #{xmId}");
+      if (MapUtils.getBooleanValue(map, "isValid")) sql.WHERE(String.format("kpi != %s", Integer.MIN_VALUE));
+      return sql.toString();
+    }
+
   }
 
   @InsertProvider(type = Sql.class, method = "add")
   @Options(useGeneratedKeys = true, keyProperty = "id")
   int add(Kpi kpi);
 
-  @SelectProvider(type = Sql.class, method = "select")
-  Kpi select(Kpi kpi);
-
   @UpdateProvider(type = Sql.class, method = "update")
   int update(Kpi kpi);
 
-  @SelectProvider(type = Sql.class, method = "selectKpisWithKpiDate")
-  List<Kpi> selectKpisWithKpiDate(LocalDate date);
+  @SelectProvider(type = Sql.class, method = "select")
+  List<Kpi> select(@Param("xmId") Integer xmId, @Param("kpiId") Integer kpiId, @Param("date") LocalDate date,
+      @Param("isValid") boolean isValid);
 
-  @SelectProvider(type = Sql.class, method = "selectKpisWithCreateTime")
-  List<Kpi> selectKpisWithCreateDate(LocalDate date);
+  @SelectProvider(type = Sql.class, method = "selectWithDateRangeAndKpiId")
+  List<Kpi> selectWithDateRangeAndKpiId(@Param("xmId") int xmId, @Param("kpiId") int kpiId,
+      @Param("beginDate") LocalDate beginDate, @Param("endDate") LocalDate endDate, @Param("isValid") boolean isValid);
 
-  @SelectProvider(type = Sql.class, method = "selectKpisWithKpiDateRangeAndXmId")
-  List<Kpi> selectKpisWithKpiDateRangeAndXmId(@Param("xmId") Integer xmId,
-      @Param("beginDate") LocalDate beginDate, @Param("endDate") LocalDate endDate);
-
-  @SelectProvider(type = Sql.class, method = "selectKpisWithKpiDateAndXmId")
-  List<Kpi> selectKpisWithKpiDateAndXmId(@Param("xmId") int xmId, @Param("date") LocalDate date);
+  @SelectProvider(type = Sql.class, method = "selectWithDateAndXmId")
+  List<Kpi> selectWithDateAndXmId(@Param("xmId") int xmId, @Param("date") LocalDate date,
+      @Param("isValid") boolean isValid);
 
 }
