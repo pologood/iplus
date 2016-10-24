@@ -9,7 +9,6 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -79,8 +78,8 @@ public class KpiController {
       @ApiQueryParam(name = "beginDate", description = "起始日期", format = "yyyy-MM-dd") @RequestParam @DateTimeFormat(iso = ISO.DATE) LocalDate beginDate,
       @ApiQueryParam(name = "endDate", description = "结束日期", format = "yyyy-MM-dd") @RequestParam @DateTimeFormat(iso = ISO.DATE) LocalDate endDate) {
     Project project = getProject(xmId, xmKey);
-    if (Objects.isNull(project)
-        || !project.getKpis().stream().map(kpi -> kpi.getKpiId()).collect(Collectors.toSet()).contains(kpiId))
+    if (Objects.isNull(project) || (xmId != 0
+        && !project.getKpis().stream().map(kpi -> kpi.getKpiId()).collect(Collectors.toSet()).contains(kpiId)))
       return ApiResult.forbidden();
     return kpiManager.selectWithDateRangeAndKpiId(xmId, kpiId, beginDate, endDate);
   }
@@ -93,11 +92,11 @@ public class KpiController {
 
   @ApiMethod(description = "select kpis with xmId on named date")
   @RequestMapping(value = "/kpi", method = RequestMethod.GET)
-  public ApiResult<?> selectKpisWithDateAndXmId(@AuthenticationPrincipal Optional<User> user,
+  public ApiResult<?> selectKpisWithDateAndXmId(@AuthenticationPrincipal User user,
       @ApiQueryParam(name = "xmId", description = "项目Id") @RequestParam int xmId,
       @ApiQueryParam(name = "xmKey", description = "项目秘钥") @RequestParam String xmKey,
       @ApiQueryParam(name = "date", description = "kpi日期", format = "yyyy-MM-dd") @RequestParam @DateTimeFormat(iso = ISO.DATE) LocalDate date) {
-    if (!user.isPresent() && Objects.isNull(getProject(xmId, xmKey))) return ApiResult.forbidden();
+    if (Objects.isNull(user) && Objects.isNull(getProject(xmId, xmKey))) return ApiResult.forbidden();
     return kpiManager.selectWithDateAndXmId(xmId, date);
   }
 
