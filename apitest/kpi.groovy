@@ -10,9 +10,7 @@ def yesterday = today - 1
 def todayStr = today.format("yyyy-MM-dd")
 def yesterdayStr = yesterday.format("yyyy-MM-dd")
 
-POST("/api/kpi") {
-  r.body=[]
-}
+POST("/api/kpi")
 EXPECT { 
   json.code = 0 
 }
