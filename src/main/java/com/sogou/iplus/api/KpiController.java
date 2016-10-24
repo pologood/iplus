@@ -92,7 +92,7 @@ public class KpiController {
   }
 
   @ApiMethod(description = "select kpis with xmId on named date")
-  @RequestMapping(value = "/kpi/date", method = RequestMethod.GET)
+  @RequestMapping(value = "/kpi", method = RequestMethod.GET)
   public ApiResult<?> selectKpisWithDateAndXmId(@AuthenticationPrincipal Optional<User> user,
       @ApiQueryParam(name = "xmId", description = "项目Id") @RequestParam int xmId,
       @ApiQueryParam(name = "xmKey", description = "项目秘钥") @RequestParam String xmKey,
