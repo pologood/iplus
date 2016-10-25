@@ -9,10 +9,12 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
 import org.jsondoc.core.annotation.Api;
@@ -33,6 +35,8 @@ import com.sogou.iplus.entity.Project;
 import com.sogou.iplus.manager.KpiManager;
 import com.sogou.iplus.model.ApiResult;
 
+import commons.saas.XiaopLoginService;
+import commons.spring.RedisRememberMeService;
 import commons.spring.RedisRememberMeService.User;
 
 //--------------------- Change Logs----------------------
@@ -45,6 +49,12 @@ public class KpiController {
 
   @Autowired
   private KpiManager kpiManager;
+
+  @Autowired
+  RedisRememberMeService redisService;
+
+  @Autowired
+  XiaopLoginService pandoraService;
 
   @ApiMethod(description = "update kpi record")
   @RequestMapping(value = "/kpi", method = RequestMethod.PUT)
@@ -62,6 +72,11 @@ public class KpiController {
     return kpiManager.update(kpis);
   }
 
+  private Project getProject(int xmId, String xmKey) {
+    Project project = Project.PROJECT_MAP.get(xmId);
+    return Objects.nonNull(project) && Objects.equals(xmKey, project.getXmKey()) ? project : null;
+  }
+
   @ApiMethod(description = "select projects do not submit kpi on named date")
   @RequestMapping(value = "/kpi/null", method = RequestMethod.GET)
   public ApiResult<?> selectProjectsDoNotSubmitKpiOnNamedDate(
@@ -71,17 +86,33 @@ public class KpiController {
 
   @ApiMethod(description = "select kpis with date range and kpiId")
   @RequestMapping(value = "/kpi/range", method = RequestMethod.GET)
-  public ApiResult<?> selectKpisWithDateRangeAndKpiId(
-      @ApiQueryParam(name = "xmId", description = "项目Id") @RequestParam int xmId,
-      @ApiQueryParam(name = "xmKey", description = "项目秘钥") @RequestParam String xmKey,
+  public ApiResult<?> selectKpisWithDateRangeAndKpiId(@AuthenticationPrincipal User user, HttpServletResponse response,
+      @ApiQueryParam(name = "token", description = "pandora token") @RequestParam Optional<String> token,
+      @ApiQueryParam(name = "xmId", description = "项目Id") @RequestParam Optional<Integer> xmId,
+      @ApiQueryParam(name = "xmKey", description = "项目秘钥") @RequestParam Optional<String> xmKey,
       @ApiQueryParam(name = "kpiId", description = "kpiId") @RequestParam int kpiId,
       @ApiQueryParam(name = "beginDate", description = "起始日期", format = "yyyy-MM-dd") @RequestParam @DateTimeFormat(iso = ISO.DATE) LocalDate beginDate,
       @ApiQueryParam(name = "endDate", description = "结束日期", format = "yyyy-MM-dd") @RequestParam @DateTimeFormat(iso = ISO.DATE) LocalDate endDate) {
-    Project project = getProject(xmId, xmKey);
-    if (Objects.isNull(project) || (xmId != 0
-        && !project.getKpis().stream().map(kpi -> kpi.getKpiId()).collect(Collectors.toSet()).contains(kpiId)))
-      return ApiResult.forbidden();
-    return kpiManager.selectWithDateRangeAndKpiId(xmId, kpiId, beginDate, endDate);
+    if (!isValid(user, token, xmId, xmKey, response, kpiId)) return ApiResult.forbidden();
+    return kpiManager.selectWithDateRangeAndKpiId(xmId.orElse(null), kpiId, beginDate, endDate);
+  }
+
+  private boolean isValid(User user, Optional<String> token, Optional<Integer> xmId, Optional<String> xmKey,
+      HttpServletResponse response, Integer kpiId) {
+    return isValid(user, kpiId) || isValid(xmId, xmKey, kpiId) || login(token, response, kpiId);
+  }
+
+  private boolean isValid(User user, Integer kpiId) {
+    return Objects.nonNull(user);
+  }
+
+  private boolean login(Optional<String> token, HttpServletResponse response, Integer kpiId) {
+    if (!token.isPresent()) return false;
+    commons.saas.LoginService.User user = pandoraService.login(token.get());
+    if (Objects.isNull(user)) return false;
+    User user2 = new User(user.getOpenId(), user.getName());
+    redisService.login(response, user2);
+    return isValid(user2, kpiId);
   }
 
   @ApiMethod(description = "get company structure information")
@@ -92,22 +123,25 @@ public class KpiController {
 
   @ApiMethod(description = "select kpis with xmId on named date")
   @RequestMapping(value = "/kpi", method = RequestMethod.GET)
-  public ApiResult<?> selectKpisWithDateAndXmId(@AuthenticationPrincipal User user,
-      @ApiQueryParam(name = "xmId", description = "项目Id") @RequestParam int xmId,
-      @ApiQueryParam(name = "xmKey", description = "项目秘钥") @RequestParam String xmKey,
+  public ApiResult<?> selectKpisWithDateAndXmId(HttpServletResponse response, @AuthenticationPrincipal User user,
+      @ApiQueryParam(name = "token", description = "pandora token") @RequestParam Optional<String> token,
+      @ApiQueryParam(name = "xmId", description = "项目Id") @RequestParam Optional<Integer> xmId,
+      @ApiQueryParam(name = "xmKey", description = "项目秘钥") @RequestParam Optional<String> xmKey,
       @ApiQueryParam(name = "date", description = "kpi日期", format = "yyyy-MM-dd") @RequestParam @DateTimeFormat(iso = ISO.DATE) LocalDate date) {
-    if (Objects.isNull(user) && Objects.isNull(getProject(xmId, xmKey))) return ApiResult.forbidden();
-    return kpiManager.selectWithDateAndXmId(xmId, date);
+    if (!isValid(user, token, xmId, xmKey, response, null)) return ApiResult.forbidden();
+    return kpiManager.selectWithDateAndXmId(xmId.orElse(null), date);
   }
 
-  private Project getProject(int xmId, String xmKey) {
-    Project project = Project.PROJECT_MAP.get(xmId);
-    return Objects.isNull(project) || !Objects.equals(project.getXmKey(), xmKey) ? null : project;
+  private boolean isValid(Optional<Integer> xmId, Optional<String> xmKey, Integer kpiId) {
+    if (!xmId.isPresent() || !xmKey.isPresent()) return false;
+    Project project = Project.PROJECT_MAP.get(xmId.get());
+    return Objects.nonNull(project) && Objects.equals(project.getXmKey(), xmKey.get()) && (Objects.isNull(kpiId) ? true
+        : project.getKpis().stream().map(kpi -> kpi.getKpiId()).collect(Collectors.toSet()).contains(kpiId));
   }
 
   @ApiMethod(description = "add kpi record")
   @RequestMapping(value = "/kpi", method = RequestMethod.POST)
-  public ApiResult<?> add() {
-    return kpiManager.addAll();
+  public ApiResult<?> add(@ApiQueryParam(name = "date", description = "上传日期") @RequestParam Optional<LocalDate> date) {
+    return kpiManager.addAll(date.orElse(LocalDate.now()));
   }
 }
