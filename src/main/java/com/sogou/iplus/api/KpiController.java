@@ -135,8 +135,9 @@ public class KpiController {
   private boolean isValid(Optional<Integer> xmId, Optional<String> xmKey, Integer kpiId) {
     if (!xmId.isPresent() || !xmKey.isPresent()) return false;
     Project project = Project.PROJECT_MAP.get(xmId.get());
-    return Objects.nonNull(project) && Objects.equals(project.getXmKey(), xmKey.get()) && (Objects.isNull(kpiId) ? true
-        : project.getKpis().stream().map(kpi -> kpi.getKpiId()).collect(Collectors.toSet()).contains(kpiId));
+    return Objects.nonNull(project) && Objects.equals(project.getXmKey(), xmKey.get())
+        && (Objects.equals(xmId, 0) || Objects.isNull(kpiId) ? true
+            : project.getKpis().stream().map(kpi -> kpi.getKpiId()).collect(Collectors.toSet()).contains(kpiId));
   }
 
   @ApiMethod(description = "add kpi record")
