@@ -18,6 +18,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -54,23 +55,25 @@ public class KpiManager {
         projectMap.values().stream().filter(project -> !project.getKpis().isEmpty()).collect(Collectors.toList()));
   }
 
-  public ApiResult<?> selectWithDateAndXmId(int xmId, LocalDate date) {
+  public ApiResult<?> selectWithDateAndXmId(Integer xmId, LocalDate date) {
     List<Kpi> kpis = kpiMapper.selectWithDateAndXmId(xmId, date, true);
     return new ApiResult<>(kpis.stream().collect(Collectors.toMap(kpi -> kpi.getKpiId(), kpi -> kpi.getKpi())));
   }
 
-  public ApiResult<?> selectWithDateRangeAndKpiId(int xmId, int kpiId, LocalDate beginDate, LocalDate endDate) {
+  public ApiResult<?> selectWithDateRangeAndKpiId(Integer xmId, int kpiId, LocalDate beginDate, LocalDate endDate) {
     List<Kpi> kpis = kpiMapper.selectWithDateRangeAndKpiId(xmId, kpiId, beginDate, endDate, true);
     Map<LocalDate, Kpi> result = new HashMap<>();
     kpis.forEach(kpi -> result.put(kpi.getCreateTime().toLocalDate(), kpi));
     return new ApiResult<>(result);
   }
 
-  public ApiResult<?> addAll() {
-    List<Kpi> today = kpiMapper.select(null, null, LocalDate.now(), false);
-    if (CollectionUtils.isNotEmpty(today)) return ApiResult.ok();
-    Project.PROJECTS.forEach(project -> project.getKpis().forEach(kpi -> kpiMapper
-        .add(new Kpi(project.getXmId(), kpi.getKpiId(), new BigDecimal(Integer.MIN_VALUE), getKpiDate(kpi)))));
+  @Transactional
+  public ApiResult<?> addAll(LocalDate localDate) {
+    Project.PROJECTS.forEach(project -> project.getKpis().forEach(kpi -> {
+      try {
+        kpiMapper.add(new Kpi(project.getXmId(), kpi.getKpiId(), new BigDecimal(Integer.MIN_VALUE), getKpiDate(kpi)));
+      } catch (DuplicateKeyException e) {}
+    }));
     return ApiResult.ok();
   }
 

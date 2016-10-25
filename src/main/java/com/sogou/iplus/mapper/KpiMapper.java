@@ -59,7 +59,7 @@ public interface KpiMapper {
     public static String selectWithDateRangeAndKpiId(Map<String, Object> map) {
       SQL sql = new SQL().SELECT(ITEMS).FROM(TABLE).WHERE("kpiId = #{kpiId}").WHERE("createTime >= #{beginDate}")
           .WHERE("createTime <= #{endDate}");
-      if (Objects.nonNull(map.get("xmId"))) sql.WHERE("xmId = #{xmId}");
+      if (0 != MapUtils.getIntValue(map, "xmId")) sql.WHERE("xmId = #{xmId}");
       if (MapUtils.getBooleanValue(map, "isValid")) sql.WHERE(String.format("kpi != %s", Integer.MIN_VALUE));
       return sql.toString();
     }
@@ -86,11 +86,11 @@ public interface KpiMapper {
       @Param("isValid") boolean isValid);
 
   @SelectProvider(type = Sql.class, method = "selectWithDateRangeAndKpiId")
-  List<Kpi> selectWithDateRangeAndKpiId(@Param("xmId") int xmId, @Param("kpiId") int kpiId,
+  List<Kpi> selectWithDateRangeAndKpiId(@Param("xmId") Integer xmId, @Param("kpiId") int kpiId,
       @Param("beginDate") LocalDate beginDate, @Param("endDate") LocalDate endDate, @Param("isValid") boolean isValid);
 
   @SelectProvider(type = Sql.class, method = "selectWithDateAndXmId")
-  List<Kpi> selectWithDateAndXmId(@Param("xmId") int xmId, @Param("date") LocalDate date,
+  List<Kpi> selectWithDateAndXmId(@Param("xmId") Integer xmId, @Param("date") LocalDate date,
       @Param("isValid") boolean isValid);
 
 }

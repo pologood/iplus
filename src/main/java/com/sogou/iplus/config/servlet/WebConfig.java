@@ -6,28 +6,22 @@ import java.time.*;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.*;
 import org.springframework.http.converter.*;
 import org.springframework.http.converter.json.*;
 import org.springframework.web.servlet.config.annotation.*;
-import org.springframework.web.servlet.handler.MappedInterceptor;
 import org.springframework.web.multipart.MultipartResolver;
 import org.springframework.web.multipart.support.StandardServletMultipartResolver;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 import commons.utils.LocalDateTimeJsonSerializer;
 import commons.utils.LocalDateJsonSerializer;
 
-import com.sogou.iplus.api.TokenInterceptor;
 import com.sogou.iplus.config.*;
 
 @Configuration
 @EnableWebMvc
 @ComponentScan({ ProjectInfo.API_PKG })
 public class WebConfig extends WebMvcConfigurerAdapter {
-
-  @Autowired
-  private TokenInterceptor tokenInterceptor;
 
   @Override
   public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
@@ -55,7 +49,6 @@ public class WebConfig extends WebMvcConfigurerAdapter {
     r.setUseTrailingSlashMatch(false);
     r.setUseSuffixPatternMatch(false);
     r.setRemoveSemicolonContent(false);
-    r.setInterceptors(new Object[] { new MappedInterceptor(new String[] { "/api/kpi" }, tokenInterceptor) });
     r.setOrder(0);
     return r;
   }
