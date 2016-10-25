@@ -7,6 +7,8 @@ package com.sogou.iplus.manager;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -68,17 +70,20 @@ public class KpiManager {
   }
 
   @Transactional
-  public ApiResult<?> addAll(LocalDate localDate) {
+  public ApiResult<?> addAll(LocalDate date) {
     Project.PROJECTS.forEach(project -> project.getKpis().forEach(kpi -> {
       try {
-        kpiMapper.add(new Kpi(project.getXmId(), kpi.getKpiId(), new BigDecimal(Integer.MIN_VALUE), getKpiDate(kpi)));
+        Kpi toAdd = new Kpi(project.getXmId(), kpi.getKpiId(), new BigDecimal(Integer.MIN_VALUE),
+            getKpiDate(kpi, date));
+        toAdd.setCreateTime(LocalDateTime.of(date, LocalTime.now()));
+        kpiMapper.add(toAdd);
       } catch (DuplicateKeyException e) {}
     }));
     return ApiResult.ok();
   }
 
-  public static LocalDate getKpiDate(Kpi kpi) {
-    return LocalDate.now().minusDays(kpi.getDay());
+  public static LocalDate getKpiDate(Kpi kpi, LocalDate date) {
+    return date.minusDays(kpi.getDay());
   }
 
 }
