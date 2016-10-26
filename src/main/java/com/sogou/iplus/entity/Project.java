@@ -6,11 +6,9 @@
 package com.sogou.iplus.entity;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.jsondoc.core.annotation.ApiObject;
@@ -96,7 +94,7 @@ public class Project {
   }
 
   @JsonIgnore
-  public transient static final Set<Project> PROJECTS = new HashSet<>();
+  public transient static final List<Project> PROJECTS = new ArrayList<>();
 
   @JsonIgnore
   public transient static final Map<Integer, Project> PROJECT_MAP;
