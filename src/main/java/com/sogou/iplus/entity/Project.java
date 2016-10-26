@@ -166,11 +166,11 @@ public class Project {
         BusinessUnit.SEARCH));
     PROJECTS.add(new Project(
         116, "4t8hnsfb3igf9p91", "百科、问问", Lists.newArrayList(new Kpi(59, "百科:百科UV(PC+无线)", 1),
-            new Kpi(60, "百科:月编辑版本数", 1), new Kpi(61, "问问:有效写入量(日均)", 1), new Kpi(62, "问问:用户规模(PV)", 1)),
+            new Kpi(60, "百科:日编辑版本数", 1), new Kpi(61, "问问:有效写入量", 1), new Kpi(62, "问问:用户规模(PV)", 1)),
         BusinessUnit.SEARCH));
     PROJECTS.add(new Project(306, "zvn6s7zwq56ri18y",
-        "中医项目", Lists.newArrayList(new Kpi(63, "中医项目App日活", 1), new Kpi(64, "中医项目App次日留存率", 2),
-            new Kpi(65, "中医项目App7日留存率", 8), new Kpi(66, "中医项目App30日留存率", 31), new Kpi(67, "中医项目App总激活数", 1)),
+        "中医项目", Lists.newArrayList(new Kpi(63, "中医项目App日活(个)", 1), new Kpi(64, "中医项目App次日留存率", 2),
+            new Kpi(65, "中医项目App7日留存率", 8), new Kpi(66, "中医项目App30日留存率", 31), new Kpi(67, "中医项目App总激活数(个)", 1)),
         BusinessUnit.SEARCH));
     PROJECTS.add(new Project(36, "1ou8k1pdoe4ac3lz", "消耗、RPM",
         Lists.newArrayList(new Kpi(68, "全部竞价日消耗(万元)", 1), new Kpi(69, "PC搜索日消耗(万元)", 1), new Kpi(70, "无线搜索日消耗(万元)", 1),
