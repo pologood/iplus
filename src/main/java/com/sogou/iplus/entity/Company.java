@@ -5,12 +5,12 @@
  */
 package com.sogou.iplus.entity;
 
-import java.util.Set;
+import java.util.List;
 
 import org.jsondoc.core.annotation.ApiObject;
 import org.jsondoc.core.annotation.ApiObjectField;
 
-import com.google.common.collect.Sets;
+import com.google.common.collect.Lists;
 
 import commons.utils.JsonHelper;
 
@@ -24,7 +24,7 @@ public class Company {
 
   static {
     SOGOU.setName("搜狗");
-    SOGOU.setKpis(Sets.newHashSet(1, 3, 13, 15, 21, 26, 37, 38, 39, 40, 41, 42, 43, 68));
+    SOGOU.setKpis(Lists.newArrayList(1, 3, 13, 15, 21, 26, 37, 38, 39, 40, 41, 42, 43, 68));
   }
 
   @ApiObjectField(description = "公司id")
@@ -34,10 +34,10 @@ public class Company {
   private String name;
 
   @ApiObjectField(description = "公司kpi")
-  private Set<Integer> kpis;
+  private List<Integer> kpis;
 
   @ApiObjectField(description = "公司事业部")
-  private Set<BusinessUnit> businessUnits;
+  private List<BusinessUnit> businessUnits;
 
   public Integer getId() {
     return id;
@@ -55,19 +55,19 @@ public class Company {
     this.name = name;
   }
 
-  public Set<Integer> getKpis() {
+  public List<Integer> getKpis() {
     return kpis;
   }
 
-  public void setKpis(Set<Integer> kpis) {
+  public void setKpis(List<Integer> kpis) {
     this.kpis = kpis;
   }
 
-  public Set<BusinessUnit> getBusinessUnits() {
+  public List<BusinessUnit> getBusinessUnits() {
     return businessUnits;
   }
 
-  public void setBusinessUnits(Set<BusinessUnit> businessUnits) {
+  public void setBusinessUnits(List<BusinessUnit> businessUnits) {
     this.businessUnits = businessUnits;
   }
 

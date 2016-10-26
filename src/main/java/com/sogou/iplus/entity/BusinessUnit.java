@@ -5,13 +5,13 @@
  */
 package com.sogou.iplus.entity;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.jsondoc.core.annotation.ApiObject;
 import org.jsondoc.core.annotation.ApiObjectField;
 
-import com.google.common.collect.Sets;
+import com.google.common.collect.Lists;
 
 import commons.utils.JsonHelper;
 
@@ -26,12 +26,12 @@ public class BusinessUnit {
 
   static {
     SEARCH.setName("搜索事业部");
-    SEARCH.setKpis(Sets.newHashSet(37, 38, 39, 40, 41, 42, 43, 49, 50, 51, 52, 53, 54, 59, 63, 207, 208));
+    SEARCH.setKpis(Lists.newArrayList(37, 38, 39, 40, 41, 42, 43, 49, 50, 51, 52, 53, 54, 59, 63, 207, 208));
     DESKTOP.setName("桌面事业部");
-    DESKTOP.setKpis(Sets.newHashSet(1, 3, 13, 15, 21, 26, 27, 32));
+    DESKTOP.setKpis(Lists.newArrayList(1, 3, 13, 15, 21, 26, 27, 32));
     SUGARCAT.setName("糖猫事业部");
     MARKETING.setName("营销事业部");
-    Company.SOGOU.setBusinessUnits(Sets.newHashSet(SEARCH, DESKTOP, SUGARCAT, MARKETING));
+    Company.SOGOU.setBusinessUnits(Lists.newArrayList(DESKTOP, SEARCH, MARKETING, SUGARCAT));
   }
 
   @ApiObjectField(description = "事业部id")
@@ -41,10 +41,10 @@ public class BusinessUnit {
   private String name;
 
   @ApiObjectField(description = "事业部kpi")
-  private Set<Integer> kpis;
+  private List<Integer> kpis;
 
   @ApiObjectField(description = "事业部项目")
-  private Set<Project> projects = new HashSet<>();
+  private List<Project> projects = new ArrayList<>();
 
   public Integer getId() {
     return id;
@@ -62,19 +62,19 @@ public class BusinessUnit {
     this.name = name;
   }
 
-  public Set<Integer> getKpis() {
+  public List<Integer> getKpis() {
     return kpis;
   }
 
-  public void setKpis(Set<Integer> kpis) {
+  public void setKpis(List<Integer> kpis) {
     this.kpis = kpis;
   }
 
-  public Set<Project> getProjects() {
+  public List<Project> getProjects() {
     return projects;
   }
 
-  public void setProjects(Set<Project> projects) {
+  public void setProjects(List<Project> projects) {
     this.projects = projects;
   }
 
