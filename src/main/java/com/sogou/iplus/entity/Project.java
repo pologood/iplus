@@ -114,7 +114,7 @@ public class Project {
         Lists.newArrayList(new Kpi(11, "QQ输入法Windows版日活跃用户数(万)", 1), new Kpi(12, "QQ输入法Android版日活跃用户数(万)", 1)),
         BusinessUnit.DESKTOP));
     PROJECTS.add(new Project(68, "2ej50d9vfy9aa486", "浏览器-PC浏览器",
-        Lists.newArrayList(new Kpi(13, "PC浏览器日主动活跃用户数(万)", 1), new Kpi(14, "PC浏览器给搜索带来的自有网页PC搜索日搜索量(万)", 1)),
+        Lists.newArrayList(new Kpi(13, "PC浏览器日主动活跃用户数(万)", 1), new Kpi(14, "搜狗PC浏览器网页搜索量-不含灵犀分流量(万)", 1)),
         BusinessUnit.DESKTOP));
     PROJECTS.add(new Project(76, "423ftqdz3cyjpa14", "浏览器-手机浏览器",
         Lists.newArrayList(new Kpi(15, "手机浏览器日活跃用户数(万)", 1), new Kpi(16, "手机浏览器给搜索带去的日搜索量(万)", 1),
