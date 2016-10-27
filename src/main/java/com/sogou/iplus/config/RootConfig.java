@@ -15,6 +15,7 @@ import redis.clients.jedis.JedisPoolConfig;
 import commons.spring.*;
 import commons.saas.RestNameService;
 import commons.saas.XiaopLoginService;
+import commons.saas.XiaopService;
 
 @Configuration
 @EnableScheduling
@@ -94,6 +95,11 @@ public class RootConfig {
     rest.getMessageConverters().add(new LooseGsonHttpMessageConverter());
 
     return rest;
+  }
+
+  @Bean
+  public XiaopService pandoraService() {
+    return new XiaopService(restTemplate());
   }
 
 }
