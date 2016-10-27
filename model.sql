@@ -9,5 +9,5 @@ CREATE TABLE `kpi` (
   `kpiDate` DATE NOT NULL DEFAULT 0 COMMENT 'kpi时间',
   `createTime` TIMESTAMP NOT NULL DEFAULT 0 COMMENT '创建时间',
   `updateTime` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-  UNIQUE KEY `xmid_kpiid_createdate_idx` (`xmId`, `kpiId`, `kpiDate`)
+  UNIQUE KEY `xmid_kpiid_date_idx` (`xmId`, `kpiId`, `kpiDate`, `createTime`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=COMPACT;
