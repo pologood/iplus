@@ -129,7 +129,7 @@ public class Project {
         BusinessUnit.DESKTOP));
     PROJECTS.add(new Project(82, "95lykq31ci0fw5p7", "语音", Lists.newArrayList(new Kpi(26, "语音日请求量(万)", 1)),
         BusinessUnit.DESKTOP));
-    PROJECTS.add(new Project(322, "hw9cfh7zaor7kuwd", "个性化",
+    PROJECTS.add(new Project(322, "hw9cfh7zaor7kuwd", "个性化阅读",
         Lists.newArrayList(new Kpi(27, "个性化阅读日活跃用户数(万)", 1), new Kpi(28, "个性化阅读日激活量(万)", 1),
             new Kpi(29, "个性化阅读次日留存率", 2), new Kpi(30, "个性化阅读第7日留存率", 8), new Kpi(31, "个性化阅读第30日留存率", 31)),
         BusinessUnit.DESKTOP));
