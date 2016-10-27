@@ -167,13 +167,13 @@ public class KpiController implements InitializingBean {
     param.setImage(COVER);
     param.setMessage(MESSAGE);
     param.setOpenId(EMAIL_LIST);
-    param.setTitle(TITLE + LocalDate.now());
+    param.setTitle("[" + LocalDate.now() + "]" + TITLE);
     param.setUrl(URL);
     String result = pandoraService.push(param);
     return Objects.isNull(result) ? ApiResult.ok() : ApiResult.internalError(result);
   }
 
-  private String PUBLIC_ID, COVER, MESSAGE, EMAIL_LIST, TITLE, TOKEN, URL;
+  private String PUBLIC_ID, COVER, MESSAGE = "今日搜狗业务指标已更新，请点击查看", EMAIL_LIST, TITLE = "搜狗业务指标", TOKEN, URL;
 
   public enum HOST {
     publicWeb(0), privateWeb(1);
@@ -193,10 +193,9 @@ public class KpiController implements InitializingBean {
   public void afterPropertiesSet() throws Exception {
     PUBLIC_ID = env.getRequiredProperty("pandora.message.publicid");
     COVER = env.getRequiredProperty("pandora.message.cover");
-    MESSAGE = env.getRequiredProperty("pandora.message.context");
     EMAIL_LIST = env.getRequiredProperty("pandora.message.list");
-    TITLE = env.getRequiredProperty("pandora.message.title");
     TOKEN = env.getRequiredProperty("pandora.message.token");
+    URL = env.getRequiredProperty("pandora.message.url");
 
     pandoraService.setAppId(PUBLIC_ID);
     pandoraService.setAppKey(TOKEN);

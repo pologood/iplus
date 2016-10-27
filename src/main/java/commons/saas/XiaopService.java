@@ -116,7 +116,7 @@ public class XiaopService {
       map.add("cover", param.getImage());
       map.add("tp", "1");
     } else {
-      map.add("tp", "0");
+      map.add("tp", "3");
     }
     map.add("url", param.getUrl());
 
