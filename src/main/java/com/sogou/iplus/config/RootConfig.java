@@ -67,11 +67,6 @@ public class RootConfig {
   }
 
   @Bean
-  public XiaopLoginService xiaopLoginService() {
-    return new XiaopLoginService(jedisPool());
-  }
-
-  @Bean
   public ThreadPoolTaskScheduler threadPoolTaskScheduler() {
     ThreadPoolTaskScheduler scheduler = new ThreadPoolTaskScheduler();
     scheduler.setPoolSize(Integer.parseInt(env.getProperty("threadpool.max", "1")));
@@ -95,6 +90,11 @@ public class RootConfig {
     rest.getMessageConverters().add(new LooseGsonHttpMessageConverter());
 
     return rest;
+  }
+
+  @Bean
+  public XiaopLoginService xiaopLoginService() {
+    return new XiaopLoginService(jedisPool(), restTemplate());
   }
 
   @Bean
