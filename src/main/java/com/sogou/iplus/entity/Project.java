@@ -164,7 +164,7 @@ public class Project {
         BusinessUnit.SEARCH));
     PROJECTS.add(new Project(
         116, "4t8hnsfb3igf9p91", "百科、问问", Lists.newArrayList(new Kpi(59, "百科:百科UV(PC+无线)", 1),
-            new Kpi(60, "百科:日编辑版本数", 1), new Kpi(61, "问问:有效写入量", 1), new Kpi(62, "问问:用户规模(PV)", 1)),
+            new Kpi(60, "百科:日编辑版本数(万)", 1), new Kpi(61, "问问:有效写入量(万)", 1), new Kpi(62, "问问:用户规模(PV)", 1)),
         BusinessUnit.SEARCH));
     PROJECTS.add(new Project(306, "zvn6s7zwq56ri18y",
         "中医项目", Lists.newArrayList(new Kpi(63, "中医项目App日活(个)", 1), new Kpi(64, "中医项目App次日留存率", 2),
