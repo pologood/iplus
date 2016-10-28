@@ -55,7 +55,7 @@ public class RootConfig {
     String pass = env.getProperty("redis.pass");
     if (pass != null) {
       return new JedisPool(new JedisPoolConfig(), env.getRequiredProperty("redis.url"),
-          env.getRequiredProperty("redis.port", Integer.class), 2, pass); // 2 second
+          env.getRequiredProperty("redis.port", Integer.class), 2000, pass); // 2 second
     } else {
       return new JedisPool(env.getRequiredProperty("redis.url"), env.getRequiredProperty("redis.port", Integer.class));
     }
