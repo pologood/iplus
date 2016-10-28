@@ -7,6 +7,7 @@ package com.sogou.iplus.api;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Optional;
@@ -31,7 +32,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.google.common.collect.Sets;
 import com.sogou.iplus.entity.Company;
 import com.sogou.iplus.entity.Kpi;
 import com.sogou.iplus.entity.Project;
@@ -67,12 +67,12 @@ public class KpiController implements InitializingBean {
   @Autowired
   XiaopService pandoraService;
 
-  private Set<String> whiteList = Sets.newHashSet("wangwenlong", "liteng", "zhengzhiyong", "fengjin");
+  private Set<String> whiteList;
 
   @ApiMethod(description = "update kpi record")
   @RequestMapping(value = "/kpi", method = RequestMethod.PUT)
   public ApiResult<?> update(HttpServletRequest request,
-      @ApiQueryParam(name = "xmId", description = "项目id") @RequestParam int xmId,
+      @ApiQueryParam(name = "xmId", description = "项目id") @RequestParam(defaultValue = "0") int xmId,
       @ApiQueryParam(name = "xmKey", description = "项目秘钥") @RequestParam String xmKey,
       @ApiQueryParam(name = "date", description = "kpi日期", format = "yyyy-MM-dd") @RequestParam @DateTimeFormat(iso = ISO.DATE) LocalDate date) {
     Project project = getProject(xmId, xmKey);
@@ -99,8 +99,8 @@ public class KpiController implements InitializingBean {
 
   @ApiMethod(description = "select kpis with date range and kpiId")
   @RequestMapping(value = "/kpi/range", method = RequestMethod.GET)
-  public ApiResult<?> selectKpisWithDateRangeAndKpiId(@RequestParam int from, HttpServletResponse response,
-      @AuthenticationPrincipal User user,
+  public ApiResult<?> selectKpisWithDateRangeAndKpiId(@RequestParam(defaultValue = "0") int from,
+      HttpServletResponse response, @AuthenticationPrincipal User user,
       @ApiQueryParam(name = "token", description = "pandora token") @RequestParam Optional<String> token,
       @ApiQueryParam(name = "xmId", description = "项目Id") @RequestParam Optional<Integer> xmId,
       @ApiQueryParam(name = "xmKey", description = "项目秘钥") @RequestParam Optional<String> xmKey,
@@ -206,5 +206,7 @@ public class KpiController implements InitializingBean {
 
     pandoraService.setAppId(PUBLIC_ID);
     pandoraService.setAppKey(TOKEN);
+
+    whiteList = Arrays.stream(EMAIL_LIST.split(",")).collect(Collectors.toSet());
   }
 }

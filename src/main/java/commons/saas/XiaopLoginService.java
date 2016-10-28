@@ -33,7 +33,7 @@ public class XiaopLoginService extends LoginService {
     if (ret.status != 0) return null;
     
     LoginService.User user = new LoginService.User();
-    user.setOpenId("xiaop_" + ret.data.uid);
+    user.setOpenId(ret.data.uid);
     user.setName(ret.data.name);
     user.setHeadImg("https://puboa.sogou-inc.com/moa/sylla/mapi/portrait?uid=" + ret.data.uid);
 
