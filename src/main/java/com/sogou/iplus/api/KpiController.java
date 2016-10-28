@@ -113,7 +113,7 @@ public class KpiController implements InitializingBean {
 
   private boolean isValid(int from, User user, Optional<String> token, Optional<Integer> xmId, Optional<String> xmKey,
       HttpServletResponse response, Integer kpiId) {
-    return isValid(user, kpiId) || login(token, response, kpiId)
+    return login(token, response, kpiId) || isValid(user, kpiId)
         || (Objects.equals(from, HOST.privateWeb.getValue()) && isValid(xmId, xmKey, kpiId));
   }
 
@@ -207,6 +207,6 @@ public class KpiController implements InitializingBean {
     pandoraService.setAppId(PUBLIC_ID);
     pandoraService.setAppKey(TOKEN);
 
-    whiteList = Arrays.stream(EMAIL_LIST.split(",")).collect(Collectors.toSet());
+    whiteList = Arrays.stream(EMAIL_LIST.split(",")).map(user -> "xiaop_" + user).collect(Collectors.toSet());
   }
 }
