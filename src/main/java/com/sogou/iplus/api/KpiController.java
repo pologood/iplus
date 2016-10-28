@@ -113,7 +113,7 @@ public class KpiController implements InitializingBean {
 
   private boolean isValid(int from, User user, Optional<String> token, Optional<Integer> xmId, Optional<String> xmKey,
       HttpServletResponse response, Integer kpiId) {
-    return login(token, response, kpiId) || isValid(user, kpiId)
+    return isValid(user, kpiId) || login(token, response, kpiId)
         || (Objects.equals(from, HOST.privateWeb.getValue()) && isValid(xmId, xmKey, kpiId));
   }
 
