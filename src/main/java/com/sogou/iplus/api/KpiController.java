@@ -31,6 +31,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.google.common.collect.Sets;
 import com.sogou.iplus.entity.Company;
 import com.sogou.iplus.entity.Kpi;
 import com.sogou.iplus.entity.Project;
@@ -65,6 +66,8 @@ public class KpiController implements InitializingBean {
 
   @Autowired
   XiaopService pandoraService;
+
+  private Set<String> whiteList = Sets.newHashSet("wangwenlong", "liteng", "zhengzhiyong", "fengjin");
 
   @ApiMethod(description = "update kpi record")
   @RequestMapping(value = "/kpi", method = RequestMethod.PUT)
@@ -115,7 +118,11 @@ public class KpiController implements InitializingBean {
   }
 
   private boolean isValid(User user, Integer kpiId) {
-    return Objects.nonNull(user);
+    return Objects.nonNull(user) && isAuthorized(user, kpiId);
+  }
+
+  private boolean isAuthorized(User user, Integer kpiId) {
+    return whiteList.contains(user.getId());
   }
 
   private boolean login(Optional<String> token, HttpServletResponse response, Integer kpiId) {
