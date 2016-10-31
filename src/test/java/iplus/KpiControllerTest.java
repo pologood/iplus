@@ -98,7 +98,7 @@ public class KpiControllerTest {
   }
 
   public void selectKpisWithDateAndXmId() {
-    ApiResult<?> result = controller.selectKpisWithDateAndXmId(null, null, Optional.empty(), Optional.of(testXmId),
+    ApiResult<?> result = controller.selectKpisWithDateAndXmId(1, null, null, Optional.empty(), Optional.of(testXmId),
         Optional.of(testXmKey), LocalDate.now());
     Assert.assertTrue(ApiResult.isOk(result));
     Map<?, ?> map = (Map<?, ?>) result.getData();
@@ -106,7 +106,7 @@ public class KpiControllerTest {
     Assert.assertFalse(map.isEmpty());
 
     //debug project
-    result = controller.selectKpisWithDateAndXmId(null, null, Optional.empty(), Optional.of(0),
+    result = controller.selectKpisWithDateAndXmId(1, null, null, Optional.empty(), Optional.of(0),
         Optional.of(Project.PROJECT_MAP.get(0).getXmKey()), LocalDate.now());
     Assert.assertTrue(ApiResult.isOk(result));
     map = (Map<?, ?>) result.getData();
@@ -115,7 +115,7 @@ public class KpiControllerTest {
   }
 
   public void selectKpisWithDateRangeAndKpiId() {
-    ApiResult<?> result = controller.selectKpisWithDateRangeAndKpiId(null, null, Optional.empty(),
+    ApiResult<?> result = controller.selectKpisWithDateRangeAndKpiId(1, null, null, Optional.empty(),
         Optional.of(testXmId), Optional.of(testXmKey), testKpiId, LocalDate.now(), LocalDate.now().plusDays(1));
     Assert.assertTrue(ApiResult.isOk(result));
     Map<?, ?> map = (Map<?, ?>) result.getData();

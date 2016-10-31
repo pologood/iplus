@@ -129,7 +129,7 @@ public class Project {
         BusinessUnit.DESKTOP));
     PROJECTS.add(new Project(82, "95lykq31ci0fw5p7", "语音", Lists.newArrayList(new Kpi(26, "语音日请求量(万)", 1)),
         BusinessUnit.DESKTOP));
-    PROJECTS.add(new Project(322, "hw9cfh7zaor7kuwd", "个性化",
+    PROJECTS.add(new Project(322, "hw9cfh7zaor7kuwd", "个性化阅读",
         Lists.newArrayList(new Kpi(27, "个性化阅读日活跃用户数(万)", 1), new Kpi(28, "个性化阅读日激活量(万)", 1),
             new Kpi(29, "个性化阅读次日留存率", 2), new Kpi(30, "个性化阅读第7日留存率", 8), new Kpi(31, "个性化阅读第30日留存率", 31)),
         BusinessUnit.DESKTOP));
@@ -164,7 +164,7 @@ public class Project {
         BusinessUnit.SEARCH));
     PROJECTS.add(new Project(
         116, "4t8hnsfb3igf9p91", "百科、问问", Lists.newArrayList(new Kpi(59, "百科:百科UV(PC+无线)", 1),
-            new Kpi(60, "百科:日编辑版本数", 1), new Kpi(61, "问问:有效写入量", 1), new Kpi(62, "问问:用户规模(PV)", 1)),
+            new Kpi(60, "百科:日编辑版本数(万)", 1), new Kpi(61, "问问:有效写入量(万)", 1), new Kpi(62, "问问:用户规模(PV)", 1)),
         BusinessUnit.SEARCH));
     PROJECTS.add(new Project(306, "zvn6s7zwq56ri18y",
         "中医项目", Lists.newArrayList(new Kpi(63, "中医项目App日活(个)", 1), new Kpi(64, "中医项目App次日留存率", 2),

@@ -7,6 +7,7 @@ package com.sogou.iplus.api;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Optional;
@@ -20,7 +21,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.jsondoc.core.annotation.Api;
 import org.jsondoc.core.annotation.ApiMethod;
 import org.jsondoc.core.annotation.ApiQueryParam;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.format.annotation.DateTimeFormat.ISO;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -36,6 +39,8 @@ import com.sogou.iplus.manager.KpiManager;
 import com.sogou.iplus.model.ApiResult;
 
 import commons.saas.XiaopLoginService;
+import commons.saas.XiaopService;
+import commons.saas.XiaopService.PushParam;
 import commons.spring.RedisRememberMeService;
 import commons.spring.RedisRememberMeService.User;
 
@@ -45,7 +50,10 @@ import commons.spring.RedisRememberMeService.User;
 @Api(name = "kpi API", description = "Read/Write/Update/Delete the kpi")
 @RestController
 @RequestMapping("/api")
-public class KpiController {
+public class KpiController implements InitializingBean {
+
+  @Autowired
+  Environment env;
 
   @Autowired
   private KpiManager kpiManager;
@@ -54,12 +62,17 @@ public class KpiController {
   RedisRememberMeService redisService;
 
   @Autowired
-  XiaopLoginService pandoraService;
+  XiaopLoginService pandoraLoginService;
+
+  @Autowired
+  XiaopService pandoraService;
+
+  private Set<String> whiteList;
 
   @ApiMethod(description = "update kpi record")
   @RequestMapping(value = "/kpi", method = RequestMethod.PUT)
   public ApiResult<?> update(HttpServletRequest request,
-      @ApiQueryParam(name = "xmId", description = "项目id") @RequestParam int xmId,
+      @ApiQueryParam(name = "xmId", description = "项目id") @RequestParam(defaultValue = "0") int xmId,
       @ApiQueryParam(name = "xmKey", description = "项目秘钥") @RequestParam String xmKey,
       @ApiQueryParam(name = "date", description = "kpi日期", format = "yyyy-MM-dd") @RequestParam @DateTimeFormat(iso = ISO.DATE) LocalDate date) {
     Project project = getProject(xmId, xmKey);
@@ -86,29 +99,35 @@ public class KpiController {
 
   @ApiMethod(description = "select kpis with date range and kpiId")
   @RequestMapping(value = "/kpi/range", method = RequestMethod.GET)
-  public ApiResult<?> selectKpisWithDateRangeAndKpiId(@AuthenticationPrincipal User user, HttpServletResponse response,
+  public ApiResult<?> selectKpisWithDateRangeAndKpiId(@RequestParam(defaultValue = "0") int from,
+      HttpServletResponse response, @AuthenticationPrincipal User user,
       @ApiQueryParam(name = "token", description = "pandora token") @RequestParam Optional<String> token,
       @ApiQueryParam(name = "xmId", description = "项目Id") @RequestParam Optional<Integer> xmId,
       @ApiQueryParam(name = "xmKey", description = "项目秘钥") @RequestParam Optional<String> xmKey,
       @ApiQueryParam(name = "kpiId", description = "kpiId") @RequestParam int kpiId,
       @ApiQueryParam(name = "beginDate", description = "起始日期", format = "yyyy-MM-dd") @RequestParam @DateTimeFormat(iso = ISO.DATE) LocalDate beginDate,
       @ApiQueryParam(name = "endDate", description = "结束日期", format = "yyyy-MM-dd") @RequestParam @DateTimeFormat(iso = ISO.DATE) LocalDate endDate) {
-    if (!isValid(user, token, xmId, xmKey, response, kpiId)) return ApiResult.forbidden();
+    if (!isValid(from, user, token, xmId, xmKey, response, kpiId)) return ApiResult.forbidden();
     return kpiManager.selectWithDateRangeAndKpiId(xmId.orElse(null), kpiId, beginDate, endDate);
   }
 
-  private boolean isValid(User user, Optional<String> token, Optional<Integer> xmId, Optional<String> xmKey,
+  private boolean isValid(int from, User user, Optional<String> token, Optional<Integer> xmId, Optional<String> xmKey,
       HttpServletResponse response, Integer kpiId) {
-    return isValid(user, kpiId) || isValid(xmId, xmKey, kpiId) || login(token, response, kpiId);
+    return isValid(user, kpiId) || login(token, response, kpiId)
+        || (Objects.equals(from, HOST.privateWeb.getValue()) && isValid(xmId, xmKey, kpiId));
   }
 
   private boolean isValid(User user, Integer kpiId) {
-    return Objects.nonNull(user);
+    return Objects.nonNull(user) && isAuthorized(user, kpiId);
+  }
+
+  private boolean isAuthorized(User user, Integer kpiId) {
+    return whiteList.contains(user.getId());
   }
 
   private boolean login(Optional<String> token, HttpServletResponse response, Integer kpiId) {
     if (!token.isPresent()) return false;
-    commons.saas.LoginService.User user = pandoraService.login(token.get());
+    commons.saas.LoginService.User user = pandoraLoginService.login(token.get());
     if (Objects.isNull(user)) return false;
     User user2 = new User(user.getOpenId(), user.getName());
     redisService.login(response, user2);
@@ -123,12 +142,13 @@ public class KpiController {
 
   @ApiMethod(description = "select kpis with xmId on named date")
   @RequestMapping(value = "/kpi", method = RequestMethod.GET)
-  public ApiResult<?> selectKpisWithDateAndXmId(HttpServletResponse response, @AuthenticationPrincipal User user,
+  public ApiResult<?> selectKpisWithDateAndXmId(@RequestParam int from, HttpServletResponse response,
+      @AuthenticationPrincipal User user,
       @ApiQueryParam(name = "token", description = "pandora token") @RequestParam Optional<String> token,
       @ApiQueryParam(name = "xmId", description = "项目Id") @RequestParam Optional<Integer> xmId,
       @ApiQueryParam(name = "xmKey", description = "项目秘钥") @RequestParam Optional<String> xmKey,
       @ApiQueryParam(name = "date", description = "kpi日期", format = "yyyy-MM-dd") @RequestParam @DateTimeFormat(iso = ISO.DATE) LocalDate date) {
-    if (!isValid(user, token, xmId, xmKey, response, null)) return ApiResult.forbidden();
+    if (!isValid(from, user, token, xmId, xmKey, response, null)) return ApiResult.forbidden();
     return kpiManager.selectWithDateAndXmId(xmId.orElse(null), date);
   }
 
@@ -145,5 +165,48 @@ public class KpiController {
   public ApiResult<?> add(
       @ApiQueryParam(name = "date", description = "上传日期") @RequestParam @DateTimeFormat(iso = ISO.DATE) Optional<LocalDate> date) {
     return kpiManager.addAll(date.orElse(LocalDate.now()));
+  }
+
+  @ApiMethod(description = "push pandora message")
+  @RequestMapping(value = "/kpi/message", method = RequestMethod.POST)
+  public ApiResult<?> pushPandoraMessage() {
+    PushParam param = new PushParam();
+    param.setImage(COVER);
+    param.setMessage(MESSAGE);
+    param.setOpenId(EMAIL_LIST);
+    param.setTitle("[" + LocalDate.now() + "]" + TITLE);
+    param.setUrl(URL);
+    String result = pandoraService.push(param);
+    return Objects.isNull(result) ? ApiResult.ok() : ApiResult.internalError(result);
+  }
+
+  private String PUBLIC_ID, COVER, MESSAGE = "今日搜狗业务指标已更新，请点击查看", EMAIL_LIST, TITLE = "搜狗业务指标", TOKEN, URL;
+
+  public enum HOST {
+    publicWeb(0), privateWeb(1);
+
+    private int value;
+
+    private HOST(int val) {
+      this.value = val;
+    }
+
+    public int getValue() {
+      return this.value;
+    }
+  }
+
+  @Override
+  public void afterPropertiesSet() throws Exception {
+    PUBLIC_ID = env.getRequiredProperty("pandora.message.publicid");
+    COVER = env.getRequiredProperty("pandora.message.cover");
+    EMAIL_LIST = env.getRequiredProperty("pandora.message.list");
+    TOKEN = env.getRequiredProperty("pandora.message.token");
+    URL = env.getRequiredProperty("pandora.message.url");
+
+    pandoraService.setAppId(PUBLIC_ID);
+    pandoraService.setAppKey(TOKEN);
+
+    whiteList = Arrays.stream(EMAIL_LIST.split(",")).map(user -> "xiaop_" + user).collect(Collectors.toSet());
   }
 }

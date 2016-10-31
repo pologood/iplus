@@ -9,11 +9,12 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 import org.apache.commons.collections4.CollectionUtils;
@@ -64,7 +65,7 @@ public class KpiManager {
 
   public ApiResult<?> selectWithDateRangeAndKpiId(Integer xmId, int kpiId, LocalDate beginDate, LocalDate endDate) {
     List<Kpi> kpis = kpiMapper.selectWithDateRangeAndKpiId(xmId, kpiId, beginDate, endDate, true);
-    Map<LocalDate, Kpi> result = new HashMap<>();
+    Map<LocalDate, Kpi> result = new TreeMap<>(Collections.reverseOrder());
     kpis.forEach(kpi -> result.put(kpi.getCreateTime().toLocalDate(), kpi));
     return new ApiResult<>(result);
   }

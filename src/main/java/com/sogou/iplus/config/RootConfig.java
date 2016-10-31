@@ -15,6 +15,7 @@ import redis.clients.jedis.JedisPoolConfig;
 import commons.spring.*;
 import commons.saas.RestNameService;
 import commons.saas.XiaopLoginService;
+import commons.saas.XiaopService;
 
 @Configuration
 @EnableScheduling
@@ -54,7 +55,7 @@ public class RootConfig {
     String pass = env.getProperty("redis.pass");
     if (pass != null) {
       return new JedisPool(new JedisPoolConfig(), env.getRequiredProperty("redis.url"),
-          env.getRequiredProperty("redis.port", Integer.class), 2, pass); // 2 second
+          env.getRequiredProperty("redis.port", Integer.class), 2000, pass); // 2 second
     } else {
       return new JedisPool(env.getRequiredProperty("redis.url"), env.getRequiredProperty("redis.port", Integer.class));
     }
@@ -63,11 +64,6 @@ public class RootConfig {
   @Bean
   public RedisRememberMeService rememberMeServices() {
     return new RedisRememberMeService(jedisPool(), env.getProperty("rest.tokenpool", ""), "", 86400 * 7);
-  }
-
-  @Bean
-  public XiaopLoginService xiaopLoginService() {
-    return new XiaopLoginService(jedisPool());
   }
 
   @Bean
@@ -94,6 +90,16 @@ public class RootConfig {
     rest.getMessageConverters().add(new LooseGsonHttpMessageConverter());
 
     return rest;
+  }
+
+  @Bean
+  public XiaopLoginService xiaopLoginService() {
+    return new XiaopLoginService(jedisPool(), restTemplate());
+  }
+
+  @Bean
+  public XiaopService pandoraService() {
+    return new XiaopService(restTemplate());
   }
 
 }

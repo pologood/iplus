@@ -16,7 +16,7 @@ EXPECT {
 }
 
 PUT("/api/kpi") {
-  r.body = [xmId: '70', xmKey: 'j0a37izra1v4n4k0', date: yesterdayStr, 1: '100', 2: '200']
+  r.body = [from: 1, xmId: '70', xmKey: 'j0a37izra1v4n4k0', date: yesterdayStr, 1: '100', 2: '200']
 }
 EXPECT { 
   json.code = 0 
@@ -31,7 +31,7 @@ EXPECT {
 }
 
 GET("/api/kpi") {
-  r.query = [xmId: '70', xmKey: 'j0a37izra1v4n4k0', date: todayStr]
+  r.query = [from: 1, xmId: '70', xmKey: 'j0a37izra1v4n4k0', date: todayStr]
 }
 EXPECT {
   json.code = 0
