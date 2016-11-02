@@ -32,6 +32,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.sogou.iplus.entity.BusinessUnit;
 import com.sogou.iplus.entity.Company;
 import com.sogou.iplus.entity.Kpi;
 import com.sogou.iplus.entity.Project;
@@ -138,6 +139,16 @@ public class KpiController implements InitializingBean {
   @RequestMapping(value = "/company", method = RequestMethod.GET)
   public ApiResult<?> getCompany() {
     return new ApiResult<>(Company.SOGOU);
+  }
+
+  @ApiMethod(description = "list company kpi")
+  @RequestMapping(value = "/company/kpi", method = RequestMethod.GET)
+  public ApiResult<?> getCompanyKpis() {
+    Set<Integer> kpis = new HashSet<>();
+    kpis.addAll(Company.SOGOU.getKpis());
+    kpis.addAll(BusinessUnit.DESKTOP.getKpis());
+    kpis.addAll(BusinessUnit.SEARCH.getKpis());
+    return new ApiResult<>(kpis.stream().sorted().map(id -> Project.getKpi(id)).collect(Collectors.toList()));
   }
 
   @ApiMethod(description = "select kpis with xmId on named date")

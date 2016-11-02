@@ -6,6 +6,7 @@
 package com.sogou.iplus.entity;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -99,6 +100,9 @@ public class Project {
   @JsonIgnore
   public transient static final Map<Integer, Project> PROJECT_MAP;
 
+  @JsonIgnore
+  public transient static final Map<Integer, Kpi> KPI_MAP = new HashMap<>();
+
   static {
     PROJECTS.add(new Project(0, "i4zqbwchh23igzwe", "test", new ArrayList<>(), null));
     PROJECTS.add(new Project(70, "j0a37izra1v4n4k0", "输入法-PC输入法",
@@ -162,12 +166,12 @@ public class Project {
             new Kpi(202, "阅读APPAndroid版7日留存率", 8), new Kpi(203, "阅读APPAndroid版30日留存率", 31),
             new Kpi(204, "阅读APPiOS版次日留存率", 2), new Kpi(205, "阅读APPiOS版7日留存率", 8), new Kpi(206, "阅读APPiOS版30日留存率", 31)),
         BusinessUnit.SEARCH));
-    PROJECTS.add(new Project(
-        116, "4t8hnsfb3igf9p91", "百科、问问", Lists.newArrayList(new Kpi(59, "百科:百科UV(PC+无线)", 1),
+    PROJECTS.add(new Project(116,
+        "4t8hnsfb3igf9p91", "百科、问问", Lists.newArrayList(new Kpi(59, "百科:百科UV(PC+无线)", 1),
             new Kpi(60, "百科:日编辑版本数(万)", 1), new Kpi(61, "问问:有效写入量(万)", 1), new Kpi(62, "问问:用户规模(PV)", 1)),
         BusinessUnit.SEARCH));
-    PROJECTS.add(new Project(306, "zvn6s7zwq56ri18y",
-        "中医项目", Lists.newArrayList(new Kpi(63, "中医项目App日活(个)", 1), new Kpi(64, "中医项目App次日留存率", 2),
+    PROJECTS.add(new Project(306, "zvn6s7zwq56ri18y", "中医项目",
+        Lists.newArrayList(new Kpi(63, "中医项目App日活(个)", 1), new Kpi(64, "中医项目App次日留存率", 2),
             new Kpi(65, "中医项目App7日留存率", 8), new Kpi(66, "中医项目App30日留存率", 31), new Kpi(67, "中医项目App总激活数(个)", 1)),
         BusinessUnit.SEARCH));
     PROJECTS.add(new Project(36, "1ou8k1pdoe4ac3lz", "消耗、RPM",
@@ -184,10 +188,16 @@ public class Project {
 
     PROJECTS.stream().filter(p -> Objects.nonNull(p.getBusinessUnit()))
         .forEach(project -> project.getBusinessUnit().getProjects().add(project));
+
+    PROJECTS.forEach(project -> project.getKpis().forEach(kpi -> KPI_MAP.put(kpi.getKpiId(), kpi)));
   }
 
   public static Map<Integer, Project> getProjectMap() {
     return PROJECTS.stream().collect(Collectors.toMap(p -> p.getXmId(), p -> new Project(p)));
+  }
+
+  public static Kpi getKpi(Integer kpiId) {
+    return KPI_MAP.get(kpiId);
   }
 
   @Override
