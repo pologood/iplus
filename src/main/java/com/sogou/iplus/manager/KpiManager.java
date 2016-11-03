@@ -63,10 +63,12 @@ public class KpiManager {
     return new ApiResult<>(kpis.stream().collect(Collectors.toMap(kpi -> kpi.getKpiId(), kpi -> kpi.getKpi())));
   }
 
-  public ApiResult<?> selectWithDateRangeAndKpiId(Integer xmId, int kpiId, LocalDate beginDate, LocalDate endDate) {
-    List<Kpi> kpis = kpiMapper.selectWithDateRangeAndKpiId(xmId, kpiId, beginDate, endDate, true);
-    Map<LocalDate, Kpi> result = new TreeMap<>(Collections.reverseOrder());
-    kpis.forEach(kpi -> result.put(kpi.getCreateTime().toLocalDate(), kpi));
+  public ApiResult<?> selectWithDateRangeAndKpiId(Integer xmId, List<Integer> kpiId, LocalDate beginDate,
+      LocalDate endDate) {
+    List<Kpi> kpis = kpiMapper.selectWithDateRangeAndKpiIds(xmId, kpiId, beginDate, endDate, true);
+    Map<Integer, Map<LocalDate, Kpi>> result = new TreeMap<>();
+    kpis.forEach(kpi -> result.computeIfAbsent(kpi.getKpiId(), k -> new TreeMap<>(Collections.reverseOrder()))
+        .put(kpi.getCreateTime().toLocalDate(), kpi));
     return new ApiResult<>(result);
   }
 

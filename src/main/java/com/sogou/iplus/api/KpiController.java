@@ -5,6 +5,7 @@
  */
 package com.sogou.iplus.api;
 
+import java.util.List;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Arrays;
@@ -18,6 +19,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
+import org.hibernate.validator.constraints.NotEmpty;
 import org.jsondoc.core.annotation.Api;
 import org.jsondoc.core.annotation.ApiMethod;
 import org.jsondoc.core.annotation.ApiQueryParam;
@@ -105,7 +107,7 @@ public class KpiController implements InitializingBean {
       @ApiQueryParam(name = "token", description = "pandora token") @RequestParam Optional<String> token,
       @ApiQueryParam(name = "xmId", description = "项目Id") @RequestParam Optional<Integer> xmId,
       @ApiQueryParam(name = "xmKey", description = "项目秘钥") @RequestParam Optional<String> xmKey,
-      @ApiQueryParam(name = "kpiId", description = "kpiId") @RequestParam int kpiId,
+      @ApiQueryParam(name = "kpiId", description = "kpiId") @RequestParam @NotEmpty List<Integer> kpiId,
       @ApiQueryParam(name = "beginDate", description = "起始日期", format = "yyyy-MM-dd") @RequestParam @DateTimeFormat(iso = ISO.DATE) LocalDate beginDate,
       @ApiQueryParam(name = "endDate", description = "结束日期", format = "yyyy-MM-dd") @RequestParam @DateTimeFormat(iso = ISO.DATE) LocalDate endDate) {
     if (!isValid(from, user, token, xmId, xmKey, response, kpiId)) return ApiResult.forbidden();
@@ -113,20 +115,20 @@ public class KpiController implements InitializingBean {
   }
 
   private boolean isValid(int from, User user, Optional<String> token, Optional<Integer> xmId, Optional<String> xmKey,
-      HttpServletResponse response, Integer kpiId) {
+      HttpServletResponse response, List<Integer> kpiId) {
     return isValid(user, kpiId) || login(token, response, kpiId)
         || (Objects.equals(from, HOST.privateWeb.getValue()) && isValid(xmId, xmKey, kpiId));
   }
 
-  private boolean isValid(User user, Integer kpiId) {
+  private boolean isValid(User user, List<Integer> kpiId) {
     return Objects.nonNull(user) && isAuthorized(user, kpiId);
   }
 
-  private boolean isAuthorized(User user, Integer kpiId) {
+  private boolean isAuthorized(User user, List<Integer> kpiId) {
     return whiteList.contains(user.getId());
   }
 
-  private boolean login(Optional<String> token, HttpServletResponse response, Integer kpiId) {
+  private boolean login(Optional<String> token, HttpServletResponse response, List<Integer> kpiId) {
     if (!token.isPresent()) return false;
     commons.saas.LoginService.User user = pandoraLoginService.login(token.get());
     if (Objects.isNull(user)) return false;
@@ -163,12 +165,12 @@ public class KpiController implements InitializingBean {
     return kpiManager.selectWithDateAndXmId(xmId.orElse(null), date);
   }
 
-  private boolean isValid(Optional<Integer> xmId, Optional<String> xmKey, Integer kpiId) {
+  private boolean isValid(Optional<Integer> xmId, Optional<String> xmKey, List<Integer> kpiId) {
     if (!xmId.isPresent() || !xmKey.isPresent()) return false;
     Project project = Project.PROJECT_MAP.get(xmId.get());
     return Objects.nonNull(project) && Objects.equals(project.getXmKey(), xmKey.get())
         && (Objects.equals(xmId.get(), 0) || Objects.isNull(kpiId) ? true
-            : project.getKpis().stream().map(kpi -> kpi.getKpiId()).collect(Collectors.toSet()).contains(kpiId));
+            : project.getKpis().stream().map(kpi -> kpi.getKpiId()).collect(Collectors.toSet()).containsAll(kpiId));
   }
 
   @ApiMethod(description = "add kpi record")
