@@ -66,9 +66,9 @@ public class KpiManager {
   public ApiResult<?> selectWithDateRangeAndKpiId(Integer xmId, List<Integer> kpiId, LocalDate beginDate,
       LocalDate endDate) {
     List<Kpi> kpis = kpiMapper.selectWithDateRangeAndKpiIds(xmId, kpiId, beginDate, endDate, true);
-    Map<Integer, Map<LocalDate, Kpi>> result = new TreeMap<>();
+    Map<Integer, Map<LocalDate, BigDecimal>> result = new TreeMap<>();
     kpis.forEach(kpi -> result.computeIfAbsent(kpi.getKpiId(), k -> new TreeMap<>(Collections.reverseOrder()))
-        .put(kpi.getCreateTime().toLocalDate(), kpi));
+        .put(kpi.getCreateTime().toLocalDate(), kpi.getKpi()));
     return new ApiResult<>(result);
   }
 
