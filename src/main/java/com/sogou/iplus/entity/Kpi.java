@@ -66,7 +66,7 @@ public class Kpi {
   private LocalDate kpiDate;
 
   @JsonIgnore
-  private LocalDateTime createTime;
+  private LocalDate createDate;
 
   @JsonIgnore
   private LocalDateTime updateTime;
@@ -122,12 +122,12 @@ public class Kpi {
     this.kpiDate = kpiDate;
   }
 
-  public LocalDateTime getCreateTime() {
-    return createTime;
+  public LocalDate getCreateDate() {
+    return createDate;
   }
 
-  public void setCreateTime(LocalDateTime createTime) {
-    this.createTime = createTime;
+  public void setCreateDate(LocalDate createDate) {
+    this.createDate = createDate;
   }
 
   public LocalDateTime getUpdateTime() {
