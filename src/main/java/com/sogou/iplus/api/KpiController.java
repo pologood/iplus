@@ -70,7 +70,7 @@ public class KpiController implements InitializingBean {
   @Autowired
   XiaopService pandoraService;
 
-  private Set<String> whiteList = new HashSet<>();
+  private Set<String> whiteList;
 
   @ApiMethod(description = "update kpi record")
   @RequestMapping(value = "/kpi", method = RequestMethod.PUT)
@@ -193,7 +193,7 @@ public class KpiController implements InitializingBean {
     return Objects.isNull(result) ? ApiResult.ok() : ApiResult.internalError(result);
   }
 
-  private String PUBLIC_ID, COVER, MESSAGE = "今日搜狗业务指标已更新，请点击查看", EMAIL_LIST, TITLE = "搜狗业务指标", TOKEN, URL, BOSS;
+  private String PUBLIC_ID, COVER, MESSAGE = "今日搜狗业务指标已更新，请点击查看", EMAIL_LIST, TITLE = "搜狗业务指标", TOKEN, URL;
 
   public enum HOST {
     publicWeb(0), privateWeb(1);
@@ -216,12 +216,10 @@ public class KpiController implements InitializingBean {
     EMAIL_LIST = env.getRequiredProperty("pandora.message.list");
     TOKEN = env.getRequiredProperty("pandora.message.token");
     URL = env.getRequiredProperty("pandora.message.url");
-    BOSS = env.getProperty("boss", "wxc,ruliyun,yanghongtao,hongtao");
 
     pandoraService.setAppId(PUBLIC_ID);
     pandoraService.setAppKey(TOKEN);
 
-    Arrays.asList(EMAIL_LIST, BOSS)
-        .forEach(s -> Arrays.stream(s.split(",")).map(user -> "xiaop_" + user).forEach(user -> whiteList.add(user)));
+    whiteList = Arrays.stream(EMAIL_LIST.split(",")).map(user -> "xiaop_" + user).collect(Collectors.toSet());
   }
 }
