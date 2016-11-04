@@ -222,7 +222,7 @@ public class KpiController implements InitializingBean {
     EMAIL_LIST = env.getRequiredProperty("pandora.message.list");
     TOKEN = env.getRequiredProperty("pandora.message.token");
     URL = env.getRequiredProperty("pandora.message.url");
-    BOSS = env.getProperty("boss", "wxc,ruliyun,yanghongtao,hongtao");
+    BOSS = env.getProperty("boss", "wxc,ruliyun,yanghongtao,hongtao,yangsonghe,zhaoliyang,lvxueshan,liziyao204083");
 
     pandoraService.setAppId(PUBLIC_ID);
     pandoraService.setAppKey(TOKEN);
