@@ -8,6 +8,7 @@ package com.sogou.iplus.api;
 import java.util.List;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Objects;
@@ -186,14 +187,19 @@ public class KpiController implements InitializingBean {
     PushParam param = new PushParam();
     param.setImage(COVER);
     param.setMessage(MESSAGE);
-    param.setOpenId(EMAIL_LIST);
+    param.setOpenId(getList());
     param.setTitle("[" + LocalDate.now() + "]" + TITLE);
     param.setUrl(URL);
     String result = pandoraService.push(param);
     return Objects.isNull(result) ? ApiResult.ok() : ApiResult.internalError(result);
   }
 
-  private String PUBLIC_ID, COVER, MESSAGE = "今日搜狗业务指标已更新，请点击查看", EMAIL_LIST, TITLE = "搜狗业务指标", TOKEN, URL;
+  private String getList() {
+    if (LocalTime.now().getHour() == 12 && LocalTime.now().getMinute() < 30) return String.join(",", EMAIL_LIST, BOSS);
+    return EMAIL_LIST;
+  }
+
+  private String PUBLIC_ID, COVER, MESSAGE = "今日搜狗业务指标已更新，请点击查看", EMAIL_LIST, TITLE = "数据已更新", TOKEN, URL, BOSS;
 
   public enum HOST {
     publicWeb(0), privateWeb(1);
@@ -216,10 +222,12 @@ public class KpiController implements InitializingBean {
     EMAIL_LIST = env.getRequiredProperty("pandora.message.list");
     TOKEN = env.getRequiredProperty("pandora.message.token");
     URL = env.getRequiredProperty("pandora.message.url");
+    BOSS = env.getProperty("boss", "wxc,ruliyun,yanghongtao,hongtao");
 
     pandoraService.setAppId(PUBLIC_ID);
     pandoraService.setAppKey(TOKEN);
 
-    whiteList = Arrays.stream(EMAIL_LIST.split(",")).map(user -> "xiaop_" + user).collect(Collectors.toSet());
+    whiteList = Arrays.stream(String.join(",", EMAIL_LIST, BOSS).split(",")).map(user -> "xiaop_" + user)
+        .collect(Collectors.toSet());
   }
 }
