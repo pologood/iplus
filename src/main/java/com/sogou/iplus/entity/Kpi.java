@@ -8,7 +8,6 @@ package com.sogou.iplus.entity;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Objects;
 
 import org.jsondoc.core.annotation.ApiObject;
 import org.jsondoc.core.annotation.ApiObjectField;
@@ -26,25 +25,24 @@ public class Kpi {
   public Kpi() {
   }
 
-  public Kpi(Integer xmId, Integer kpiId, String kpiName, BigDecimal kpi, LocalDate kpiDate, Integer day) {
+  public Kpi(Integer xmId, Integer kpiId, String kpiName, BigDecimal kpi, LocalDate kpiDate) {
     this.xmId = xmId;
     this.kpiId = kpiId;
     this.kpiName = kpiName;
     this.kpi = kpi;
     this.kpiDate = kpiDate;
-    this.day = day;
   }
 
   public Kpi(Kpi kpi) {
-    this(kpi.getXmId(), kpi.getKpiId(), kpi.getKpiName(), kpi.getKpi(), kpi.getKpiDate(), kpi.getDay());
+    this(kpi.getXmId(), kpi.getKpiId(), kpi.getKpiName(), kpi.getKpi(), kpi.getKpiDate());
   }
 
-  public Kpi(int kpiId, String kpiName, int day) {
-    this(null, kpiId, kpiName, null, null, day);
+  public Kpi(int kpiId, String kpiName) {
+    this(null, kpiId, kpiName, null, null);
   }
 
   public Kpi(int xmId, Integer kpiId, BigDecimal kpi, LocalDate kpiDate) {
-    this(xmId, kpiId, null, kpi, kpiDate, 1);
+    this(xmId, kpiId, null, kpi, kpiDate);
   }
 
   @JsonIgnore
@@ -70,9 +68,6 @@ public class Kpi {
 
   @JsonIgnore
   private LocalDateTime updateTime;
-
-  @JsonIgnore
-  private transient Integer day = 1;
 
   public Integer getId() {
     return id;
@@ -138,24 +133,9 @@ public class Kpi {
     this.updateTime = updateTime;
   }
 
-  public int getDay() {
-    return Objects.isNull(day) ? 1 : day;
-  }
-
-  public void setDay(int day) {
-    this.day = day;
-  }
-
   @Override
   public String toString() {
     return JsonHelper.writeValueAsString(this);
   }
 
-  @Override
-  public boolean equals(Object o) {
-    if (Objects.isNull(o) || !(o instanceof Kpi)) return false;
-    Kpi another = (Kpi) o;
-    return Objects.equals(this.kpiId, another.getKpiId()) && Objects.equals(this.kpi, another.getKpi())
-        && Objects.equals(this.kpiDate, another.getKpiDate());
-  }
 }

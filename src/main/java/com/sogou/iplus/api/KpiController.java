@@ -19,7 +19,8 @@ import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.jsondoc.core.annotation.Api;
 import org.jsondoc.core.annotation.ApiMethod;
@@ -35,7 +36,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.sogou.iplus.entity.BusinessUnit;
 import com.sogou.iplus.entity.Company;
 import com.sogou.iplus.entity.Kpi;
 import com.sogou.iplus.entity.Project;
@@ -76,7 +76,7 @@ public class KpiController implements InitializingBean {
   @ApiMethod(description = "update kpi record")
   @RequestMapping(value = "/kpi", method = RequestMethod.PUT)
   public ApiResult<?> update(HttpServletRequest request,
-      @ApiQueryParam(name = "xmId", description = "项目id") @RequestParam(defaultValue = "0") int xmId,
+      @ApiQueryParam(name = "xmId", description = "项目id") @RequestParam int xmId,
       @ApiQueryParam(name = "xmKey", description = "项目秘钥") @RequestParam String xmKey,
       @ApiQueryParam(name = "date", description = "kpi日期", format = "yyyy-MM-dd") @RequestParam @DateTimeFormat(iso = ISO.DATE) LocalDate date) {
     Project project = getProject(xmId, xmKey);
@@ -84,7 +84,7 @@ public class KpiController implements InitializingBean {
     Set<Kpi> kpis = new HashSet<>();
     String kpiStr;
     for (Kpi kpi : project.getKpis())
-      if (StringUtils.isNotBlank(kpiStr = request.getParameter(kpi.getKpiId().toString())))
+      if (NumberUtils.isNumber(kpiStr = request.getParameter(kpi.getKpiId().toString())))
         kpis.add(new Kpi(xmId, kpi.getKpiId(), new BigDecimal(kpiStr), date));
     return kpiManager.update(kpis);
   }
@@ -149,9 +149,8 @@ public class KpiController implements InitializingBean {
   public ApiResult<?> getCompanyKpis() {
     Set<Integer> kpis = new HashSet<>();
     kpis.addAll(Company.SOGOU.getKpis());
-    kpis.addAll(BusinessUnit.DESKTOP.getKpis());
-    kpis.addAll(BusinessUnit.SEARCH.getKpis());
-    return new ApiResult<>(kpis.stream().sorted().map(id -> Project.getKpi(id)).collect(Collectors.toList()));
+    Company.SOGOU.getBusinessUnits().forEach(bu -> kpis.addAll(bu.getKpis()));
+    return new ApiResult<>(kpis.stream().sorted().map(Project::getKpi).collect(Collectors.toList()));
   }
 
   @ApiMethod(description = "select kpis with xmId on named date")
@@ -168,10 +167,9 @@ public class KpiController implements InitializingBean {
 
   private boolean isValid(Optional<Integer> xmId, Optional<String> xmKey, List<Integer> kpiId) {
     if (!xmId.isPresent() || !xmKey.isPresent()) return false;
-    Project project = Project.PROJECT_MAP.get(xmId.get());
-    return Objects.nonNull(project) && Objects.equals(project.getXmKey(), xmKey.get())
-        && (Objects.equals(xmId.get(), 0) || Objects.isNull(kpiId) ? true
-            : project.getKpis().stream().map(kpi -> kpi.getKpiId()).collect(Collectors.toSet()).containsAll(kpiId));
+    Project project = getProject(xmId.get(), xmKey.get());
+    return Objects.nonNull(project) && (Objects.equals(xmId.get(), 0) || CollectionUtils.isEmpty(kpiId) ? true
+        : project.getKpis().stream().map(kpi -> kpi.getKpiId()).collect(Collectors.toSet()).containsAll(kpiId));
   }
 
   @ApiMethod(description = "add kpi record")
@@ -188,7 +186,7 @@ public class KpiController implements InitializingBean {
     param.setImage(COVER);
     param.setMessage(MESSAGE);
     param.setOpenId(getList());
-    param.setTitle("[" + LocalDate.now() + "]" + TITLE);
+    param.setTitle(String.format("[%s]%s", LocalDate.now(), TITLE));
     param.setUrl(URL);
     String result = pandoraService.push(param);
     return Objects.isNull(result) ? ApiResult.ok() : ApiResult.internalError(result);
@@ -222,7 +220,8 @@ public class KpiController implements InitializingBean {
     EMAIL_LIST = env.getRequiredProperty("pandora.message.list");
     TOKEN = env.getRequiredProperty("pandora.message.token");
     URL = env.getRequiredProperty("pandora.message.url");
-    BOSS = env.getProperty("boss", "wxc,ruliyun,yanghongtao,hongtao,yangsonghe,zhaoliyang,lvxueshan,liziyao204083,zhouyi,wangsi,lisihao");
+    BOSS = env.getProperty("boss",
+        "wxc,ruliyun,yanghongtao,hongtao,yangsonghe,zhaoliyang,lvxueshan,liziyao204083,zhouyi,wangsi,lisihao");
 
     pandoraService.setAppId(PUBLIC_ID);
     pandoraService.setAppKey(TOKEN);

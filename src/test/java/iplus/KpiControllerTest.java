@@ -5,15 +5,18 @@
  */
 package iplus;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.MapUtils;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -45,15 +48,18 @@ import commons.spring.RedisRememberMeService.User;
 public class KpiControllerTest {
 
   @Mock
-  private HttpServletRequest mockRequest;
+  private HttpServletRequest request;
 
-  private final int testXmId = 70;
+  private final int xmId = 70, debugId = 0;
 
-  private final Project testProject = Project.PROJECT_MAP.get(testXmId);
+  private final Project project = Project.PROJECT_MAP.get(xmId), debugProject = Project.PROJECT_MAP.get(debugId);
 
-  private final String testXmKey = testProject.getXmKey();
+  private final String xmKey = project.getXmKey(), debugKey = debugProject.getXmKey();
 
-  private final int testKpiId = testProject.getKpis().iterator().next().getKpiId();
+  private final List<Integer> kpiId = project.getKpis().stream().map(kpi -> kpi.getKpiId())
+      .collect(Collectors.toList());
+
+  private LocalDate today = LocalDate.now(), yesterday = today.minusDays(1), tomorrow = today.plusDays(1);
 
   @Autowired
   private KpiController controller;
@@ -61,25 +67,28 @@ public class KpiControllerTest {
   @Before
   public void setup() {
     MockitoAnnotations.initMocks(this);
+    project.getKpis().forEach(
+        kpi -> Mockito.when(request.getParameter(kpi.getKpiId().toString())).thenReturn(kpi.getKpiId().toString()));
   }
 
   @Test
   public void test() {
+    Assert.assertNotNull(controller);
     getCompany();
     add();
     update();
     selectNull();
     selectKpisWithDateAndXmId();
     selectKpisWithDateRangeAndKpiId();
-    selectKpisWithDateRangeAndKpiIdLogin();
   }
 
   public void getCompany() {
     ApiResult<?> result = controller.getCompany();
     Assert.assertTrue(ApiResult.isOk(result));
     Company sogou = (Company) result.getData();
+    Assert.assertNotNull(sogou);
     System.out.println(sogou);
-    Assert.assertFalse(sogou.getBusinessUnits().isEmpty());
+    Assert.assertFalse(CollectionUtils.isEmpty(sogou.getBusinessUnits()));
   }
 
   public void add() {
@@ -87,56 +96,54 @@ public class KpiControllerTest {
   }
 
   public void update() {
-    testProject.getKpis().forEach(
-        kpi -> Mockito.when(mockRequest.getParameter(kpi.getKpiId().toString())).thenReturn(kpi.getKpiId().toString()));
-    Assert
-        .assertTrue(ApiResult.isOk(controller.update(mockRequest, testXmId, testXmKey, LocalDate.now().minusDays(1))));
+    Assert.assertTrue(ApiResult.isOk(controller.update(request, xmId, xmKey, yesterday)));
   }
 
   public void selectNull() {
-    ApiResult<?> result = controller.selectProjectsDoNotSubmitKpiOnNamedDate(LocalDate.now());
+    ApiResult<?> result = controller.selectProjectsDoNotSubmitKpiOnNamedDate(today);
     Assert.assertTrue(ApiResult.isOk(result));
-    List<?> objects = (List<?>) result.getData();
-    Assert.assertFalse(objects.isEmpty());
-    Assert.assertEquals(0,
-        objects.stream().map(o -> (Project) o).filter(project -> Objects.equals(testXmId, project.getXmId())).count());
+    List<?> list = (List<?>) result.getData();
+    Assert.assertFalse(CollectionUtils.isEmpty(list));
+    Assert.assertFalse(list.stream().map(o -> (Project) o).anyMatch(p -> Objects.equals(xmId, p.getXmId())));
   }
 
   public void selectKpisWithDateAndXmId() {
-    ApiResult<?> result = controller.selectKpisWithDateAndXmId(HOST.privateWeb.getValue(), null, null, Optional.empty(),
-        Optional.of(testXmId), Optional.of(testXmKey), LocalDate.now());
+    validateResultOfSelectKpisWithDateAndXmId(selectKpisWithDateAndXmId(xmId, xmKey));
+    validateResultOfSelectKpisWithDateAndXmId(selectKpisWithDateAndXmId(debugId, debugKey));
+  }
+
+  void validateResultOfSelectKpisWithDateAndXmId(ApiResult<?> result) {
     Assert.assertTrue(ApiResult.isOk(result));
     Map<?, ?> map = (Map<?, ?>) result.getData();
+    Assert.assertFalse(MapUtils.isEmpty(map));
     System.out.println(map);
-    Assert.assertFalse(map.isEmpty());
+    Assert.assertTrue(map.entrySet().stream().filter(e -> kpiId.contains(e.getKey()))
+        .allMatch(e -> Objects.equals((Integer) e.getKey(), ((BigDecimal) e.getValue()).intValue())));
+  }
 
-    //debug project
-    result = controller.selectKpisWithDateAndXmId(HOST.privateWeb.getValue(), null, null, Optional.empty(),
-        Optional.of(0), Optional.of(Project.PROJECT_MAP.get(0).getXmKey()), LocalDate.now());
-    Assert.assertTrue(ApiResult.isOk(result));
-    map = (Map<?, ?>) result.getData();
-    System.out.println(map);
-    Assert.assertFalse(map.isEmpty());
+  private ApiResult<?> selectKpisWithDateAndXmId(int xmId, String xmKey) {
+    return controller.selectKpisWithDateAndXmId(HOST.privateWeb.getValue(), null, null, Optional.empty(),
+        Optional.of(xmId), Optional.of(xmKey), today);
   }
 
   public void selectKpisWithDateRangeAndKpiId() {
-    ApiResult<?> result = controller.selectKpisWithDateRangeAndKpiId(HOST.privateWeb.getValue(), null, null,
-        Optional.empty(), Optional.of(testXmId), Optional.of(testXmKey), Arrays.asList(testKpiId), LocalDate.now(),
-        LocalDate.now().plusDays(1));
-    Assert.assertTrue(ApiResult.isOk(result));
-    Map<?, ?> map = (Map<?, ?>) result.getData();
-    System.out.println(map);
-    Assert.assertFalse(map.isEmpty());
+    validateResultOfSelectKpisWithDateRangeAndKpiId(
+        selectKpisWithDateRangeAndKpiId(HOST.privateWeb, null, xmId, xmKey));
+    User user = new User("xiaop_lisihao", "李思昊");
+    validateResultOfSelectKpisWithDateRangeAndKpiId(selectKpisWithDateRangeAndKpiId(HOST.publicWeb, user, null, null));
   }
 
-  public void selectKpisWithDateRangeAndKpiIdLogin() {
-    ApiResult<?> result = controller.selectKpisWithDateRangeAndKpiId(HOST.publicWeb.getValue(), null,
-        new User("xiaop_ruliyun", "茹立云"), Optional.empty(), Optional.empty(), Optional.empty(), Arrays.asList(testKpiId),
-        LocalDate.now(), LocalDate.now().plusDays(1));
+  private ApiResult<?> selectKpisWithDateRangeAndKpiId(HOST host, User user, Integer xmId, String xmKey) {
+    return controller.selectKpisWithDateRangeAndKpiId(host.getValue(), null, user, Optional.empty(),
+        Optional.ofNullable(xmId), Optional.ofNullable(xmKey), kpiId, today, tomorrow);
+  }
+
+  private void validateResultOfSelectKpisWithDateRangeAndKpiId(ApiResult<?> result) {
     Assert.assertTrue(ApiResult.isOk(result));
     Map<?, ?> map = (Map<?, ?>) result.getData();
+    Assert.assertTrue(MapUtils.isNotEmpty(map)
+        && map.entrySet().stream().filter(e -> kpiId.contains(e.getKey())).findAny().isPresent());
     System.out.println(map);
-    Assert.assertFalse(map.isEmpty());
   }
 
 }
