@@ -49,7 +49,7 @@ public class KpiManager {
 
   public ApiResult<?> selectProjectsDoNotSubmitKpiOnNamedDate(LocalDate date) {
     Map<Integer, Project> projectMap = Project.getProjectMap();
-    List<Kpi> kpis = kpiMapper.select(null, null, date, true);
+    List<Kpi> kpis = select(null, null, date);
     kpis.forEach(already -> projectMap.get(already.getXmId()).getKpis()
         .removeIf(kpi -> Objects.equals(already.getKpiId(), kpi.getKpiId())));
     return new ApiResult<>(
@@ -57,13 +57,13 @@ public class KpiManager {
   }
 
   public ApiResult<?> selectWithDateAndXmId(Integer xmId, LocalDate date) {
-    List<Kpi> kpis = kpiMapper.selectWithDateAndXmId(xmId, date, true);
+    List<Kpi> kpis = select(xmId, null, date);
     return new ApiResult<>(kpis.stream().collect(Collectors.toMap(kpi -> kpi.getKpiId(), kpi -> kpi.getKpi())));
   }
 
   public ApiResult<?> selectWithDateRangeAndKpiId(Integer xmId, List<Integer> kpiId, LocalDate beginDate,
       LocalDate endDate) {
-    List<Kpi> kpis = kpiMapper.selectWithDateRangeAndKpiIds(xmId, kpiId, beginDate, endDate, true);
+    List<Kpi> kpis = select(xmId, kpiId, beginDate, endDate);
     Map<Integer, Map<LocalDate, Kpi>> result = new TreeMap<>();
     kpis.forEach(kpi -> result.computeIfAbsent(kpi.getKpiId(), k -> new TreeMap<>(Collections.reverseOrder()))
         .put(kpi.getCreateDate(), kpi));
@@ -84,7 +84,19 @@ public class KpiManager {
   }
 
   public static LocalDate getKpiDate(Kpi kpi, LocalDate date) {
-    return date.minusDays(kpi.getDay());
+    int day = 1;
+    if (kpi.getKpiName().indexOf("次日") != -1) day = 2;
+    else if (kpi.getKpiName().indexOf("7日") != -1) day = 8;
+    else if (kpi.getKpiName().indexOf("30日") != -1) day = 31;
+    return date.minusDays(day);
+  }
+
+  List<Kpi> select(Integer xmId, List<Integer> kpiId, LocalDate date) {
+    return select(xmId, kpiId, date, date);
+  }
+
+  List<Kpi> select(Integer xmId, List<Integer> kpiId, LocalDate begin, LocalDate end) {
+    return kpiMapper.select(xmId, kpiId, begin, end, true);
   }
 
 }
