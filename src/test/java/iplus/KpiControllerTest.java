@@ -27,11 +27,14 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.sogou.iplus.api.KpiController;
+import com.sogou.iplus.api.KpiController.HOST;
 import com.sogou.iplus.config.DaoConfig;
 import com.sogou.iplus.config.RootConfig;
 import com.sogou.iplus.entity.Company;
 import com.sogou.iplus.entity.Project;
 import com.sogou.iplus.model.ApiResult;
+
+import commons.spring.RedisRememberMeService.User;
 
 //--------------------- Change Logs----------------------
 //@author wangwenlong Initial Created at 2016年10月14日;
@@ -68,6 +71,7 @@ public class KpiControllerTest {
     selectNull();
     selectKpisWithDateAndXmId();
     selectKpisWithDateRangeAndKpiId();
+    selectKpisWithDateRangeAndKpiIdLogin();
   }
 
   public void getCompany() {
@@ -99,16 +103,16 @@ public class KpiControllerTest {
   }
 
   public void selectKpisWithDateAndXmId() {
-    ApiResult<?> result = controller.selectKpisWithDateAndXmId(1, null, null, Optional.empty(), Optional.of(testXmId),
-        Optional.of(testXmKey), LocalDate.now());
+    ApiResult<?> result = controller.selectKpisWithDateAndXmId(HOST.privateWeb.getValue(), null, null, Optional.empty(),
+        Optional.of(testXmId), Optional.of(testXmKey), LocalDate.now());
     Assert.assertTrue(ApiResult.isOk(result));
     Map<?, ?> map = (Map<?, ?>) result.getData();
     System.out.println(map);
     Assert.assertFalse(map.isEmpty());
 
     //debug project
-    result = controller.selectKpisWithDateAndXmId(1, null, null, Optional.empty(), Optional.of(0),
-        Optional.of(Project.PROJECT_MAP.get(0).getXmKey()), LocalDate.now());
+    result = controller.selectKpisWithDateAndXmId(HOST.privateWeb.getValue(), null, null, Optional.empty(),
+        Optional.of(0), Optional.of(Project.PROJECT_MAP.get(0).getXmKey()), LocalDate.now());
     Assert.assertTrue(ApiResult.isOk(result));
     map = (Map<?, ?>) result.getData();
     System.out.println(map);
@@ -116,9 +120,19 @@ public class KpiControllerTest {
   }
 
   public void selectKpisWithDateRangeAndKpiId() {
-    ApiResult<?> result = controller.selectKpisWithDateRangeAndKpiId(1, null, null, Optional.empty(),
-        Optional.of(testXmId), Optional.of(testXmKey), Arrays.asList(testKpiId), LocalDate.now(),
+    ApiResult<?> result = controller.selectKpisWithDateRangeAndKpiId(HOST.privateWeb.getValue(), null, null,
+        Optional.empty(), Optional.of(testXmId), Optional.of(testXmKey), Arrays.asList(testKpiId), LocalDate.now(),
         LocalDate.now().plusDays(1));
+    Assert.assertTrue(ApiResult.isOk(result));
+    Map<?, ?> map = (Map<?, ?>) result.getData();
+    System.out.println(map);
+    Assert.assertFalse(map.isEmpty());
+  }
+
+  public void selectKpisWithDateRangeAndKpiIdLogin() {
+    ApiResult<?> result = controller.selectKpisWithDateRangeAndKpiId(HOST.publicWeb.getValue(), null,
+        new User("xiaop_ruliyun", "茹立云"), Optional.empty(), Optional.empty(), Optional.empty(), Arrays.asList(testKpiId),
+        LocalDate.now(), LocalDate.now().plusDays(1));
     Assert.assertTrue(ApiResult.isOk(result));
     Map<?, ?> map = (Map<?, ?>) result.getData();
     System.out.println(map);
