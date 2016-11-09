@@ -97,8 +97,8 @@ public class KpiController implements InitializingBean {
   @ApiMethod(description = "select projects do not submit kpi on named date")
   @RequestMapping(value = "/kpi/null", method = RequestMethod.GET)
   public ApiResult<?> selectProjectsDoNotSubmitKpiOnNamedDate(
-      @ApiQueryParam(name = "date", description = "kpi日期", format = "yyyy-MM-dd") @RequestParam @DateTimeFormat(iso = ISO.DATE) LocalDate date) {
-    return kpiManager.selectProjectsDoNotSubmitKpiOnNamedDate(date);
+      @ApiQueryParam(name = "date", description = "kpi日期", format = "yyyy-MM-dd") @RequestParam @DateTimeFormat(iso = ISO.DATE) Optional<LocalDate> date) {
+    return kpiManager.selectProjectsDoNotSubmitKpiOnNamedDate(date.orElse(LocalDate.now()));
   }
 
   @ApiMethod(description = "select kpis with date range and kpiId")
