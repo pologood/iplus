@@ -100,7 +100,7 @@ public class KpiControllerTest {
   }
 
   public void selectNull() {
-    ApiResult<?> result = controller.selectProjectsDoNotSubmitKpiOnNamedDate(today);
+    ApiResult<?> result = controller.selectProjectsDoNotSubmitKpiOnNamedDate(Optional.of(today));
     Assert.assertTrue(ApiResult.isOk(result));
     List<?> list = (List<?>) result.getData();
     Assert.assertFalse(CollectionUtils.isEmpty(list));
