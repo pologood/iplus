@@ -9,6 +9,7 @@ import java.util.List;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Objects;
@@ -175,7 +176,7 @@ public class KpiController implements InitializingBean {
   @ApiMethod(description = "add kpi record")
   @RequestMapping(value = "/kpi", method = RequestMethod.POST)
   public ApiResult<?> add(
-      @ApiQueryParam(name = "date", description = "上传日期") @RequestParam @DateTimeFormat(iso = ISO.DATE) Optional<LocalDate> date) {
+      @ApiQueryParam(name = "date", description = "上传日期", format = "yyyy-MM-dd") @RequestParam @DateTimeFormat(iso = ISO.DATE) Optional<LocalDate> date) {
     return kpiManager.addAll(date.orElse(LocalDate.now()));
   }
 
@@ -185,19 +186,21 @@ public class KpiController implements InitializingBean {
     PushParam param = new PushParam();
     param.setImage(COVER);
     param.setMessage(MESSAGE);
-    param.setOpenId(getList());
+    param.setOpenId(isBossTime() ? ALL : EMAIL_LIST);
     param.setTitle(String.format("[%s]%s", LocalDate.now(), TITLE));
     param.setUrl(URL);
     String result = pandoraService.push(param);
     return Objects.isNull(result) ? ApiResult.ok() : ApiResult.internalError(result);
   }
 
-  private String getList() {
-    if (LocalTime.now().getHour() == 12 && LocalTime.now().getMinute() < 30) return String.join(",", EMAIL_LIST, BOSS);
-    return EMAIL_LIST;
+  private boolean isBossTime() {
+    return Math.abs(ChronoUnit.MINUTES.between(LocalTime.now(), LocalTime.of(12, 0))) < 30;
   }
 
-  private String PUBLIC_ID, COVER, MESSAGE = "今日搜狗业务指标已更新，请点击查看", EMAIL_LIST, TITLE = "数据已更新", TOKEN, URL, BOSS;
+  private String MESSAGE = "今日搜狗业务指标已更新，请点击查看", TITLE = "数据已更新",
+      BOSS = "wxc,ruliyun,yanghongtao,hongtao,zhaoliyang,zhouyi,lisihao,wangsi,lvxueshan,yangsonghe,liziyao204083",
+      EMAIL_LIST = "fengjin,zhengzhiyong,wangwenlong,liteng,wangjialin", COVER, URL,
+      ALL = String.join(",", BOSS, EMAIL_LIST);
 
   public enum HOST {
     publicWeb(0), privateWeb(1);
@@ -215,18 +218,9 @@ public class KpiController implements InitializingBean {
 
   @Override
   public void afterPropertiesSet() throws Exception {
-    PUBLIC_ID = env.getRequiredProperty("pandora.message.publicid");
     COVER = env.getRequiredProperty("pandora.message.cover");
-    EMAIL_LIST = env.getRequiredProperty("pandora.message.list");
-    TOKEN = env.getRequiredProperty("pandora.message.token");
     URL = env.getRequiredProperty("pandora.message.url");
-    BOSS = env.getProperty("boss",
-        "wxc,ruliyun,yanghongtao,hongtao,yangsonghe,zhaoliyang,lvxueshan,liziyao204083,zhouyi,wangsi,lisihao");
 
-    pandoraService.setAppId(PUBLIC_ID);
-    pandoraService.setAppKey(TOKEN);
-
-    whiteList = Arrays.stream(String.join(",", EMAIL_LIST, BOSS).split(",")).map(user -> "xiaop_" + user)
-        .collect(Collectors.toSet());
+    whiteList = Arrays.stream(ALL.split(",")).map(user -> "xiaop_" + user).collect(Collectors.toSet());
   }
 }
