@@ -6,6 +6,7 @@
 package com.sogou.iplus.api;
 
 import java.util.List;
+import java.util.Map;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -37,6 +38,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.google.common.collect.ImmutableMap;
 import com.sogou.iplus.entity.Company;
 import com.sogou.iplus.entity.Kpi;
 import com.sogou.iplus.entity.Project;
@@ -168,8 +170,12 @@ public class KpiController implements InitializingBean {
 
   private boolean isValid(Optional<Integer> xmId, Optional<String> xmKey, List<Integer> kpiId) {
     if (!xmId.isPresent() || !xmKey.isPresent()) return false;
-    Project project = getProject(xmId.get(), xmKey.get());
-    return Objects.nonNull(project) && (Objects.equals(xmId.get(), 0) || CollectionUtils.isEmpty(kpiId) ? true
+    return isValid(xmId.get(), xmKey.get(), kpiId);
+  }
+
+  private boolean isValid(Integer xmId, String xmKey, List<Integer> kpiId) {
+    Project project = getProject(xmId, xmKey);
+    return Objects.nonNull(project) && (Objects.equals(xmId, 0) || CollectionUtils.isEmpty(kpiId) ? true
         : project.getKpis().stream().map(kpi -> kpi.getKpiId()).collect(Collectors.toSet()).containsAll(kpiId));
   }
 
@@ -191,6 +197,17 @@ public class KpiController implements InitializingBean {
     param.setUrl(URL);
     String result = pandoraService.push(param);
     return Objects.isNull(result) ? ApiResult.ok() : ApiResult.internalError(result);
+  }
+
+  @ApiMethod(description = "get average kpi")
+  @RequestMapping(value = "/kpi/average", method = RequestMethod.GET)
+  public ApiResult<?> getAverage(@ApiQueryParam(name = "xmId", description = "项目Id") @RequestParam Integer xmId,
+      @ApiQueryParam(name = "xmKey", description = "项目秘钥") @RequestParam String xmKey,
+      @ApiQueryParam(name = "kpiIds", description = "kpiId list") @RequestParam Optional<List<Integer>> kpiIds,
+      @ApiQueryParam(name = "date", description = "kpi日期", format = "yyyy-MM-dd") @RequestParam @DateTimeFormat(iso = ISO.DATE) LocalDate date,
+      @ApiQueryParam(name = "type", description = "平均时间范围类型") @RequestParam AVERAGE type) {
+    if (!isValid(xmId, xmKey, kpiIds.orElse(null))) return ApiResult.forbidden();
+    return kpiManager.getAverage(xmId, kpiIds.orElse(null), date.minusDays(AVERAGE_MAP.get(type)), date);
   }
 
   private boolean isBossTime() {
@@ -215,6 +232,12 @@ public class KpiController implements InitializingBean {
       return this.value;
     }
   }
+
+  public enum AVERAGE {
+    day, week, month;
+  }
+
+  private Map<AVERAGE, Integer> AVERAGE_MAP = ImmutableMap.of(AVERAGE.day, 0, AVERAGE.week, 7, AVERAGE.month, 30);
 
   @Override
   public void afterPropertiesSet() throws Exception {
