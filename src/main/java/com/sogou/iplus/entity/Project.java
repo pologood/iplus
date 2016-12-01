@@ -151,7 +151,7 @@ public class Project {
     PROJECTS
         .add(new Project(232, "sohampb0dogwgxuz", "搜索APP",
             Lists.newArrayList(new Kpi(43, "搜索APP日活跃用户数(万)"), new Kpi(44, "搜索APP日搜索量(万)"), new Kpi(45, "搜索APP日激活量(万)"),
-                new Kpi(46, "搜索APP次日留存率"), new Kpi(47, "搜索APP7日留存率"), new Kpi(48, "搜索APP30日留存率")),
+                new Kpi(46, "搜索APP次日留存率"), new Kpi(47, "搜索APP第7日留存率"), new Kpi(48, "搜索APP第30日留存率")),
         BusinessUnit.SEARCH));
     PROJECTS.add(new Project(141, "t4nnt1t5a055mjch", "视频搜索", Lists.newArrayList(new Kpi(49, "视频搜索(PC+无线)用户量(万)")),
         BusinessUnit.SEARCH));
@@ -163,9 +163,9 @@ public class Project {
         BusinessUnit.SEARCH));
     PROJECTS.add(new Project(31, "1k5rg0vny4y1htl2", "小说搜索",
         Lists.newArrayList(new Kpi(54, "小说搜索搜索量(万)"), new Kpi(207, "阅读APPAndroid版日活跃用户数(万)"),
-            new Kpi(208, "阅读APPiOS版日活跃用户数(万)"), new Kpi(201, "阅读APPAndroid版次日留存率"), new Kpi(202, "阅读APPAndroid版7日留存率"),
-            new Kpi(203, "阅读APPAndroid版30日留存率"), new Kpi(204, "阅读APPiOS版次日留存率"), new Kpi(205, "阅读APPiOS版7日留存率"),
-            new Kpi(206, "阅读APPiOS版30日留存率")),
+            new Kpi(208, "阅读APPiOS版日活跃用户数(万)"), new Kpi(201, "阅读APPAndroid版次日留存率"), new Kpi(202, "阅读APPAndroid版第7日留存率"),
+            new Kpi(203, "阅读APPAndroid版第30日留存率"), new Kpi(204, "阅读APPiOS版次日留存率"), new Kpi(205, "阅读APPiOS版第7日留存率"),
+            new Kpi(206, "阅读APPiOS版第30日留存率")),
         BusinessUnit.SEARCH));
     PROJECTS
         .add(new Project(
@@ -174,7 +174,7 @@ public class Project {
         BusinessUnit.SEARCH));
     PROJECTS.add(new Project(306, "zvn6s7zwq56ri18y",
         "中医项目", Lists.newArrayList(new Kpi(63, "中医项目App日活(个)"), new Kpi(64, "中医项目App次日留存率"),
-            new Kpi(65, "中医项目App7日留存率"), new Kpi(66, "中医项目App30日留存率"), new Kpi(67, "中医项目App总激活数(个)")),
+            new Kpi(65, "中医项目App第7日留存率"), new Kpi(66, "中医项目App第30日留存率"), new Kpi(67, "中医项目App总激活数(个)")),
         BusinessUnit.SEARCH));
     PROJECTS.add(new Project(36, "1ou8k1pdoe4ac3lz", "消耗、RPM",
         Lists.newArrayList(new Kpi(68, "全部竞价日消耗(万元)"), new Kpi(69, "PC搜索日消耗(万元)"), new Kpi(70, "无线搜索日消耗(万元)"),
@@ -184,7 +184,7 @@ public class Project {
     PROJECTS
         .add(new Project(42, "qfysv8ha64crrdsc", "糖猫",
             Lists.newArrayList(new Kpi(77, "糖猫日新激活(个)"), new Kpi(78, "糖猫日活跃用户(个)"), new Kpi(79, "糖猫日活跃APP用户(个)"),
-                new Kpi(80, "糖猫APP次日留存率"), new Kpi(81, "糖猫APP7日留存率"), new Kpi(82, "糖猫APP30日留存率")),
+                new Kpi(80, "糖猫APP次日留存率"), new Kpi(81, "糖猫APP第7日留存率"), new Kpi(82, "糖猫APP第30日留存率")),
         BusinessUnit.SUGARCAT));
 
     PROJECT_MAP = getProjectMap();
