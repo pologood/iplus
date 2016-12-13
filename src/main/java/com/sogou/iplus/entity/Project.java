@@ -136,11 +136,14 @@ public class Project {
         .add(new Project(322, "hw9cfh7zaor7kuwd",
             "个性化阅读", Lists.newArrayList(new Kpi(27, "个性化阅读日活跃用户数(万)"), new Kpi(28, "个性化阅读日激活量(万)"),
                 new Kpi(29, "个性化阅读次日留存率"), new Kpi(30, "个性化阅读第7日留存率"), new Kpi(31, "个性化阅读第30日留存率")),
-        BusinessUnit.DESKTOP));
+            BusinessUnit.DESKTOP));
     PROJECTS.add(new Project(148, "h0wb4btxx2xm56xp", "手机地图",
         Lists.newArrayList(new Kpi(32, "手机地图日活跃用户数(万)"), new Kpi(33, "手机地图日激活量(万)"), new Kpi(113, "手机地图Android版次日留存率"),
             new Kpi(114, "手机地图Android版7日留存率"), new Kpi(115, "手机地图Android版30日留存率"), new Kpi(116, "手机地图iOS版次日留存率"),
             new Kpi(117, "手机地图iOS版7日留存率"), new Kpi(118, "手机地图iOS版30日留存率")),
+        BusinessUnit.DESKTOP));
+    PROJECTS.add(new Project(11, "ljy4vpeq567fejbj", "应用市场",
+        Lists.newArrayList(new Kpi(8, "应用分发(市场+手机助手)日活跃用户数(万)"), new Kpi(9, "应用分发(市场+手机助手)日下载量(万)")),
         BusinessUnit.DESKTOP));
     PROJECTS.add(new Project(137, "sp6jmm92s2p1u8qn", "PC网页搜索",
         Lists.newArrayList(new Kpi(37, "PC搜狗自有渠道日搜索量(万)"), new Kpi(38, "PC腾讯渠道日搜索量(万)"), new Kpi(39, "PC外购网页日搜索量(万)")),
@@ -152,7 +155,7 @@ public class Project {
         .add(new Project(232, "sohampb0dogwgxuz", "搜索APP",
             Lists.newArrayList(new Kpi(43, "搜索APP日活跃用户数(万)"), new Kpi(44, "搜索APP日搜索量(万)"), new Kpi(45, "搜索APP日激活量(万)"),
                 new Kpi(46, "搜索APP次日留存率"), new Kpi(47, "搜索APP第7日留存率"), new Kpi(48, "搜索APP第30日留存率")),
-        BusinessUnit.SEARCH));
+            BusinessUnit.SEARCH));
     PROJECTS.add(new Project(141, "t4nnt1t5a055mjch", "视频搜索", Lists.newArrayList(new Kpi(49, "视频搜索(PC+无线)用户量(万)")),
         BusinessUnit.SEARCH));
     PROJECTS.add(new Project(138, "wzze931ap6087cf7", "图片搜索", Lists.newArrayList(new Kpi(50, "图片搜索(PC+无线)用户量(万)")),
@@ -167,11 +170,8 @@ public class Project {
             new Kpi(203, "阅读APPAndroid版第30日留存率"), new Kpi(204, "阅读APPiOS版次日留存率"), new Kpi(205, "阅读APPiOS版第7日留存率"),
             new Kpi(206, "阅读APPiOS版第30日留存率")),
         BusinessUnit.SEARCH));
-    PROJECTS
-        .add(new Project(
-            116, "4t8hnsfb3igf9p91", "百科、问问", Lists.newArrayList(new Kpi(59, "百科:百科UV(PC+无线)"),
-                new Kpi(60, "百科:日编辑版本数(万)"), new Kpi(61, "问问:有效写入量(万)"), new Kpi(62, "问问:用户规模(PV)")),
-        BusinessUnit.SEARCH));
+    PROJECTS.add(new Project(116, "4t8hnsfb3igf9p91", "百科、问问", Lists.newArrayList(new Kpi(59, "百科:百科UV(PC+无线)"),
+        new Kpi(60, "百科:日编辑版本数(万)"), new Kpi(61, "问问:有效写入量(万)"), new Kpi(62, "问问:用户规模(PV)")), BusinessUnit.SEARCH));
     PROJECTS.add(new Project(306, "zvn6s7zwq56ri18y",
         "中医项目", Lists.newArrayList(new Kpi(63, "中医项目App日活(个)"), new Kpi(64, "中医项目App次日留存率"),
             new Kpi(65, "中医项目App第7日留存率"), new Kpi(66, "中医项目App第30日留存率"), new Kpi(67, "中医项目App总激活数(个)")),
@@ -181,10 +181,9 @@ public class Project {
             new Kpi(71, "网盟日消耗(万元)"), new Kpi(72, "银河皓月日消耗(万元)"), new Kpi(73, "PC搜狗浏览器起始页RPM(元/千次)"),
             new Kpi(74, "无线QQ浏览器RPM(元/千次)"), new Kpi(75, "PC搜索RPM(优质)(元/千次)"), new Kpi(76, "无线搜索RPM(元/千次)")),
         BusinessUnit.MARKETING));
-    PROJECTS
-        .add(new Project(42, "qfysv8ha64crrdsc", "糖猫",
-            Lists.newArrayList(new Kpi(77, "糖猫日新激活(个)"), new Kpi(78, "糖猫日活跃用户(个)"), new Kpi(79, "糖猫日活跃APP用户(个)"),
-                new Kpi(80, "糖猫APP次日留存率"), new Kpi(81, "糖猫APP第7日留存率"), new Kpi(82, "糖猫APP第30日留存率")),
+    PROJECTS.add(new Project(42, "qfysv8ha64crrdsc", "糖猫",
+        Lists.newArrayList(new Kpi(77, "糖猫日新激活(个)"), new Kpi(78, "糖猫日活跃用户(个)"), new Kpi(79, "糖猫日活跃APP用户(个)"),
+            new Kpi(80, "糖猫APP次日留存率"), new Kpi(81, "糖猫APP第7日留存率"), new Kpi(82, "糖猫APP第30日留存率")),
         BusinessUnit.SUGARCAT));
 
     PROJECT_MAP = getProjectMap();
