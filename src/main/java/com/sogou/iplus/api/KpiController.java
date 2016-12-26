@@ -214,10 +214,7 @@ public class KpiController implements InitializingBean {
     return Math.abs(ChronoUnit.MINUTES.between(LocalTime.now(), LocalTime.of(12, 0))) < 30;
   }
 
-  private String MESSAGE = "今日搜狗业务指标已更新，请点击查看", TITLE = "数据已更新",
-      BOSS = "wxc,ruliyun,yanghongtao,hongtao,zhaoliyang,zhouyi,lisihao,wangsi,lvxueshan,yangsonghe,liziyao204083,donglu",
-      EMAIL_LIST = "fengjin,zhengzhiyong,wangwenlong,liteng,wangjialin,xiepeidong", COVER, URL,
-      ALL = String.join(",", BOSS, EMAIL_LIST);
+  private String MESSAGE = "今日搜狗业务指标已更新，请点击查看", TITLE = "数据已更新", BOSS, EMAIL_LIST, COVER, URL, ALL;
 
   public enum HOST {
     publicWeb(0), privateWeb(1);
@@ -243,6 +240,10 @@ public class KpiController implements InitializingBean {
   public void afterPropertiesSet() throws Exception {
     COVER = env.getRequiredProperty("pandora.message.cover");
     URL = env.getRequiredProperty("pandora.message.url");
+    BOSS = env.getProperty("boss",
+        "wxc,ruliyun,yanghongtao,hongtao,zhaoliyang,zhouyi,lisihao,wangsi,lvxueshan,yangsonghe,liziyao204083,donglu");
+    EMAIL_LIST = env.getProperty("email.list", "fengjin,zhengzhiyong,wangwenlong,liteng,wangjialin");
+    ALL = String.join(",", BOSS, EMAIL_LIST);
 
     whiteList = Arrays.stream(ALL.split(",")).map(user -> "xiaop_" + user).collect(Collectors.toSet());
   }
