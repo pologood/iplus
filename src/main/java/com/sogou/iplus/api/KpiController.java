@@ -215,8 +215,8 @@ public class KpiController implements InitializingBean {
   }
 
   private String MESSAGE = "今日搜狗业务指标已更新，请点击查看", TITLE = "数据已更新",
-      BOSS = "wxc,ruliyun,yanghongtao,hongtao,zhaoliyang,zhouyi,lisihao,wangsi,lvxueshan,yangsonghe,liziyao204083",
-      EMAIL_LIST = "fengjin,zhengzhiyong,wangwenlong,liteng,wangjialin", COVER, URL,
+      BOSS = "wxc,ruliyun,yanghongtao,hongtao,zhaoliyang,zhouyi,lisihao,wangsi,lvxueshan,yangsonghe,liziyao204083,donglu",
+      EMAIL_LIST = "fengjin,zhengzhiyong,wangwenlong,liteng,wangjialin,xiepeidong", COVER, URL,
       ALL = String.join(",", BOSS, EMAIL_LIST);
 
   public enum HOST {
