@@ -11,6 +11,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Objects;
@@ -39,8 +40,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.google.common.collect.ImmutableMap;
+import com.sogou.iplus.entity.BusinessUnit;
 import com.sogou.iplus.entity.Company;
 import com.sogou.iplus.entity.Kpi;
+import com.sogou.iplus.entity.Permission;
 import com.sogou.iplus.entity.Project;
 import com.sogou.iplus.manager.KpiManager;
 import com.sogou.iplus.model.ApiResult;
@@ -129,7 +132,7 @@ public class KpiController implements InitializingBean {
   }
 
   private boolean isAuthorized(User user, List<Integer> kpiId) {
-    return whiteList.contains(user.getId());
+    return whiteList.contains(user.getId()) && Permission.isAuthorized(user.getId(), kpiId);
   }
 
   private boolean login(Optional<String> token, HttpServletResponse response, List<Integer> kpiId) {
@@ -143,8 +146,46 @@ public class KpiController implements InitializingBean {
 
   @ApiMethod(description = "get company structure information")
   @RequestMapping(value = "/company", method = RequestMethod.GET)
-  public ApiResult<?> getCompany() {
-    return new ApiResult<>(Company.SOGOU);
+  public ApiResult<?> getCompany(HttpServletResponse response, @AuthenticationPrincipal User user,
+      @ApiQueryParam(name = "token", description = "pandora token") @RequestParam Optional<String> token) {
+    if (Objects.isNull(user) && token.isPresent()) {
+      commons.saas.LoginService.User u = pandoraLoginService.login(token.get());
+      if (Objects.nonNull(u)) redisService.login(response, user = new User(u.getOpenId(), u.getName()));
+    }
+    return new ApiResult<>(
+        filter(Permission.MAP.getOrDefault(Objects.isNull(user) ? "" : user.getId(), new HashSet<>())));
+  }
+
+  private Company filter(Set<Integer> set) {
+    if (CollectionUtils.isEmpty(set)) return Company.SOGOU;
+    Company company = new Company(), sogou = Company.SOGOU;
+
+    company.setId(sogou.getId());
+    company.setName(sogou.getName());
+    company.setKpis(sogou.getKpis());
+    company.setBusinessUnits(new ArrayList<>());
+
+    for (BusinessUnit sogouBu : sogou.getBusinessUnits()) {
+      BusinessUnit bu = new BusinessUnit();
+
+      bu.setId(sogouBu.getId());
+      bu.setName(sogouBu.getName());
+      bu.setKpis(sogouBu.getKpis());
+      bu.setProjects(new ArrayList<>());
+
+      for (Project sogouProject : sogouBu.getProjects()) {
+        Project project = new Project(sogouProject);
+
+        for (Kpi kpi : sogouProject.getKpis())
+          if (!set.contains(kpi.getId())) project.getKpis().remove(kpi);
+
+        if (!project.getKpis().isEmpty()) bu.getProjects().add(project);
+      }
+
+      if (!bu.getProjects().isEmpty()) company.getBusinessUnits().add(bu);
+    }
+
+    return company;
   }
 
   @ApiMethod(description = "list company kpi")
@@ -158,13 +199,13 @@ public class KpiController implements InitializingBean {
 
   @ApiMethod(description = "select kpis with xmId on named date")
   @RequestMapping(value = "/kpi", method = RequestMethod.GET)
-  public ApiResult<?> selectKpisWithDateAndXmId(@RequestParam int from, HttpServletResponse response,
-      @AuthenticationPrincipal User user,
+  public ApiResult<?> selectKpisWithDateAndXmId(@RequestParam(defaultValue = "0") int from,
+      HttpServletResponse response, @AuthenticationPrincipal User user,
       @ApiQueryParam(name = "token", description = "pandora token") @RequestParam Optional<String> token,
       @ApiQueryParam(name = "xmId", description = "项目Id") @RequestParam Optional<Integer> xmId,
       @ApiQueryParam(name = "xmKey", description = "项目秘钥") @RequestParam Optional<String> xmKey,
       @ApiQueryParam(name = "date", description = "kpi日期", format = "yyyy-MM-dd") @RequestParam @DateTimeFormat(iso = ISO.DATE) LocalDate date) {
-    if (!isValid(from, user, token, xmId, xmKey, response, null)) return ApiResult.forbidden();
+    if (!isValid(from, user, token, xmId, xmKey, response, new ArrayList<>())) return ApiResult.forbidden();
     return kpiManager.selectWithDateAndXmId(xmId.orElse(null), date);
   }
 
@@ -175,7 +216,7 @@ public class KpiController implements InitializingBean {
 
   private boolean isValid(Integer xmId, String xmKey, List<Integer> kpiId) {
     Project project = getProject(xmId, xmKey);
-    return Objects.nonNull(project) && (Objects.equals(xmId, 0) || CollectionUtils.isEmpty(kpiId) ? true
+    return Objects.nonNull(project) && (Objects.equals(xmId, 0) ? true
         : project.getKpis().stream().map(kpi -> kpi.getKpiId()).collect(Collectors.toSet()).containsAll(kpiId));
   }
 
