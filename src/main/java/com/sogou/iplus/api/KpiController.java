@@ -45,9 +45,9 @@ import com.google.common.collect.ImmutableMap;
 import com.sogou.iplus.entity.BusinessUnit;
 import com.sogou.iplus.entity.Company;
 import com.sogou.iplus.entity.Kpi;
-import com.sogou.iplus.entity.Permission;
 import com.sogou.iplus.entity.Project;
 import com.sogou.iplus.manager.KpiManager;
+import com.sogou.iplus.manager.Permission;
 import com.sogou.iplus.model.ApiResult;
 
 import commons.saas.XiaopLoginService;
