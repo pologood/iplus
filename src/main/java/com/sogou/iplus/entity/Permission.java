@@ -12,7 +12,7 @@ public class Permission {
   public static final Map<String, Set<Integer>> MAP = new HashMap<>();
 
   static {
-    MAP.put("fengjin", BusinessUnit.SUGARCAT.getProjects().stream().flatMap(project -> project.getKpis().stream())
+    MAP.put("wangwenlong", BusinessUnit.SUGARCAT.getProjects().stream().flatMap(project -> project.getKpis().stream())
         .map(kpi -> kpi.getKpiId()).collect(Collectors.toSet()));
   }
 
