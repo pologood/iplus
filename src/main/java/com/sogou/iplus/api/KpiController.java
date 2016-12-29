@@ -28,6 +28,8 @@ import org.hibernate.validator.constraints.NotEmpty;
 import org.jsondoc.core.annotation.Api;
 import org.jsondoc.core.annotation.ApiMethod;
 import org.jsondoc.core.annotation.ApiQueryParam;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
@@ -61,6 +63,8 @@ import commons.spring.RedisRememberMeService.User;
 @RestController
 @RequestMapping("/api")
 public class KpiController implements InitializingBean {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(KpiController.class);
 
   @Autowired
   Environment env;
@@ -132,6 +136,7 @@ public class KpiController implements InitializingBean {
   }
 
   private boolean isAuthorized(User user, List<Integer> kpiId) {
+    LOGGER.info("user is {} kpiId is {}", user.getId(), kpiId);
     return whiteList.contains(user.getId()) && Permission.isAuthorized(user.getId(), kpiId);
   }
 
