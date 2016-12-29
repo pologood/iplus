@@ -242,7 +242,7 @@ public class KpiController implements InitializingBean {
     param.setUrl(URL);
     String result = pandoraService.push(param);
 
-     for (String user : Permission.MAP.keySet()) {
+    for (String user : Permission.MAP.keySet()) {
       param = new PushParam();
       param.setImage(COVER);
       param.setMessage(MESSAGE);
