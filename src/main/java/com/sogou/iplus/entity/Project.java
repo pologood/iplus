@@ -17,6 +17,7 @@ import org.jsondoc.core.annotation.ApiObjectField;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.common.collect.Lists;
+import com.sogou.iplus.manager.Permission;
 
 import commons.utils.JsonHelper;
 
@@ -190,6 +191,8 @@ public class Project {
 
     PROJECTS.stream().filter(p -> Objects.nonNull(p.getBusinessUnit()))
         .forEach(project -> project.getBusinessUnit().getProjects().add(project));
+
+    Permission.init();
 
     PROJECTS.forEach(project -> project.getKpis().forEach(kpi -> KPI_MAP.put(kpi.getKpiId(), kpi)));
   }
