@@ -10,6 +10,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import com.sogou.iplus.entity.BusinessUnit;
+import com.sogou.iplus.entity.Project;
 
 import commons.spring.RedisRememberMeService.User;
 
@@ -21,8 +22,17 @@ public class Permission {
     return MAP.getOrDefault(userId, new HashSet<>(kpiIds)).containsAll(kpiIds);
   }
 
+  public static Set<Integer> getXmIds(User user) {
+    Set<Integer> kpiIds = MAP.getOrDefault(Objects.isNull(user) ? "" : user.getId(), new HashSet<>()),
+        result = new HashSet<>();
+    kpiIds.forEach(kpi -> result.add(Project.PROJECTS.stream()
+        .filter(p -> p.getKpis().stream().filter(k -> Objects.equals(k.getKpiId(), kpi)).findFirst().isPresent())
+        .findFirst().get().getXmId()));
+    return result;
+  }
+
   public static Set<Integer> get(User user) {
-    return Permission.MAP.getOrDefault(Objects.isNull(user) ? "" : user.getId(), new HashSet<>());
+    return MAP.getOrDefault(Objects.isNull(user) ? "" : user.getId(), new HashSet<>());
   }
 
   public static void init() {
