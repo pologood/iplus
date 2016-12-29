@@ -23,6 +23,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.jsondoc.core.annotation.Api;
@@ -77,7 +78,7 @@ public class KpiController implements InitializingBean {
   @Autowired
   XiaopService pandoraService;
 
-  private Set<String> whiteList;
+  private Set<String> whiteList, bossSet;
 
   @ApiMethod(description = "update kpi record")
   @RequestMapping(value = "/kpi", method = RequestMethod.PUT)
@@ -240,6 +241,16 @@ public class KpiController implements InitializingBean {
     param.setTitle(String.format("[%s]%s", LocalDate.now(), TITLE));
     param.setUrl(URL);
     String result = pandoraService.push(param);
+
+     for (String user : Permission.MAP.keySet()) {
+      param = new PushParam();
+      param.setImage(COVER);
+      param.setMessage(MESSAGE);
+      param.setOpenId(user.substring(6));
+      param.setTitle(String.format("[%s]%s", LocalDate.now(), TITLE));
+      param.setUrl(URLC + "?xmIds=" + StringUtils.join(Permission.MAP.get(user), '_'));
+      result = pandoraService.push(param);
+    }
     return Objects.isNull(result) ? ApiResult.ok() : ApiResult.internalError(result);
   }
 
@@ -258,7 +269,7 @@ public class KpiController implements InitializingBean {
     return Math.abs(ChronoUnit.MINUTES.between(LocalTime.now(), LocalTime.of(12, 0))) < 30;
   }
 
-  private String MESSAGE = "今日搜狗业务指标已更新，请点击查看", TITLE = "数据已更新", BOSS, EMAIL_LIST, COVER, URL, ALL;
+  private String MESSAGE = "今日搜狗业务指标已更新，请点击查看", TITLE = "数据已更新", BOSS, EMAIL_LIST, COVER, URL, URLC, ALL;
 
   public enum HOST {
     publicWeb(0), privateWeb(1);
@@ -284,11 +295,15 @@ public class KpiController implements InitializingBean {
   public void afterPropertiesSet() throws Exception {
     COVER = env.getRequiredProperty("pandora.message.cover");
     URL = env.getRequiredProperty("pandora.message.url");
+    URLC = env.getRequiredProperty("pandora.message.urlc");
     BOSS = env.getProperty("boss",
         "wxc,ruliyun,yanghongtao,hongtao,zhaoliyang,zhouyi,lisihao,wangsi,lvxueshan,yangsonghe,liziyao204083,donglu");
     EMAIL_LIST = env.getProperty("email.list", "fengjin,zhengzhiyong,wangwenlong,liteng,wangjialin");
-    ALL = String.join(",", BOSS, EMAIL_LIST);
+    whiteList = Arrays.asList(BOSS, EMAIL_LIST).stream().flatMap(s -> Arrays.stream(s.split(",")))
+        .map(s -> "xiaop_" + s).collect(Collectors.toSet());
 
-    whiteList = Arrays.stream(ALL.split(",")).map(user -> "xiaop_" + user).collect(Collectors.toSet());
+    bossSet = new HashSet<>(whiteList);
+    bossSet.removeAll(Permission.MAP.keySet());
+    ALL = StringUtils.join(bossSet, ',');
   }
 }

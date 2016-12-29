@@ -26,7 +26,7 @@ public class Permission {
   }
 
   public static void init() {
-    MAP.put("xiaop_markwu", BusinessUnit.SUGARCAT.getProjects().stream().flatMap(project -> project.getKpis().stream())
+    MAP.put("xiaop_fengjin", BusinessUnit.SUGARCAT.getProjects().stream().flatMap(project -> project.getKpis().stream())
         .map(kpi -> kpi.getKpiId()).collect(Collectors.toSet()));
     MAP.put("xiaop_wangjialin",
         Arrays.asList(BusinessUnit.SUGARCAT, BusinessUnit.MARKETING).stream().flatMap(bu -> bu.getProjects().stream())
