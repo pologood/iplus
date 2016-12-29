@@ -1,6 +1,5 @@
 package com.sogou.iplus.manager;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -22,9 +21,8 @@ public class Permission {
     return MAP.getOrDefault(userId, new HashSet<>(kpiIds)).containsAll(kpiIds);
   }
 
-  public static Set<Integer> getXmIds(User user) {
-    Set<Integer> kpiIds = MAP.getOrDefault(Objects.isNull(user) ? "" : user.getId(), new HashSet<>()),
-        result = new HashSet<>();
+  public static Set<Integer> getXmIds(String user) {
+    Set<Integer> kpiIds = MAP.getOrDefault(user, new HashSet<>()), result = new HashSet<>();
     kpiIds.forEach(kpi -> result.add(Project.PROJECTS.stream()
         .filter(p -> p.getKpis().stream().filter(k -> Objects.equals(k.getKpiId(), kpi)).findFirst().isPresent())
         .findFirst().get().getXmId()));
@@ -36,10 +34,7 @@ public class Permission {
   }
 
   public static void init() {
-    MAP.put("xiaop_fengjin", BusinessUnit.SUGARCAT.getProjects().stream().flatMap(project -> project.getKpis().stream())
+    MAP.put("xiaop_markwu", BusinessUnit.SUGARCAT.getProjects().stream().flatMap(project -> project.getKpis().stream())
         .map(kpi -> kpi.getKpiId()).collect(Collectors.toSet()));
-    MAP.put("xiaop_wangjialin",
-        Arrays.asList(BusinessUnit.SUGARCAT, BusinessUnit.MARKETING).stream().flatMap(bu -> bu.getProjects().stream())
-            .flatMap(project -> project.getKpis().stream()).map(kpi -> kpi.getKpiId()).collect(Collectors.toSet()));
   }
 }

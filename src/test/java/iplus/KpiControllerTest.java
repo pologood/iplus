@@ -73,6 +73,7 @@ public class KpiControllerTest {
 
   @Test
   public void test() {
+    //push();
     Assert.assertNotNull(controller);
     getCompany();
     add();
@@ -144,6 +145,10 @@ public class KpiControllerTest {
     Assert.assertTrue(MapUtils.isNotEmpty(map)
         && map.entrySet().stream().filter(e -> kpiId.contains(e.getKey())).findAny().isPresent());
     System.out.println(map);
+  }
+
+  public void push() {
+    controller.pushPandoraMessage();
   }
 
 }

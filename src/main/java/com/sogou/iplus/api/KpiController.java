@@ -248,7 +248,7 @@ public class KpiController implements InitializingBean {
       param.setMessage(MESSAGE);
       param.setOpenId(user.substring(6));
       param.setTitle(String.format("[%s]%s", LocalDate.now(), TITLE));
-      param.setUrl(URLC + "?xmIds=" + StringUtils.join(Permission.MAP.get(user), '_'));
+      param.setUrl(URLC + "?xmIds=" + StringUtils.join(Permission.getXmIds(user), '_'));
       result = pandoraService.push(param);
     }
     return Objects.isNull(result) ? ApiResult.ok() : ApiResult.internalError(result);
