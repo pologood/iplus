@@ -152,8 +152,7 @@ public class KpiController implements InitializingBean {
       commons.saas.LoginService.User u = pandoraLoginService.login(token.get());
       if (Objects.nonNull(u)) redisService.login(response, user = new User(u.getOpenId(), u.getName()));
     }
-    return new ApiResult<>(
-        filter(Permission.MAP.getOrDefault(Objects.isNull(user) ? "" : user.getId(), new HashSet<>())));
+    return new ApiResult<>(filter(Permission.get(user)));
   }
 
   private Company filter(Set<Integer> set) {
@@ -177,7 +176,8 @@ public class KpiController implements InitializingBean {
         Project project = new Project(sogouProject);
 
         for (Kpi kpi : sogouProject.getKpis())
-          if (!set.contains(kpi.getId())) project.getKpis().remove(kpi);
+          if (!set.contains(kpi.getKpiId()))
+            project.getKpis().removeIf(k -> Objects.equals(k.getKpiId(), kpi.getKpiId()));
 
         if (!project.getKpis().isEmpty()) bu.getProjects().add(project);
       }
