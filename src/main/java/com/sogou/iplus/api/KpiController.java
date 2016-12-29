@@ -28,6 +28,8 @@ import org.hibernate.validator.constraints.NotEmpty;
 import org.jsondoc.core.annotation.Api;
 import org.jsondoc.core.annotation.ApiMethod;
 import org.jsondoc.core.annotation.ApiQueryParam;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
@@ -61,6 +63,8 @@ import commons.spring.RedisRememberMeService.User;
 @RestController
 @RequestMapping("/api")
 public class KpiController implements InitializingBean {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(KpiController.class);
 
   @Autowired
   Environment env;
@@ -132,6 +136,7 @@ public class KpiController implements InitializingBean {
   }
 
   private boolean isAuthorized(User user, List<Integer> kpiId) {
+    LOGGER.info("user is {} kpiIds is {}", user.getId(), kpiId);
     return whiteList.contains(user.getId()) && Permission.isAuthorized(user.getId(), kpiId);
   }
 
@@ -205,7 +210,10 @@ public class KpiController implements InitializingBean {
       @ApiQueryParam(name = "xmId", description = "项目Id") @RequestParam Optional<Integer> xmId,
       @ApiQueryParam(name = "xmKey", description = "项目秘钥") @RequestParam Optional<String> xmKey,
       @ApiQueryParam(name = "date", description = "kpi日期", format = "yyyy-MM-dd") @RequestParam @DateTimeFormat(iso = ISO.DATE) LocalDate date) {
-    if (!isValid(from, user, token, xmId, xmKey, response, new ArrayList<>())) return ApiResult.forbidden();
+    Project project = Project.PROJECT_MAP.get(xmId.orElse(null));
+    List<Integer> kpiIds = Objects.isNull(project) ? new ArrayList<>()
+        : project.getKpis().stream().map(kpi -> kpi.getKpiId()).collect(Collectors.toList());
+    if (!isValid(from, user, token, xmId, xmKey, response, kpiIds)) return ApiResult.forbidden();
     return kpiManager.selectWithDateAndXmId(xmId.orElse(null), date);
   }
 
