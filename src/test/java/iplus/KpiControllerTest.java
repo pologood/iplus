@@ -83,7 +83,7 @@ public class KpiControllerTest {
   }
 
   public void getCompany() {
-    ApiResult<?> result = controller.getCompany();
+    ApiResult<?> result = controller.getCompany(null, null, Optional.empty());
     Assert.assertTrue(ApiResult.isOk(result));
     Company sogou = (Company) result.getData();
     Assert.assertNotNull(sogou);
