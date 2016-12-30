@@ -167,7 +167,7 @@ public class KpiController {
   @RequestMapping(value = "/kpi/message", method = RequestMethod.POST)
   public ApiResult<?> pushPandoraMessage(
       @ApiQueryParam(name = "role", description = "发送对象角色") @RequestParam Optional<List<Role>> role) {
-    return pushManager.push(role.orElse(Arrays.asList(Role.ADMIN)));
+    return pushManager.push(new HashSet<>(role.orElse(Arrays.asList(Role.ADMIN))));
   }
 
   @ApiMethod(description = "get average kpi")

@@ -31,15 +31,17 @@ import commons.spring.RedisRememberMeService.User;
 public class PermissionManager {
 
   @Autowired
-  Environment env;
+  RedisRememberMeService redisService;
 
   @Autowired
-  RedisRememberMeService redisService;
+  public PermissionManager(Environment env) {
+    WHITE_LIST = getSet(env, ",", "boss", "admin");
+  }
 
   @Autowired
   XiaopLoginService pandoraLoginService;
 
-  public Set<String> WHITE_LIST = getSet(",", "boss", "admin");
+  public Set<String> WHITE_LIST;
 
   public static final Map<String, Set<Integer>> MAP = new HashMap<>();
 
@@ -101,7 +103,7 @@ public class PermissionManager {
     return company;
   }
 
-  public Set<String> getSet(String regex, String... keys) {
+  public Set<String> getSet(Environment env, String regex, String... keys) {
     return Arrays.stream(keys).flatMap(key -> Arrays.stream(env.getRequiredProperty(key).split(regex)))
         .collect(Collectors.toSet());
   }

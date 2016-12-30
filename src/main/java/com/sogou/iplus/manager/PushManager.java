@@ -1,9 +1,9 @@
 package com.sogou.iplus.manager;
 
 import java.time.LocalDate;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -23,10 +23,15 @@ import commons.saas.XiaopService.PushParam;
 public class PushManager {
 
   @Autowired
-  private Environment env;
+  public PushManager(Environment env) {
+    LIST_MAP = ImmutableMap.of(Role.BOSS, env.getRequiredProperty("boss"), Role.ADMIN,
+        env.getRequiredProperty("admin"));
+    COVER = env.getRequiredProperty("pandora.message.cover");
+    URL = env.getRequiredProperty("pandora.message.url");
+    PERMISSION_URL = env.getRequiredProperty("pandora.message.permissionurl");
+  }
 
-  private Map<Role, String> LIST_MAP = ImmutableMap.of(Role.BOSS, env.getRequiredProperty("boss"), Role.ADMIN,
-      env.getRequiredProperty("admin"));
+  private Map<Role, String> LIST_MAP;
 
   @Autowired
   XiaopService pandoraService;
@@ -36,11 +41,9 @@ public class PushManager {
     BOSS, ADMIN, MANAGER;
   }
 
-  private String MESSAGE = "今日搜狗业务指标已更新，请点击查看", TITLE = "数据已更新",
-      COVER = env.getRequiredProperty("pandora.message.cover"), URL = env.getRequiredProperty("pandora.message.url"),
-      PERMISSION_URL = env.getRequiredProperty("pandora.message.permissionurl");
+  private String MESSAGE = "今日搜狗业务指标已更新，请点击查看", TITLE = "数据已更新", COVER, URL, PERMISSION_URL;
 
-  public ApiResult<?> push(List<Role> roles) {
+  public ApiResult<?> push(Set<Role> roles) {
     String result1 = null, result2 = null, result;
 
     if (roles.remove(Role.MANAGER)) result1 = push(PermissionManager.getManagerList(), PERMISSION_URL);
@@ -63,7 +66,7 @@ public class PushManager {
     return pandoraService.push(param);
   }
 
-  private String getList(List<Role> roles) {
+  private String getList(Set<Role> roles) {
     return String.join(",", roles.stream().map(role -> LIST_MAP.get(role)).collect(Collectors.toList()));
   }
 }
