@@ -233,25 +233,34 @@ public class KpiController implements InitializingBean {
 
   @ApiMethod(description = "push pandora message")
   @RequestMapping(value = "/kpi/message", method = RequestMethod.POST)
-  public ApiResult<?> pushPandoraMessage() {
+  public ApiResult<?> pushPandoraMessage(
+    @ApiQueryParam(name = "force", description = "force push")
+    @RequestParam Optional<Boolean> force) {
+
+    boolean doit = force.orElse(false) || isBossTime();
+
     PushParam param = new PushParam();
     param.setImage(COVER);
     param.setMessage(MESSAGE);
-    param.setOpenId(isBossTime() ? ALL : EMAIL_LIST);
+    param.setOpenId(doit ? ALL : EMAIL_LIST);
     param.setTitle(String.format("[%s]%s", LocalDate.now(), TITLE));
     param.setUrl(URL);
     String result = pandoraService.push(param);
+    if (result != null) return ApiResult.internalError(result);
 
-    for (String user : Permission.MAP.keySet()) {
-      param = new PushParam();
-      param.setImage(COVER);
-      param.setMessage(MESSAGE);
-      param.setOpenId(user.substring(6));
-      param.setTitle(String.format("[%s]%s", LocalDate.now(), TITLE));
-      param.setUrl(URLC + "?xmIds=" + StringUtils.join(Permission.getXmIds(user), '_'));
-      result = pandoraService.push(param);
+    if (doit) {
+      for (String user : Permission.MAP.keySet()) {
+        param = new PushParam();
+        param.setImage(COVER);
+        param.setMessage(MESSAGE);
+        param.setOpenId(user.substring(6));
+        param.setTitle(String.format("[%s]%s", LocalDate.now(), TITLE));
+        param.setUrl(URLC + "?xmIds=" + StringUtils.join(Permission.getXmIds(user), '_'));
+        result = pandoraService.push(param);
+        if (result != null) return ApiResult.internalError(result);
+      }
     }
-    return Objects.isNull(result) ? ApiResult.ok() : ApiResult.internalError(result);
+    return ApiResult.ok();
   }
 
   @ApiMethod(description = "get average kpi")
