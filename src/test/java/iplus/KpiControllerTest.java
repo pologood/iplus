@@ -148,7 +148,6 @@ public class KpiControllerTest {
   }
 
   public void push() {
-    controller.pushPandoraMessage();
+    controller.pushPandoraMessage(Optional.empty());
   }
-
 }
