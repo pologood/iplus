@@ -304,6 +304,7 @@ public class KpiController implements InitializingBean {
 
     bossSet = new HashSet<>(whiteList);
     bossSet.removeAll(Permission.MAP.keySet());
-    ALL = StringUtils.join(bossSet, ',');
+
+    ALL = String.join(",", bossSet.stream().map(s -> s.substring(6)).collect(Collectors.toList()));
   }
 }
