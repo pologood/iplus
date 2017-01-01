@@ -74,7 +74,7 @@ public class KpiControllerTest {
   @Test
   public void test() {
     Assert.assertNotNull(controller);
-    getCompany();
+    //getCompany();
     add();
     update();
     selectNull();
