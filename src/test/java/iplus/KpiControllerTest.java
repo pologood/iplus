@@ -74,17 +74,17 @@ public class KpiControllerTest {
   @Test
   public void test() {
     Assert.assertNotNull(controller);
-    //getCompany();
-//    add();
-//    update();
-//    selectNull();
-//    selectKpisWithDateAndXmId();
-//    selectKpisWithDateRangeAndKpiId();
-//    push();
+    getCompany();
+    add();
+    update();
+    selectNull();
+    selectKpisWithDateAndXmId();
+    selectKpisWithDateRangeAndKpiId();
+    push();
   }
 
   public void getCompany() {
-    ApiResult<?> result = controller.getCompany(null, null, Optional.empty());
+    ApiResult<?> result = controller.getCompany(null, new User("xiaop_lisihao", "李思昊"), Optional.empty());
     Assert.assertTrue(ApiResult.isOk(result));
     Company sogou = (Company) result.getData();
     Assert.assertNotNull(sogou);
