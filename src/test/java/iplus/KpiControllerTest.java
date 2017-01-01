@@ -84,7 +84,7 @@ public class KpiControllerTest {
   }
 
   public void getCompany() {
-    ApiResult<?> result = controller.getCompany(null, new User("xiaop_lisihao", "李思昊"), Optional.empty());
+    ApiResult<?> result = controller.getCompany(null, new User("xiaop_liteng", "李腾"), Optional.empty());
     Assert.assertTrue(ApiResult.isOk(result));
     Company sogou = (Company) result.getData();
     Assert.assertNotNull(sogou);
@@ -130,7 +130,7 @@ public class KpiControllerTest {
   public void selectKpisWithDateRangeAndKpiId() {
     validateResultOfSelectKpisWithDateRangeAndKpiId(
         selectKpisWithDateRangeAndKpiId(HOST.privateWeb, null, xmId, xmKey));
-    User user = new User("xiaop_lisihao", "李思昊");
+    User user = new User("xiaop_liteng", "李腾");
     validateResultOfSelectKpisWithDateRangeAndKpiId(selectKpisWithDateRangeAndKpiId(HOST.publicWeb, user, null, null));
   }
 
