@@ -74,13 +74,13 @@ public class KpiControllerTest {
   @Test
   public void test() {
     Assert.assertNotNull(controller);
-    //getCompany();
-//    add();
-//    update();
-//    selectNull();
-//    selectKpisWithDateAndXmId();
-//    selectKpisWithDateRangeAndKpiId();
-//    push();
+    getCompany();
+    add();
+    update();
+    selectNull();
+    selectKpisWithDateAndXmId();
+    selectKpisWithDateRangeAndKpiId();
+    push();
   }
 
   public void getCompany() {
