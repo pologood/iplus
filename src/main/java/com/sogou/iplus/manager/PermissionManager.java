@@ -70,8 +70,8 @@ public class PermissionManager {
   }
 
   public Company getCompany(User user) {
-    Set<Integer> set = MAP.get(user.getId().substring(6));
-    if (CollectionUtils.isEmpty(set)) return Company.SOGOU;
+    Set<Integer> set;
+    if (Objects.isNull(user) || CollectionUtils.isEmpty(set = MAP.get(user.getId().substring(6)))) return Company.SOGOU;
     Company company = new Company(), sogou = Company.SOGOU;
 
     company.setId(sogou.getId());

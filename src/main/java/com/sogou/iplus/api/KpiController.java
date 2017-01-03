@@ -116,9 +116,8 @@ public class KpiController {
   @RequestMapping(value = "/company", method = RequestMethod.GET)
   public ApiResult<?> getCompany(HttpServletResponse response, @AuthenticationPrincipal User user,
       @ApiQueryParam(name = "token", description = "pandora token") @RequestParam Optional<String> token) {
-    if (Objects.isNull(user = Objects.isNull(user) ? permissionManager.login(token, response) : user))
-      return ApiResult.forbidden();
-    return new ApiResult<>(permissionManager.getCompany(user));
+    return new ApiResult<>(
+        permissionManager.getCompany(Objects.isNull(user) ? permissionManager.login(token, response) : user));
   }
 
   @ApiMethod(description = "list company kpi")
