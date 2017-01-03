@@ -50,13 +50,13 @@ public class KpiControllerTest {
   @Mock
   private HttpServletRequest request;
 
-  private final int xmId = 70, debugId = 0;
+  private final int testId = 70, debugId = 0;
 
-  private final Project project = Project.PROJECT_MAP.get(xmId), debugProject = Project.PROJECT_MAP.get(debugId);
+  private final Project testProject = Project.PROJECT_MAP.get(testId), debugProject = Project.PROJECT_MAP.get(debugId);
 
-  private final String xmKey = project.getXmKey(), debugKey = debugProject.getXmKey();
+  private final String testKey = testProject.getXmKey(), debugKey = debugProject.getXmKey();
 
-  private final List<Integer> kpiId = project.getKpis().stream().map(kpi -> kpi.getKpiId())
+  private final List<Integer> kpiIds = testProject.getKpis().stream().map(kpi -> kpi.getKpiId())
       .collect(Collectors.toList());
 
   private LocalDate today = LocalDate.now(), yesterday = today.minusDays(1), tomorrow = today.plusDays(1);
@@ -67,7 +67,7 @@ public class KpiControllerTest {
   @Before
   public void setup() {
     MockitoAnnotations.initMocks(this);
-    project.getKpis().forEach(
+    testProject.getKpis().forEach(
         kpi -> Mockito.when(request.getParameter(kpi.getKpiId().toString())).thenReturn(kpi.getKpiId().toString()));
   }
 
@@ -97,19 +97,19 @@ public class KpiControllerTest {
   }
 
   public void update() {
-    Assert.assertTrue(ApiResult.isOk(controller.update(request, xmId, xmKey, yesterday)));
+    Assert.assertTrue(ApiResult.isOk(controller.update(request, testId, testKey, yesterday)));
   }
 
   public void selectNull() {
-    ApiResult<?> result = controller.selectProjectsDoNotSubmitKpiOnNamedDate(Optional.of(today));
+    ApiResult<?> result = controller.selectProjectsDoNotSubmitKpiOnNamedDate(Optional.empty());
     Assert.assertTrue(ApiResult.isOk(result));
     List<?> list = (List<?>) result.getData();
     Assert.assertFalse(CollectionUtils.isEmpty(list));
-    Assert.assertFalse(list.stream().map(o -> (Project) o).anyMatch(p -> Objects.equals(xmId, p.getXmId())));
+    Assert.assertTrue(list.stream().map(o -> (Project) o).noneMatch(p -> Objects.equals(testId, p.getXmId())));
   }
 
   public void selectKpisWithDateAndXmId() {
-    validateResultOfSelectKpisWithDateAndXmId(selectKpisWithDateAndXmId(xmId, xmKey));
+    validateResultOfSelectKpisWithDateAndXmId(selectKpisWithDateAndXmId(testId, testKey));
     validateResultOfSelectKpisWithDateAndXmId(selectKpisWithDateAndXmId(debugId, debugKey));
   }
 
@@ -118,7 +118,7 @@ public class KpiControllerTest {
     Map<?, ?> map = (Map<?, ?>) result.getData();
     Assert.assertFalse(MapUtils.isEmpty(map));
     System.out.println(map);
-    Assert.assertTrue(map.entrySet().stream().filter(e -> kpiId.contains(e.getKey()))
+    Assert.assertTrue(map.entrySet().stream().filter(e -> kpiIds.contains(e.getKey()))
         .allMatch(e -> Objects.equals((Integer) e.getKey(), ((BigDecimal) e.getValue()).intValue())));
   }
 
@@ -129,21 +129,20 @@ public class KpiControllerTest {
 
   public void selectKpisWithDateRangeAndKpiId() {
     validateResultOfSelectKpisWithDateRangeAndKpiId(
-        selectKpisWithDateRangeAndKpiId(HOST.privateWeb, null, xmId, xmKey));
+        selectKpisWithDateRangeAndKpiId(HOST.privateWeb, null, testId, testKey));
     User user = new User("xiaop_liteng", "李腾");
     validateResultOfSelectKpisWithDateRangeAndKpiId(selectKpisWithDateRangeAndKpiId(HOST.publicWeb, user, null, null));
   }
 
   private ApiResult<?> selectKpisWithDateRangeAndKpiId(HOST host, User user, Integer xmId, String xmKey) {
     return controller.selectKpisWithDateRangeAndKpiId(host.getValue(), null, user, Optional.empty(),
-        Optional.ofNullable(xmId), Optional.ofNullable(xmKey), kpiId, today, tomorrow);
+        Optional.ofNullable(xmId), Optional.ofNullable(xmKey), kpiIds, today, tomorrow);
   }
 
   private void validateResultOfSelectKpisWithDateRangeAndKpiId(ApiResult<?> result) {
     Assert.assertTrue(ApiResult.isOk(result));
     Map<?, ?> map = (Map<?, ?>) result.getData();
-    Assert.assertTrue(MapUtils.isNotEmpty(map)
-        && map.entrySet().stream().filter(e -> kpiId.contains(e.getKey())).findAny().isPresent());
+    Assert.assertTrue(MapUtils.isNotEmpty(map) && map.entrySet().stream().allMatch(e -> kpiIds.contains(e.getKey())));
     System.out.println(map);
   }
 
