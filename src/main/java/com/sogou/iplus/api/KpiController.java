@@ -25,6 +25,8 @@ import org.hibernate.validator.constraints.NotEmpty;
 import org.jsondoc.core.annotation.Api;
 import org.jsondoc.core.annotation.ApiMethod;
 import org.jsondoc.core.annotation.ApiQueryParam;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.format.annotation.DateTimeFormat.ISO;
@@ -45,6 +47,7 @@ import com.sogou.iplus.manager.PushManager.Role;
 import com.sogou.iplus.model.ApiResult;
 
 import commons.spring.RedisRememberMeService.User;
+import commons.utils.JsonHelper;
 
 //--------------------- Change Logs----------------------
 //@author wangwenlong Initial Created at 2016年10月11日;
@@ -53,6 +56,8 @@ import commons.spring.RedisRememberMeService.User;
 @RestController
 @RequestMapping("/api")
 public class KpiController {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(KpiController.class);
 
   @Autowired
   private KpiManager kpiManager;
@@ -116,6 +121,7 @@ public class KpiController {
   @RequestMapping(value = "/company", method = RequestMethod.GET)
   public ApiResult<?> getCompany(HttpServletResponse response, @AuthenticationPrincipal User user,
       @ApiQueryParam(name = "token", description = "pandora token") @RequestParam Optional<String> token) {
+    LOGGER.info("get company user is {} token is {}", JsonHelper.writeValueAsString(user), token.orElse(null));
     return new ApiResult<>(
         permissionManager.getCompany(Objects.isNull(user) ? permissionManager.login(token, response) : user));
   }
