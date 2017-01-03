@@ -14,8 +14,6 @@ import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.collections4.CollectionUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
@@ -28,12 +26,9 @@ import com.sogou.iplus.entity.Project;
 import commons.saas.XiaopLoginService;
 import commons.spring.RedisRememberMeService;
 import commons.spring.RedisRememberMeService.User;
-import commons.utils.JsonHelper;
 
 @Service
 public class PermissionManager {
-
-  private static final Logger LOGGER = LoggerFactory.getLogger(PermissionManager.class);
 
   @Autowired
   RedisRememberMeService redisService;
@@ -69,14 +64,12 @@ public class PermissionManager {
   }
 
   public boolean isAuthorized(User user, List<Integer> kpiIds) {
-    LOGGER.info("white list is {}", WHITE_LIST);
     if (Objects.isNull(user)) return false;
     String userId = user.getId().substring(6);
     return WHITE_LIST.contains(userId) || MAP.getOrDefault(userId, new HashSet<>()).containsAll(kpiIds);
   }
 
   public Company getCompany(User user) {
-    LOGGER.info("get company user is {}", JsonHelper.writeValueAsString(user));
     Set<Integer> set;
     if (Objects.isNull(user) || CollectionUtils.isEmpty(set = MAP.get(user.getId().substring(6)))) return Company.SOGOU;
     Company company = new Company(), sogou = Company.SOGOU;

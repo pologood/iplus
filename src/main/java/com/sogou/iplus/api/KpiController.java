@@ -25,8 +25,6 @@ import org.hibernate.validator.constraints.NotEmpty;
 import org.jsondoc.core.annotation.Api;
 import org.jsondoc.core.annotation.ApiMethod;
 import org.jsondoc.core.annotation.ApiQueryParam;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.format.annotation.DateTimeFormat.ISO;
@@ -47,7 +45,6 @@ import com.sogou.iplus.manager.PushManager.Role;
 import com.sogou.iplus.model.ApiResult;
 
 import commons.spring.RedisRememberMeService.User;
-import commons.utils.JsonHelper;
 
 //--------------------- Change Logs----------------------
 //@author wangwenlong Initial Created at 2016年10月11日;
@@ -56,8 +53,6 @@ import commons.utils.JsonHelper;
 @RestController
 @RequestMapping("/api")
 public class KpiController {
-
-  private static final Logger LOGGER = LoggerFactory.getLogger(KpiController.class);
 
   @Autowired
   private KpiManager kpiManager;
@@ -103,11 +98,11 @@ public class KpiController {
       @ApiQueryParam(name = "token", description = "pandora token") @RequestParam Optional<String> token,
       @ApiQueryParam(name = "xmId", description = "项目Id") @RequestParam Optional<Integer> xmId,
       @ApiQueryParam(name = "xmKey", description = "项目秘钥") @RequestParam Optional<String> xmKey,
-      @ApiQueryParam(name = "kpiId", description = "kpiId") @RequestParam @NotEmpty List<Integer> kpiIds,
+      @ApiQueryParam(name = "kpiId", description = "kpiId") @RequestParam @NotEmpty List<Integer> kpiId,
       @ApiQueryParam(name = "beginDate", description = "起始日期", format = "yyyy-MM-dd") @RequestParam @DateTimeFormat(iso = ISO.DATE) LocalDate beginDate,
       @ApiQueryParam(name = "endDate", description = "结束日期", format = "yyyy-MM-dd") @RequestParam @DateTimeFormat(iso = ISO.DATE) LocalDate endDate) {
-    if (!isValid(from, user, token, xmId, xmKey, response, kpiIds)) return ApiResult.forbidden();
-    return kpiManager.selectWithDateRangeAndKpiId(xmId.orElse(null), kpiIds, beginDate, endDate);
+    if (!isValid(from, user, token, xmId, xmKey, response, kpiId)) return ApiResult.forbidden();
+    return kpiManager.selectWithDateRangeAndKpiId(xmId.orElse(null), kpiId, beginDate, endDate);
   }
 
   private boolean isValid(int from, User user, Optional<String> token, Optional<Integer> xmId, Optional<String> xmKey,
@@ -121,7 +116,6 @@ public class KpiController {
   @RequestMapping(value = "/company", method = RequestMethod.GET)
   public ApiResult<?> getCompany(HttpServletResponse response, @AuthenticationPrincipal User user,
       @ApiQueryParam(name = "token", description = "pandora token") @RequestParam Optional<String> token) {
-    LOGGER.info("get company user is {} token is {}", JsonHelper.writeValueAsString(user), token.orElse(null));
     return new ApiResult<>(
         permissionManager.getCompany(Objects.isNull(user) ? permissionManager.login(token, response) : user));
   }
