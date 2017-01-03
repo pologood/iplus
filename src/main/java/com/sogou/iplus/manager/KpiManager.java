@@ -7,7 +7,7 @@ package com.sogou.iplus.manager;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -66,7 +66,7 @@ public class KpiManager {
       LocalDate endDate) {
     List<Kpi> kpis = select(xmId, kpiId, beginDate, endDate);
     Map<Integer, Map<LocalDate, Kpi>> result = new TreeMap<>();
-    kpis.forEach(kpi -> result.computeIfAbsent(kpi.getKpiId(), k -> new TreeMap<>(Collections.reverseOrder()))
+    kpis.forEach(kpi -> result.computeIfAbsent(kpi.getKpiId(), k -> new TreeMap<>(Comparator.reverseOrder()))
         .put(kpi.getCreateDate(), kpi));
     return new ApiResult<>(result);
   }
@@ -97,7 +97,8 @@ public class KpiManager {
             getKpiDate(kpi, date));
         toAdd.setCreateDate(date);
         kpiMapper.add(toAdd);
-      } catch (DuplicateKeyException e) {}
+      } catch (DuplicateKeyException e) {
+      }
     }));
     return ApiResult.ok();
   }

@@ -98,11 +98,11 @@ public class KpiController {
       @ApiQueryParam(name = "token", description = "pandora token") @RequestParam Optional<String> token,
       @ApiQueryParam(name = "xmId", description = "项目Id") @RequestParam Optional<Integer> xmId,
       @ApiQueryParam(name = "xmKey", description = "项目秘钥") @RequestParam Optional<String> xmKey,
-      @ApiQueryParam(name = "kpiId", description = "kpiId") @RequestParam @NotEmpty List<Integer> kpiId,
+      @ApiQueryParam(name = "kpiId", description = "kpiId") @RequestParam @NotEmpty List<Integer> kpiIds,
       @ApiQueryParam(name = "beginDate", description = "起始日期", format = "yyyy-MM-dd") @RequestParam @DateTimeFormat(iso = ISO.DATE) LocalDate beginDate,
       @ApiQueryParam(name = "endDate", description = "结束日期", format = "yyyy-MM-dd") @RequestParam @DateTimeFormat(iso = ISO.DATE) LocalDate endDate) {
-    if (!isValid(from, user, token, xmId, xmKey, response, kpiId)) return ApiResult.forbidden();
-    return kpiManager.selectWithDateRangeAndKpiId(xmId.orElse(null), kpiId, beginDate, endDate);
+    if (!isValid(from, user, token, xmId, xmKey, response, kpiIds)) return ApiResult.forbidden();
+    return kpiManager.selectWithDateRangeAndKpiId(xmId.orElse(null), kpiIds, beginDate, endDate);
   }
 
   private boolean isValid(int from, User user, Optional<String> token, Optional<Integer> xmId, Optional<String> xmKey,
@@ -150,10 +150,10 @@ public class KpiController {
     return isValid(xmId.get(), xmKey.get(), kpiId);
   }
 
-  private boolean isValid(int xmId, String xmKey, List<Integer> kpiId) {
+  private boolean isValid(int xmId, String xmKey, List<Integer> kpiIds) {
     Project project = getProject(xmId, xmKey);
-    return Objects.nonNull(project) && (xmId == 0 ? true
-        : project.getKpis().stream().map(kpi -> kpi.getKpiId()).collect(Collectors.toSet()).containsAll(kpiId));
+    return Objects.nonNull(project) && (xmId == 0
+        || project.getKpis().stream().map(kpi -> kpi.getKpiId()).collect(Collectors.toSet()).containsAll(kpiIds));
   }
 
   @ApiMethod(description = "add kpi record")
@@ -172,7 +172,7 @@ public class KpiController {
 
   @ApiMethod(description = "get average kpi")
   @RequestMapping(value = "/kpi/average", method = RequestMethod.GET)
-  public ApiResult<?> getAverage(@ApiQueryParam(name = "xmId", description = "项目Id") @RequestParam Integer xmId,
+  public ApiResult<?> getAverage(@ApiQueryParam(name = "xmId", description = "项目Id") @RequestParam int xmId,
       @ApiQueryParam(name = "xmKey", description = "项目秘钥") @RequestParam String xmKey,
       @ApiQueryParam(name = "kpiIds", description = "kpiId list") @RequestParam Optional<List<Integer>> kpiIds,
       @ApiQueryParam(name = "date", description = "kpi日期", format = "yyyy-MM-dd") @RequestParam @DateTimeFormat(iso = ISO.DATE) LocalDate date,
