@@ -7,6 +7,8 @@ package iplus;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -83,6 +85,9 @@ public class KpiControllerTest {
     selectKpisWithDateRangeAndKpiId();
     push();
     System.out.println(getRandomString("0123456789abcdefghijklmnopqrstuvwxyz".toCharArray(), 16));
+    System.out.println(getDailyActiveUserKpiIds());
+    System.out.println(getNewUserKpiIds());
+    System.out.println(getRetentionRateKpiIds());
   }
 
   public void getCompany() {
@@ -157,5 +162,35 @@ public class KpiControllerTest {
     char[] result = new char[len];
     for (int i = 0; i < len; result[i++] = chars[random.nextInt(chars.length)]);
     return new String(result);
+  }
+
+  public List<Integer> getDailyActiveUserKpiIds() {
+    return Project.KPI_MAP.values().stream()
+        .filter(kpi -> Arrays.asList("日活", "活跃").stream().anyMatch(regex -> -1 != kpi.getKpiName().indexOf(regex)))
+        .map(kpi -> kpi.getKpiId()).collect(Collectors.toList());
+  }
+
+  public List<Integer> getNewUserKpiIds() {
+    return Project.KPI_MAP.values().stream().filter(kpi -> -1 != kpi.getKpiName().indexOf("激活"))
+        .map(kpi -> kpi.getKpiId()).collect(Collectors.toList());
+  }
+
+  public Map<Integer, List<Integer>> getRetentionRateKpiIds() {
+    Map<Integer, List<Integer>> result = new HashMap<>();
+
+    result.put(1,
+        Project.KPI_MAP.values().stream()
+            .filter(kpi -> Arrays.asList("留存", "次").stream().allMatch(regex -> -1 != kpi.getKpiName().indexOf(regex)))
+            .map(kpi -> kpi.getKpiId()).collect(Collectors.toList()));
+    result.put(7,
+        Project.KPI_MAP.values().stream()
+            .filter(kpi -> Arrays.asList("留存", "7").stream().allMatch(regex -> -1 != kpi.getKpiName().indexOf(regex)))
+            .map(kpi -> kpi.getKpiId()).collect(Collectors.toList()));
+    result.put(30,
+        Project.KPI_MAP.values().stream()
+            .filter(kpi -> Arrays.asList("留存", "30").stream().allMatch(regex -> -1 != kpi.getKpiName().indexOf(regex)))
+            .map(kpi -> kpi.getKpiId()).collect(Collectors.toList()));
+
+    return result;
   }
 }
