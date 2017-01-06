@@ -6,9 +6,10 @@
 package com.sogou.iplus.api;
 
 import java.util.List;
+import java.util.Map;
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Objects;
@@ -19,15 +20,12 @@ import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.jsondoc.core.annotation.Api;
 import org.jsondoc.core.annotation.ApiMethod;
 import org.jsondoc.core.annotation.ApiQueryParam;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.format.annotation.DateTimeFormat.ISO;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -36,16 +34,16 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.google.common.collect.ImmutableMap;
 import com.sogou.iplus.entity.Company;
 import com.sogou.iplus.entity.Kpi;
 import com.sogou.iplus.entity.Project;
 import com.sogou.iplus.manager.KpiManager;
+import com.sogou.iplus.manager.PermissionManager;
+import com.sogou.iplus.manager.PushManager;
+import com.sogou.iplus.manager.PushManager.Role;
 import com.sogou.iplus.model.ApiResult;
 
-import commons.saas.XiaopLoginService;
-import commons.saas.XiaopService;
-import commons.saas.XiaopService.PushParam;
-import commons.spring.RedisRememberMeService;
 import commons.spring.RedisRememberMeService.User;
 
 //--------------------- Change Logs----------------------
@@ -54,24 +52,16 @@ import commons.spring.RedisRememberMeService.User;
 @Api(name = "kpi API", description = "Read/Write/Update/Delete the kpi")
 @RestController
 @RequestMapping("/api")
-public class KpiController implements InitializingBean {
-
-  @Autowired
-  Environment env;
+public class KpiController {
 
   @Autowired
   private KpiManager kpiManager;
 
   @Autowired
-  RedisRememberMeService redisService;
+  private PermissionManager permissionManager;
 
   @Autowired
-  XiaopLoginService pandoraLoginService;
-
-  @Autowired
-  XiaopService pandoraService;
-
-  private Set<String> whiteList;
+  private PushManager pushManager;
 
   @ApiMethod(description = "update kpi record")
   @RequestMapping(value = "/kpi", method = RequestMethod.PUT)
@@ -116,32 +106,18 @@ public class KpiController implements InitializingBean {
   }
 
   private boolean isValid(int from, User user, Optional<String> token, Optional<Integer> xmId, Optional<String> xmKey,
-      HttpServletResponse response, List<Integer> kpiId) {
-    return isValid(user, kpiId) || login(token, response, kpiId)
-        || (Objects.equals(from, HOST.privateWeb.getValue()) && isValid(xmId, xmKey, kpiId));
-  }
-
-  private boolean isValid(User user, List<Integer> kpiId) {
-    return Objects.nonNull(user) && isAuthorized(user, kpiId);
-  }
-
-  private boolean isAuthorized(User user, List<Integer> kpiId) {
-    return whiteList.contains(user.getId());
-  }
-
-  private boolean login(Optional<String> token, HttpServletResponse response, List<Integer> kpiId) {
-    if (!token.isPresent()) return false;
-    commons.saas.LoginService.User user = pandoraLoginService.login(token.get());
-    if (Objects.isNull(user)) return false;
-    User user2 = new User(user.getOpenId(), user.getName());
-    redisService.login(response, user2);
-    return isValid(user2, kpiId);
+      HttpServletResponse response, List<Integer> kpiIds) {
+    return permissionManager.isAuthorized(user, kpiIds)
+        || permissionManager.isAuthorized(permissionManager.login(token, response), kpiIds)
+        || (Objects.equals(from, HOST.privateWeb.getValue()) && isValid(xmId, xmKey, kpiIds));
   }
 
   @ApiMethod(description = "get company structure information")
   @RequestMapping(value = "/company", method = RequestMethod.GET)
-  public ApiResult<?> getCompany() {
-    return new ApiResult<>(Company.SOGOU);
+  public ApiResult<?> getCompany(HttpServletResponse response, @AuthenticationPrincipal User user,
+      @ApiQueryParam(name = "token", description = "pandora token") @RequestParam Optional<String> token) {
+    return new ApiResult<>(
+        permissionManager.getCompany(Objects.isNull(user) ? permissionManager.login(token, response) : user));
   }
 
   @ApiMethod(description = "list company kpi")
@@ -155,49 +131,54 @@ public class KpiController implements InitializingBean {
 
   @ApiMethod(description = "select kpis with xmId on named date")
   @RequestMapping(value = "/kpi", method = RequestMethod.GET)
-  public ApiResult<?> selectKpisWithDateAndXmId(@RequestParam int from, HttpServletResponse response,
-      @AuthenticationPrincipal User user,
+  public ApiResult<?> selectKpisWithDateAndXmId(@RequestParam(defaultValue = "0") int from,
+      HttpServletResponse response, @AuthenticationPrincipal User user,
       @ApiQueryParam(name = "token", description = "pandora token") @RequestParam Optional<String> token,
       @ApiQueryParam(name = "xmId", description = "项目Id") @RequestParam Optional<Integer> xmId,
       @ApiQueryParam(name = "xmKey", description = "项目秘钥") @RequestParam Optional<String> xmKey,
       @ApiQueryParam(name = "date", description = "kpi日期", format = "yyyy-MM-dd") @RequestParam @DateTimeFormat(iso = ISO.DATE) LocalDate date) {
-    if (!isValid(from, user, token, xmId, xmKey, response, null)) return ApiResult.forbidden();
+    Project project = Project.PROJECT_MAP.get(xmId.orElse(null));
+    List<Integer> kpiIds = Objects.isNull(project) ? new ArrayList<>()
+        : project.getKpis().stream().map(kpi -> kpi.getKpiId()).collect(Collectors.toList());
+    if (!isValid(from, user, token, xmId, xmKey, response, kpiIds)) return ApiResult.forbidden();
     return kpiManager.selectWithDateAndXmId(xmId.orElse(null), date);
   }
 
   private boolean isValid(Optional<Integer> xmId, Optional<String> xmKey, List<Integer> kpiId) {
     if (!xmId.isPresent() || !xmKey.isPresent()) return false;
-    Project project = getProject(xmId.get(), xmKey.get());
-    return Objects.nonNull(project) && (Objects.equals(xmId.get(), 0) || CollectionUtils.isEmpty(kpiId) ? true
-        : project.getKpis().stream().map(kpi -> kpi.getKpiId()).collect(Collectors.toSet()).containsAll(kpiId));
+    return isValid(xmId.get(), xmKey.get(), kpiId);
+  }
+
+  private boolean isValid(int xmId, String xmKey, List<Integer> kpiIds) {
+    Project project = getProject(xmId, xmKey);
+    return Objects.nonNull(project) && (xmId == 0
+        || project.getKpis().stream().map(kpi -> kpi.getKpiId()).collect(Collectors.toSet()).containsAll(kpiIds));
   }
 
   @ApiMethod(description = "add kpi record")
   @RequestMapping(value = "/kpi", method = RequestMethod.POST)
   public ApiResult<?> add(
-      @ApiQueryParam(name = "date", description = "上传日期") @RequestParam @DateTimeFormat(iso = ISO.DATE) Optional<LocalDate> date) {
+      @ApiQueryParam(name = "date", description = "上传日期", format = "yyyy-MM-dd") @RequestParam @DateTimeFormat(iso = ISO.DATE) Optional<LocalDate> date) {
     return kpiManager.addAll(date.orElse(LocalDate.now()));
   }
 
   @ApiMethod(description = "push pandora message")
   @RequestMapping(value = "/kpi/message", method = RequestMethod.POST)
-  public ApiResult<?> pushPandoraMessage() {
-    PushParam param = new PushParam();
-    param.setImage(COVER);
-    param.setMessage(MESSAGE);
-    param.setOpenId(getList());
-    param.setTitle(String.format("[%s]%s", LocalDate.now(), TITLE));
-    param.setUrl(URL);
-    String result = pandoraService.push(param);
-    return Objects.isNull(result) ? ApiResult.ok() : ApiResult.internalError(result);
+  public ApiResult<?> pushPandoraMessage(
+      @ApiQueryParam(name = "role", description = "发送对象角色") @RequestParam Optional<List<Role>> role) {
+    return pushManager.push(new HashSet<>(role.orElse(Arrays.asList(Role.ADMIN))));
   }
 
-  private String getList() {
-    if (LocalTime.now().getHour() == 12 && LocalTime.now().getMinute() < 30) return String.join(",", EMAIL_LIST, BOSS);
-    return EMAIL_LIST;
+  @ApiMethod(description = "get average kpi")
+  @RequestMapping(value = "/kpi/average", method = RequestMethod.GET)
+  public ApiResult<?> getAverage(@ApiQueryParam(name = "xmId", description = "项目Id") @RequestParam int xmId,
+      @ApiQueryParam(name = "xmKey", description = "项目秘钥") @RequestParam String xmKey,
+      @ApiQueryParam(name = "kpiIds", description = "kpiId list") @RequestParam Optional<List<Integer>> kpiIds,
+      @ApiQueryParam(name = "date", description = "kpi日期", format = "yyyy-MM-dd") @RequestParam @DateTimeFormat(iso = ISO.DATE) LocalDate date,
+      @ApiQueryParam(name = "type", description = "平均时间范围类型") @RequestParam AVERAGE type) {
+    if (!isValid(xmId, xmKey, kpiIds.orElse(new ArrayList<>()))) return ApiResult.forbidden();
+    return kpiManager.getAverage(xmId, kpiIds.orElse(new ArrayList<>()), date.minusDays(AVERAGE_MAP.get(type)), date);
   }
-
-  private String PUBLIC_ID, COVER, MESSAGE = "今日搜狗业务指标已更新，请点击查看", EMAIL_LIST, TITLE = "数据已更新", TOKEN, URL, BOSS;
 
   public enum HOST {
     publicWeb(0), privateWeb(1);
@@ -213,20 +194,9 @@ public class KpiController implements InitializingBean {
     }
   }
 
-  @Override
-  public void afterPropertiesSet() throws Exception {
-    PUBLIC_ID = env.getRequiredProperty("pandora.message.publicid");
-    COVER = env.getRequiredProperty("pandora.message.cover");
-    EMAIL_LIST = env.getRequiredProperty("pandora.message.list");
-    TOKEN = env.getRequiredProperty("pandora.message.token");
-    URL = env.getRequiredProperty("pandora.message.url");
-    BOSS = env.getProperty("boss",
-        "wxc,ruliyun,yanghongtao,hongtao,yangsonghe,zhaoliyang,lvxueshan,liziyao204083,zhouyi,wangsi,lisihao");
-
-    pandoraService.setAppId(PUBLIC_ID);
-    pandoraService.setAppKey(TOKEN);
-
-    whiteList = Arrays.stream(String.join(",", EMAIL_LIST, BOSS).split(",")).map(user -> "xiaop_" + user)
-        .collect(Collectors.toSet());
+  public enum AVERAGE {
+    day, week, month;
   }
+
+  private Map<AVERAGE, Integer> AVERAGE_MAP = ImmutableMap.of(AVERAGE.day, 0, AVERAGE.week, 7, AVERAGE.month, 30);
 }

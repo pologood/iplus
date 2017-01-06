@@ -7,7 +7,8 @@ package com.sogou.iplus.manager;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -65,9 +66,27 @@ public class KpiManager {
       LocalDate endDate) {
     List<Kpi> kpis = select(xmId, kpiId, beginDate, endDate);
     Map<Integer, Map<LocalDate, Kpi>> result = new TreeMap<>();
-    kpis.forEach(kpi -> result.computeIfAbsent(kpi.getKpiId(), k -> new TreeMap<>(Collections.reverseOrder()))
+    kpis.forEach(kpi -> result.computeIfAbsent(kpi.getKpiId(), k -> new TreeMap<>(Comparator.reverseOrder()))
         .put(kpi.getCreateDate(), kpi));
     return new ApiResult<>(result);
+  }
+
+  public ApiResult<?> getAverage(Integer xmId, List<Integer> kpiId, LocalDate beginDate, LocalDate endDate) {
+    List<Kpi> kpis = select(xmId, kpiId, beginDate, endDate);
+    Map<Integer, Map<LocalDate, BigDecimal>> map = new HashMap<>();
+    kpis.forEach(
+        kpi -> map.computeIfAbsent(kpi.getKpiId(), k -> new HashMap<>()).put(kpi.getCreateDate(), kpi.getKpi()));
+    Map<Integer, BigDecimal> result = new TreeMap<>();
+    map.entrySet().forEach(e -> result.put(e.getKey(), getAverage(e.getValue())));
+    return new ApiResult<>(result);
+  }
+
+  private BigDecimal getAverage(Map<LocalDate, BigDecimal> map) {
+    BigDecimal sum = BigDecimal.ZERO;
+    if (map.isEmpty()) return sum;
+    for (BigDecimal v : map.values())
+      sum = sum.add(v);
+    return sum.divide(new BigDecimal(map.size()));
   }
 
   @Transactional
@@ -78,7 +97,8 @@ public class KpiManager {
             getKpiDate(kpi, date));
         toAdd.setCreateDate(date);
         kpiMapper.add(toAdd);
-      } catch (DuplicateKeyException e) {}
+      } catch (DuplicateKeyException e) {
+      }
     }));
     return ApiResult.ok();
   }

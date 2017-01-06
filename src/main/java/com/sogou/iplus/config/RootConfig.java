@@ -99,7 +99,10 @@ public class RootConfig {
 
   @Bean
   public XiaopService pandoraService() {
-    return new XiaopService(restTemplate());
+    XiaopService service = new XiaopService(restTemplate());
+    service.setAppId(env.getRequiredProperty("pandora.message.publicid"));
+    service.setAppKey(env.getRequiredProperty("pandora.message.token"));
+    return service;
   }
 
 }

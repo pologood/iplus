@@ -41,7 +41,7 @@ public class BusinessUnit {
   private String name;
 
   @ApiObjectField(description = "事业部kpi")
-  private List<Integer> kpis;
+  private List<Integer> kpis = new ArrayList<>();
 
   @ApiObjectField(description = "事业部项目")
   private List<Project> projects = new ArrayList<>();
