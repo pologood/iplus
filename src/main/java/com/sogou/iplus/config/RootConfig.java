@@ -63,7 +63,10 @@ public class RootConfig {
 
   @Bean
   public RedisRememberMeService rememberMeServices() {
-    return new RedisRememberMeService(jedisPool(), env.getProperty("rest.tokenpool", ""), "", 86400 * 7);
+    RedisRememberMeService service = new RedisRememberMeService(jedisPool(), env.getProperty("rest.tokenpool", ""), "",
+        86400 * 7);
+    service.setCookiePrefix("iplus");
+    return service;
   }
 
   @Bean

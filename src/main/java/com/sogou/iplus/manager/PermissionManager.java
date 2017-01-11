@@ -10,6 +10,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -46,8 +47,9 @@ public class PermissionManager {
   public static final Map<String, Set<Integer>> MAP = new HashMap<>();
 
   public static void init() {
-    MAP.put("markwu", BusinessUnit.SUGARCAT.getProjects().stream()
-        .flatMap(project -> project.getKpis().stream().map(kpi -> kpi.getKpiId())).collect(Collectors.toSet()));
+    Stream.of("markwu", "toddlee", "wuxudong", "solomonlee", "liuzhankun")
+        .forEach(s -> MAP.put(s, BusinessUnit.SUGARCAT.getProjects().stream()
+            .flatMap(project -> project.getKpis().stream().map(kpi -> kpi.getKpiId())).collect(Collectors.toSet())));
   }
 
   public static String getManagerList() {
