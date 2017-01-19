@@ -183,12 +183,12 @@ public class Project {
             new Kpi(74, "无线QQ浏览器RPM(元/千次)"), new Kpi(75, "PC搜索RPM(优质)(元/千次)"), new Kpi(76, "无线搜索RPM(元/千次)")),
         BusinessUnit.MARKETING));
     PROJECTS.add(new Project(42, "qfysv8ha64crrdsc", "糖猫",
-        Lists.newArrayList(new Kpi(77, "糖猫日新激活(个)"), new Kpi(78, "糖猫日活跃用户(个)"), new Kpi(79, "糖猫日活跃APP用户(个)"),
-            new Kpi(80, "糖猫APP次日留存率"), new Kpi(81, "糖猫APP第7日留存率"), new Kpi(82, "糖猫APP第30日留存率"),
-            new Kpi(83, "糖猫T1日活跃用户(个)"), new Kpi(84, "糖猫T2日活跃用户(个)"), new Kpi(85, "糖猫E1日活跃用户(个)"),
-            new Kpi(86, "糖猫M1日活跃用户(个)"), new Kpi(87, "糖猫BASIC日活跃用户(个)"), new Kpi(88, "糖猫T1日新激活(个)"),
-            new Kpi(89, "糖猫T2日新激活(个)"), new Kpi(90, "糖猫E1日新激活(个)"), new Kpi(91, "糖猫M1日新激活(个)"),
-            new Kpi(92, "糖猫BASIC日新激活(个)")),
+        Lists.newArrayList(new Kpi(77, "糖猫日新激活(个)"), new Kpi(88, "糖猫T1日新激活(个)"), new Kpi(89, "糖猫T2日新激活(个)"),
+            new Kpi(90, "糖猫E1日新激活(个)"), new Kpi(91, "糖猫M1日新激活(个)"), new Kpi(92, "糖猫BASIC日新激活(个)"),
+            new Kpi(78, "糖猫日活跃用户(个)"), new Kpi(83, "糖猫T1日活跃用户(个)"), new Kpi(84, "糖猫T2日活跃用户(个)"),
+            new Kpi(85, "糖猫E1日活跃用户(个)"), new Kpi(86, "糖猫M1日活跃用户(个)"), new Kpi(87, "糖猫BASIC日活跃用户(个)"),
+            new Kpi(79, "糖猫日活跃APP用户(个)"), new Kpi(80, "糖猫APP次日留存率"), new Kpi(81, "糖猫APP第7日留存率"),
+            new Kpi(82, "糖猫APP第30日留存率")),
         BusinessUnit.SUGARCAT));
 
     PROJECT_MAP = getProjectMap();
