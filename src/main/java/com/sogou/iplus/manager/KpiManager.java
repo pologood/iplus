@@ -7,6 +7,7 @@ package com.sogou.iplus.manager;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.AbstractMap;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -63,6 +64,7 @@ public class KpiManager {
     return new ApiResult<>(kpis.stream()
         .sorted((k1, k2) -> Double.compare(Project.getSortKpiId(k1.getKpiId()), Project.getSortKpiId(k2.getKpiId())))
         .collect(Collectors.toMap(k -> k.getKpiId(), k -> k.getKpi(), (u, v) -> u, LinkedHashMap::new)));
+
   }
 
   public ApiResult<?> selectWithDateRangeAndKpiId(Integer xmId, List<Integer> kpiId, LocalDate beginDate,

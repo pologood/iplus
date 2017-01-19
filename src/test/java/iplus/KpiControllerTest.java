@@ -14,12 +14,12 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Random;
+import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.collections4.MapUtils;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -122,10 +122,10 @@ public class KpiControllerTest {
 
   void validateResultOfSelectKpisWithDateAndXmId(ApiResult<?> result) {
     Assert.assertTrue(ApiResult.isOk(result));
-    Map<?, ?> map = (Map<?, ?>) result.getData();
-    Assert.assertFalse(MapUtils.isEmpty(map));
+    List<?> map = (List<?>) result.getData();
+    Assert.assertFalse(CollectionUtils.isEmpty(map));
     System.out.println(map);
-    Assert.assertTrue(map.entrySet().stream().filter(e -> kpiIds.contains(e.getKey()))
+    Assert.assertTrue(map.stream().map(o -> (Entry<?, ?>) o).filter(e -> kpiIds.contains(e.getKey()))
         .allMatch(e -> Objects.equals((Integer) e.getKey(), ((BigDecimal) e.getValue()).intValue())));
   }
 
@@ -148,8 +148,9 @@ public class KpiControllerTest {
 
   private void validateResultOfSelectKpisWithDateRangeAndKpiId(ApiResult<?> result) {
     Assert.assertTrue(ApiResult.isOk(result));
-    Map<?, ?> map = (Map<?, ?>) result.getData();
-    Assert.assertTrue(MapUtils.isNotEmpty(map) && map.entrySet().stream().allMatch(e -> kpiIds.contains(e.getKey())));
+    List<?> map = (List<?>) result.getData();
+    Assert.assertTrue(CollectionUtils.isNotEmpty(map)
+        && map.stream().map(o -> (Entry<?, ?>) o).allMatch(e -> kpiIds.contains(e.getKey())));
     System.out.println(map);
   }
 
