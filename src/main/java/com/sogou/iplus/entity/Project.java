@@ -104,6 +104,9 @@ public class Project {
   @JsonIgnore
   public transient static final Map<Integer, Kpi> KPI_MAP = new HashMap<>();
 
+  @JsonIgnore
+  private static final Map<Integer, Double> SORT_MAP = new HashMap<>();
+
   static {
     PROJECTS.add(new Project(0, "i4zqbwchh23igzwe", "test", new ArrayList<>(), null));
     PROJECTS.add(new Project(70, "j0a37izra1v4n4k0", "输入法-PC输入法",
@@ -199,6 +202,17 @@ public class Project {
     PermissionManager.init();
 
     PROJECTS.forEach(project -> project.getKpis().forEach(kpi -> KPI_MAP.put(kpi.getKpiId(), kpi)));
+
+    SORT_MAP.put(83, 78.1);
+    SORT_MAP.put(84, 78.2);
+    SORT_MAP.put(85, 78.3);
+    SORT_MAP.put(86, 78.4);
+    SORT_MAP.put(87, 78.5);
+    SORT_MAP.put(88, 77.1);
+    SORT_MAP.put(89, 77.2);
+    SORT_MAP.put(90, 77.3);
+    SORT_MAP.put(91, 77.4);
+    SORT_MAP.put(92, 77.5);
   }
 
   public static Map<Integer, Project> getProjectMap() {
@@ -207,6 +221,10 @@ public class Project {
 
   public static Kpi getKpi(Integer kpiId) {
     return KPI_MAP.get(kpiId);
+  }
+
+  public static Double getSortKpiId(int kpiId) {
+    return SORT_MAP.getOrDefault(kpiId, (double) kpiId);
   }
 
   @Override

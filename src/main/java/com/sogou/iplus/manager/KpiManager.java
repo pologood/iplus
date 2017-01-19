@@ -9,6 +9,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -59,16 +60,20 @@ public class KpiManager {
 
   public ApiResult<?> selectWithDateAndXmId(Integer xmId, LocalDate date) {
     List<Kpi> kpis = select(xmId, null, date);
-    return new ApiResult<>(kpis.stream().collect(Collectors.toMap(kpi -> kpi.getKpiId(), kpi -> kpi.getKpi())));
+    return new ApiResult<>(kpis.stream()
+        .sorted((k1, k2) -> Double.compare(Project.getSortKpiId(k1.getKpiId()), Project.getSortKpiId(k2.getKpiId())))
+        .collect(Collectors.toMap(k -> k.getKpiId(), k -> k.getKpi(), (u, v) -> u, LinkedHashMap::new)));
   }
 
   public ApiResult<?> selectWithDateRangeAndKpiId(Integer xmId, List<Integer> kpiId, LocalDate beginDate,
       LocalDate endDate) {
     List<Kpi> kpis = select(xmId, kpiId, beginDate, endDate);
-    Map<Integer, Map<LocalDate, Kpi>> result = new TreeMap<>();
+    Map<Integer, Map<LocalDate, Kpi>> result = new HashMap<>();
     kpis.forEach(kpi -> result.computeIfAbsent(kpi.getKpiId(), k -> new TreeMap<>(Comparator.reverseOrder()))
         .put(kpi.getCreateDate(), kpi));
-    return new ApiResult<>(result);
+    return new ApiResult<>(result.entrySet().stream()
+        .sorted((e1, e2) -> Double.compare(Project.getSortKpiId(e1.getKey()), Project.getSortKpiId(e2.getKey())))
+        .collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue(), (u, v) -> u, LinkedHashMap::new)));
   }
 
   public ApiResult<?> getAverage(Integer xmId, List<Integer> kpiId, LocalDate beginDate, LocalDate endDate) {
