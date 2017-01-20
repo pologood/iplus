@@ -10,7 +10,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -47,9 +46,39 @@ public class PermissionManager {
   public static final Map<String, Set<Integer>> MAP = new HashMap<>();
 
   public static void init() {
-    Stream.of("markwu", "toddlee", "wuxudong", "solomonlee", "liuzhankun")
-        .forEach(s -> MAP.put(s, BusinessUnit.SUGARCAT.getProjects().stream()
-            .flatMap(project -> project.getKpis().stream().map(kpi -> kpi.getKpiId())).collect(Collectors.toSet())));
+    addBus(BusinessUnit.SUGARCAT, "markwu", "toddlee", "wuxudong", "solomonlee", "liuzhankun");
+    addBus(BusinessUnit.MARKETING, "ligang");
+    addProjects(Arrays.asList(Project.NEWS), "lizhi");
+    addProjects(Arrays.asList(Project.CHINESE_MEDICINE), "buhailiang");
+    addProjects(Arrays.asList(Project.PEDIA), "guoqi");
+    addProjects(Arrays.asList(Project.PC_INPUT, Project.MOBILE_INPUT, Project.QQ_INPUT), "yanglei");
+    addProjects(Arrays.asList(Project.QQ_INPUT, Project.MOBILE_INPUT), "lilin");
+    addProjects(Arrays.asList(Project.PC_BROWSER, Project.MOBILE_BROWSER), "wujian");
+    addProjects(Arrays.asList(Project.NAVIGATION), "kaiwang");
+    addProjects(Arrays.asList(Project.APP_MARKET), "wuzhiqiang");
+    addProjects(Arrays.asList(Project.NAVIGATION, Project.APP_MARKET), "casperwang", "yuanzhijun");
+    addProjects(Arrays.asList(Project.VOICE), "wangyanfeng");
+    addProjects(Arrays.asList(Project.NOVEL_SEARCH, Project.APP_SEARCH), "gaopeng");
+    addProjects(Arrays.asList(Project.PICTURE_SEARCH, Project.SHOPPING_SEARCH), "huangxiaofeng");
+    addProjects(Arrays.asList(Project.VEDIO_SEARCH), "jiangfeng");
+    addProjects(Arrays.asList(Project.NOVEL_SEARCH, Project.APP_SEARCH, Project.PICTURE_SEARCH, Project.SHOPPING_SEARCH,
+        Project.VEDIO_SEARCH), "tongzijian");
+    addProjects(Arrays.asList(Project.SEARCH_APP), "wangxun", "yuhao");
+    addProjects(Arrays.asList(Project.MAP), "zhouzhaoying", "kongxianglai");
+    addProjects(Arrays.asList(Project.PC_SEARCH, Project.WIRELESS_SEARCH), "hanyifan");
+  }
+
+  private static void addBus(BusinessUnit bu, String... users) {
+    addProjects(bu.getProjects(), users);
+  }
+
+  private static void addProjects(List<Project> projects, String... users) {
+    addKpiIds(projects.stream().flatMap(project -> project.getKpis().stream().map(kpi -> kpi.getKpiId()))
+        .collect(Collectors.toList()), users);
+  }
+
+  private static void addKpiIds(List<Integer> kpiIds, String... users) {
+    Arrays.stream(users).forEach(user -> MAP.put(user, new HashSet<>(kpiIds)));
   }
 
   public static String getManagerList() {
