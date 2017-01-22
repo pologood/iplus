@@ -66,6 +66,7 @@ public class PermissionManager {
     addProjects(Arrays.asList(Project.SEARCH_APP), "wangxun", "yuhao");
     addProjects(Arrays.asList(Project.MAP), "zhouzhaoying", "kongxianglai");
     addProjects(Arrays.asList(Project.PC_SEARCH, Project.WIRELESS_SEARCH), "hanyifan");
+    addProjects(Arrays.asList(Project.PC_INPUT), "tianyamin");
   }
 
   private static void addBus(BusinessUnit bu, String... users) {
