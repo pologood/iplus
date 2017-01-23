@@ -6,12 +6,11 @@
 package com.sogou.iplus.entity;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.jsondoc.core.annotation.ApiObject;
 import org.jsondoc.core.annotation.ApiObjectField;
-
-import com.google.common.collect.Lists;
 
 import commons.utils.JsonHelper;
 
@@ -26,12 +25,12 @@ public class BusinessUnit {
 
   static {
     SEARCH.setName("搜索事业部");
-    SEARCH.setKpis(Lists.newArrayList(37, 38, 39, 40, 41, 42, 43, 49, 50, 51, 52, 53, 54, 59, 63, 207, 208));
+    SEARCH.setKpis(Arrays.asList(37, 38, 39, 40, 41, 42, 43, 49, 50, 51, 52, 53, 54, 59, 63, 207, 208));
     DESKTOP.setName("桌面事业部");
-    DESKTOP.setKpis(Lists.newArrayList(1, 3, 13, 15, 21, 26, 27, 32));
+    DESKTOP.setKpis(Arrays.asList(1, 3, 13, 15, 21, 26, 27, 32));
     SUGARCAT.setName("糖猫事业部");
     MARKETING.setName("营销事业部");
-    Company.SOGOU.setBusinessUnits(Lists.newArrayList(DESKTOP, SEARCH, MARKETING, SUGARCAT));
+    Company.SOGOU.setBusinessUnits(Arrays.asList(DESKTOP, SEARCH, MARKETING, SUGARCAT));
   }
 
   @ApiObjectField(description = "事业部id")
@@ -82,5 +81,4 @@ public class BusinessUnit {
   public String toString() {
     return JsonHelper.writeValueAsString(this);
   }
-
 }
