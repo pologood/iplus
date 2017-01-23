@@ -1,7 +1,6 @@
 package com.sogou.iplus.manager;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -15,13 +14,15 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
 import com.sogou.iplus.entity.BusinessUnit;
 import com.sogou.iplus.entity.Company;
 import com.sogou.iplus.entity.Kpi;
+import com.sogou.iplus.entity.Permission;
 import com.sogou.iplus.entity.Project;
+import com.sogou.iplus.entity.Permission.Role;
+import com.sogou.iplus.mapper.PermissionMapper;
 import com.sogou.iplus.model.ApiResult;
 
 import commons.saas.XiaopLoginService;
@@ -35,53 +36,26 @@ public class PermissionManager {
   RedisRememberMeService redisService;
 
   @Autowired
-  public PermissionManager(Environment env) {
-    WHITE_LIST = getSet(env, ",", "boss", "admin");
-  }
+  PermissionMapper permissionMapper;
 
   @Autowired
   XiaopLoginService pandoraLoginService;
 
-  public Set<String> WHITE_LIST;
+  public static final Set<String> WHITE_LIST = new HashSet<>();
 
   public static final Map<String, Set<Integer>> MAP = new HashMap<>();
 
-  public static void init() {
-    addBus(BusinessUnit.SUGARCAT, "markwu", "toddlee", "wuxudong", "solomonlee", "liuzhankun");
-    addBus(BusinessUnit.MARKETING, "ligang");
-    addProjects(Arrays.asList(Project.NEWS), "lizhi");
-    addProjects(Arrays.asList(Project.CHINESE_MEDICINE), "buhailiang");
-    addProjects(Arrays.asList(Project.PEDIA), "guoqi");
-    addProjects(Arrays.asList(Project.PC_INPUT, Project.MOBILE_INPUT, Project.QQ_INPUT), "yanglei");
-    addProjects(Arrays.asList(Project.QQ_INPUT, Project.MOBILE_INPUT), "lilin");
-    addProjects(Arrays.asList(Project.PC_BROWSER, Project.MOBILE_BROWSER), "wujian");
-    addProjects(Arrays.asList(Project.NAVIGATION), "kaiwang");
-    addProjects(Arrays.asList(Project.APP_MARKET), "wuzhiqiang");
-    addProjects(Arrays.asList(Project.NAVIGATION, Project.APP_MARKET), "casperwang", "yuanzhijun");
-    addProjects(Arrays.asList(Project.VOICE), "wangyanfeng");
-    addProjects(Arrays.asList(Project.NOVEL_SEARCH, Project.APP_SEARCH), "gaopeng");
-    addProjects(Arrays.asList(Project.PICTURE_SEARCH, Project.SHOPPING_SEARCH), "huangxiaofeng");
-    addProjects(Arrays.asList(Project.VEDIO_SEARCH), "jiangfeng");
-    addProjects(Arrays.asList(Project.NOVEL_SEARCH, Project.APP_SEARCH, Project.PICTURE_SEARCH, Project.SHOPPING_SEARCH,
-        Project.VEDIO_SEARCH), "tongzijian");
-    addProjects(Arrays.asList(Project.SEARCH_APP), "wangxun", "yuhao");
-    addProjects(Arrays.asList(Project.MAP), "zhouzhaoying", "kongxianglai");
-    addProjects(Arrays.asList(Project.PC_SEARCH, Project.WIRELESS_SEARCH), "hanyifan");
-    addProjects(Arrays.asList(Project.MOBILE_INPUT), "tianyamin");
-    addProjects(Arrays.asList(Project.MOBILE_INPUT), "leiyu", "hulu");
+  public synchronized void init() {
+    clear();
+    List<Permission> permissions = permissionMapper.selectAll();
+    for (Permission p : permissions)
+      if (p.getRole() == Role.MANAGER) MAP.put(p.getName(), p.getKpiIdSet());
+      else WHITE_LIST.add(p.getName());
   }
 
-  private static void addBus(BusinessUnit bu, String... users) {
-    addProjects(bu.getProjects(), users);
-  }
-
-  private static void addProjects(List<Project> projects, String... users) {
-    addKpiIds(projects.stream().flatMap(project -> project.getKpis().stream().map(kpi -> kpi.getKpiId()))
-        .collect(Collectors.toList()), users);
-  }
-
-  private static void addKpiIds(List<Integer> kpiIds, String... users) {
-    Arrays.stream(users).forEach(user -> MAP.put(user, new HashSet<>(kpiIds)));
+  private void clear() {
+    WHITE_LIST.clear();
+    MAP.clear();
   }
 
   public static String getManagerList() {
@@ -137,14 +111,16 @@ public class PermissionManager {
     return company;
   }
 
-  public Set<String> getSet(Environment env, String regex, String... keys) {
-    return Arrays.stream(keys).flatMap(key -> Arrays.stream(env.getRequiredProperty(key).split(regex)))
-        .collect(Collectors.toSet());
-  }
-
   public ApiResult<?> add(List<String> names, List<String> projects) {
-    addProjects(projects.stream().map(name -> getProject(name)).filter(Objects::nonNull).collect(Collectors.toList()),
-        names.toArray(new String[0]));
+    names.forEach(name -> {
+      Permission permission = new Permission();
+      permission.setName(name);
+      permission.setRole(Role.MANAGER);
+      permission.setKpiIds(
+          String.join(",", projects.stream().flatMap(p -> getProject(p).getKpis().stream().map(k -> k.getKpiId()))
+              .sorted().map(String::valueOf).collect(Collectors.toList())));
+      permissionMapper.add(permission);
+    });
     return ApiResult.ok();
   }
 
