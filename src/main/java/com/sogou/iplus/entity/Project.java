@@ -26,86 +26,12 @@ import commons.utils.JsonHelper;
 //-------------------------------------------------------
 @ApiObject(name = "project", description = "项目")
 public class Project {
+  public @JsonIgnore transient static final List<Project> PROJECTS = new ArrayList<>();
+  public @JsonIgnore transient static final Map<Integer, Project> PROJECT_MAP;
+  public @JsonIgnore transient static final Map<Integer, Kpi> KPI_MAP = new HashMap<>();
 
-  public Project(Integer xmId, String xmKey, String projectName, List<Kpi> kpis, BusinessUnit businessUnit) {
-    this.xmId = xmId;
-    this.xmKey = xmKey;
-    this.projectName = projectName;
-    this.kpis = kpis;
-    this.businessUnit = businessUnit;
-  }
-
-  public Project(Project project) {
-    this(project.getXmId(), project.getXmKey(), project.getProjectName(),
-        project.getKpis().stream().map(kpi -> new Kpi(kpi)).collect(Collectors.toList()), project.getBusinessUnit());
-  }
-
-  @ApiObjectField(description = "项目id", required = true)
-  private Integer xmId;
-
-  @JsonIgnore
-  private String xmKey;
-
-  @ApiObjectField(description = "项目名称")
-  private String projectName;
-
-  @ApiObjectField(description = "kpi", required = true)
-  private List<Kpi> kpis;
-
-  @JsonIgnore
-  private BusinessUnit businessUnit;
-
-  public Integer getXmId() {
-    return xmId;
-  }
-
-  public void setXmId(Integer xmId) {
-    this.xmId = xmId;
-  }
-
-  public String getXmKey() {
-    return xmKey;
-  }
-
-  public void setXmKey(String xmKey) {
-    this.xmKey = xmKey;
-  }
-
-  public String getProjectName() {
-    return projectName;
-  }
-
-  public void setProjectName(String projectName) {
-    this.projectName = projectName;
-  }
-
-  public List<Kpi> getKpis() {
-    return kpis;
-  }
-
-  public void setKpis(List<Kpi> kpis) {
-    this.kpis = kpis;
-  }
-
-  public BusinessUnit getBusinessUnit() {
-    return this.businessUnit;
-  }
-
-  public void setBusinessUnit(BusinessUnit businessUnit) {
-    this.businessUnit = businessUnit;
-  }
-
-  @JsonIgnore
-  public transient static final List<Project> PROJECTS = new ArrayList<>();
-
-  @JsonIgnore
-  public transient static final Map<Integer, Project> PROJECT_MAP;
-
-  @JsonIgnore
-  public transient static final Map<Integer, Kpi> KPI_MAP = new HashMap<>();
-
-  public static Project PC_INPUT, MOBILE_INPUT, QQ_INPUT, PC_BROWSER, MOBILE_BROWSER, NAVIGATION, VOICE, NEWS, PEDIA,
-      CHINESE_MEDICINE, MAP, APP_MARKET, PC_SEARCH, WIRELESS_SEARCH, SEARCH_APP, VEDIO_SEARCH, PICTURE_SEARCH,
+  public static final Project PC_INPUT, MOBILE_INPUT, QQ_INPUT, PC_BROWSER, MOBILE_BROWSER, NAVIGATION, VOICE, NEWS,
+      PEDIA, CHINESE_MEDICINE, MAP, APP_MARKET, PC_SEARCH, WIRELESS_SEARCH, SEARCH_APP, VEDIO_SEARCH, PICTURE_SEARCH,
       SHOPPING_SEARCH, NOVEL_SEARCH, APP_SEARCH;
 
   static {
@@ -219,5 +145,73 @@ public class Project {
   @Override
   public String toString() {
     return JsonHelper.writeValueAsString(this);
+  }
+
+  public Project(Integer xmId, String xmKey, String projectName, List<Kpi> kpis, BusinessUnit businessUnit) {
+    this.xmId = xmId;
+    this.xmKey = xmKey;
+    this.projectName = projectName;
+    this.kpis = kpis;
+    this.businessUnit = businessUnit;
+  }
+
+  public Project(Project project) {
+    this(project.getXmId(), project.getXmKey(), project.getProjectName(),
+        project.getKpis().stream().map(kpi -> new Kpi(kpi)).collect(Collectors.toList()), project.getBusinessUnit());
+  }
+
+  @ApiObjectField(description = "项目id", required = true)
+  private Integer xmId;
+
+  @JsonIgnore
+  private String xmKey;
+
+  @ApiObjectField(description = "项目名称")
+  private String projectName;
+
+  @ApiObjectField(description = "kpi", required = true)
+  private List<Kpi> kpis;
+
+  @JsonIgnore
+  private BusinessUnit businessUnit;
+
+  public Integer getXmId() {
+    return xmId;
+  }
+
+  public void setXmId(Integer xmId) {
+    this.xmId = xmId;
+  }
+
+  public String getXmKey() {
+    return xmKey;
+  }
+
+  public void setXmKey(String xmKey) {
+    this.xmKey = xmKey;
+  }
+
+  public String getProjectName() {
+    return projectName;
+  }
+
+  public void setProjectName(String projectName) {
+    this.projectName = projectName;
+  }
+
+  public List<Kpi> getKpis() {
+    return kpis;
+  }
+
+  public void setKpis(List<Kpi> kpis) {
+    this.kpis = kpis;
+  }
+
+  public BusinessUnit getBusinessUnit() {
+    return this.businessUnit;
+  }
+
+  public void setBusinessUnit(BusinessUnit businessUnit) {
+    this.businessUnit = businessUnit;
   }
 }

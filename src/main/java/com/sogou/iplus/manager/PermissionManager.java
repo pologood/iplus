@@ -22,6 +22,7 @@ import com.sogou.iplus.entity.BusinessUnit;
 import com.sogou.iplus.entity.Company;
 import com.sogou.iplus.entity.Kpi;
 import com.sogou.iplus.entity.Project;
+import com.sogou.iplus.model.ApiResult;
 
 import commons.saas.XiaopLoginService;
 import commons.spring.RedisRememberMeService;
@@ -67,6 +68,7 @@ public class PermissionManager {
     addProjects(Arrays.asList(Project.MAP), "zhouzhaoying", "kongxianglai");
     addProjects(Arrays.asList(Project.PC_SEARCH, Project.WIRELESS_SEARCH), "hanyifan");
     addProjects(Arrays.asList(Project.MOBILE_INPUT), "tianyamin");
+    addProjects(Arrays.asList(Project.MOBILE_INPUT), "leiyu", "hulu");
   }
 
   private static void addBus(BusinessUnit bu, String... users) {
@@ -138,5 +140,15 @@ public class PermissionManager {
   public Set<String> getSet(Environment env, String regex, String... keys) {
     return Arrays.stream(keys).flatMap(key -> Arrays.stream(env.getRequiredProperty(key).split(regex)))
         .collect(Collectors.toSet());
+  }
+
+  public ApiResult<?> add(List<String> names, List<String> projects) {
+    addProjects(projects.stream().map(name -> getProject(name)).filter(Objects::nonNull).collect(Collectors.toList()),
+        names.toArray(new String[0]));
+    return ApiResult.ok();
+  }
+
+  private Project getProject(String name) {
+    return Project.PROJECTS.stream().filter(p -> p.getProjectName().equalsIgnoreCase(name)).findFirst().orElse(null);
   }
 }
