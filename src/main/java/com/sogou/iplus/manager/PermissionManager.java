@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.collections4.CollectionUtils;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -30,7 +31,7 @@ import commons.spring.RedisRememberMeService;
 import commons.spring.RedisRememberMeService.User;
 
 @Service
-public class PermissionManager {
+public class PermissionManager implements InitializingBean {
 
   @Autowired
   RedisRememberMeService redisService;
@@ -126,5 +127,10 @@ public class PermissionManager {
 
   private Project getProject(String name) {
     return Project.PROJECTS.stream().filter(p -> p.getProjectName().equalsIgnoreCase(name)).findFirst().orElse(null);
+  }
+
+  @Override
+  public void afterPropertiesSet() throws Exception {
+    init();
   }
 }

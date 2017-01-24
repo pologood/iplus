@@ -38,6 +38,7 @@ import com.sogou.iplus.config.DaoConfig;
 import com.sogou.iplus.config.RootConfig;
 import com.sogou.iplus.entity.Company;
 import com.sogou.iplus.entity.Project;
+import com.sogou.iplus.manager.PermissionManager;
 import com.sogou.iplus.model.ApiResult;
 
 import commons.spring.RedisRememberMeService.User;
@@ -52,6 +53,9 @@ public class KpiControllerTest {
 
   @Mock
   private HttpServletRequest request;
+
+  @Autowired
+  PermissionManager permissionManager;
 
   private final int testId = 70, debugId = 0;
 
@@ -72,6 +76,7 @@ public class KpiControllerTest {
     MockitoAnnotations.initMocks(this);
     testProject.getKpis().forEach(
         kpi -> Mockito.when(request.getParameter(kpi.getKpiId().toString())).thenReturn(kpi.getKpiId().toString()));
+    permissionManager.init();
   }
 
   @Test
