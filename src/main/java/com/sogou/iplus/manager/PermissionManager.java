@@ -8,7 +8,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -112,21 +111,9 @@ public class PermissionManager implements InitializingBean {
     return company;
   }
 
-  public ApiResult<?> add(List<String> names, List<String> projects) {
-    names.forEach(name -> {
-      Permission permission = new Permission();
-      permission.setName(name);
-      permission.setRole(Role.MANAGER);
-      permission.setKpiIds(
-          String.join(",", projects.stream().flatMap(p -> getProject(p).getKpis().stream().map(k -> k.getKpiId()))
-              .sorted().map(String::valueOf).collect(Collectors.toList())));
-      permissionMapper.add(permission);
-    });
+  public ApiResult<?> refresh() {
+    init();
     return ApiResult.ok();
-  }
-
-  private Project getProject(String name) {
-    return Project.PROJECTS.stream().filter(p -> p.getProjectName().equalsIgnoreCase(name)).findFirst().orElse(null);
   }
 
   @Override
