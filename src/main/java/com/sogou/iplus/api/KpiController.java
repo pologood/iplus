@@ -181,8 +181,9 @@ public class KpiController {
   }
 
   @RequestMapping(value = "/kpi/permission", method = RequestMethod.GET)
-  public ApiResult<?> addPerson(@RequestParam List<String> names, @RequestParam List<String> projects) {
-    return permissionManager.add(names, projects);
+  public ApiResult<?> add(@RequestParam @NotEmpty List<String> names, @RequestParam List<String> projects,
+      @RequestParam Optional<Role> role) {
+    return permissionManager.add(names, projects, role.orElse(Role.MANAGER));
   }
 
   public enum HOST {

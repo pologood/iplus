@@ -15,6 +15,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 
 import com.sogou.iplus.entity.BusinessUnit;
@@ -112,25 +113,30 @@ public class PermissionManager implements InitializingBean {
     return company;
   }
 
-  public ApiResult<?> add(List<String> names, List<String> projects) {
+  @Override
+  public void afterPropertiesSet() throws Exception {
+    init();
+  }
+
+  public ApiResult<?> add(List<String> names, List<String> projects, Role role) {
     names.forEach(name -> {
-      Permission permission = new Permission();
-      permission.setName(name);
-      permission.setRole(Role.MANAGER);
-      permission.setKpiIds(
-          String.join(",", projects.stream().flatMap(p -> getProject(p).getKpis().stream().map(k -> k.getKpiId()))
-              .sorted().map(String::valueOf).collect(Collectors.toList())));
-      permissionMapper.add(permission);
+      try {
+        Permission permission = new Permission();
+        permission.setName(name);
+        permission.setRole(role);
+        if (CollectionUtils.isNotEmpty(projects)) permission.setKpiIds(String.join(",",
+            projects.stream()
+                .flatMap(p -> getProject(p).getKpis().stream().map(kpi -> kpi.getKpiId().toString()).sorted())
+                .collect(Collectors.toList())));
+        permissionMapper.add(permission);
+      } catch (DuplicateKeyException e) {
+      }
     });
+    init();
     return ApiResult.ok();
   }
 
   private Project getProject(String name) {
-    return Project.PROJECTS.stream().filter(p -> p.getProjectName().equalsIgnoreCase(name)).findFirst().orElse(null);
-  }
-
-  @Override
-  public void afterPropertiesSet() throws Exception {
-    init();
+    return Project.PROJECTS.stream().filter(p -> name.equalsIgnoreCase(p.getProjectName())).findFirst().orElse(null);
   }
 }
