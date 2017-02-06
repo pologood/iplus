@@ -1,6 +1,7 @@
 package com.sogou.iplus.manager;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -13,51 +14,75 @@ import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.collections4.CollectionUtils;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DuplicateKeyException;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
 import com.sogou.iplus.entity.BusinessUnit;
 import com.sogou.iplus.entity.Company;
 import com.sogou.iplus.entity.Kpi;
-import com.sogou.iplus.entity.Permission;
 import com.sogou.iplus.entity.Project;
-import com.sogou.iplus.entity.Permission.Role;
-import com.sogou.iplus.mapper.PermissionMapper;
-import com.sogou.iplus.model.ApiResult;
 
 import commons.saas.XiaopLoginService;
 import commons.spring.RedisRememberMeService;
 import commons.spring.RedisRememberMeService.User;
 
 @Service
-public class PermissionManager implements InitializingBean {
+public class PermissionManager {
 
   @Autowired
   RedisRememberMeService redisService;
 
   @Autowired
-  PermissionMapper permissionMapper;
+  public PermissionManager(Environment env) {
+    WHITE_LIST = getSet(env, ",", "boss", "admin");
+    init();
+  }
 
   @Autowired
   XiaopLoginService pandoraLoginService;
 
-  public static final Set<String> WHITE_LIST = new HashSet<>();
+  public Set<String> WHITE_LIST;
 
   public static final Map<String, Set<Integer>> MAP = new HashMap<>();
 
-  public synchronized void init() {
-    clear();
-    List<Permission> permissions = permissionMapper.selectAll();
-    for (Permission p : permissions)
-      if (p.getRole() == Role.MANAGER) MAP.put(p.getName(), p.getKpiIdSet());
-      else WHITE_LIST.add(p.getName());
+  private static void init() {
+    addBus(BusinessUnit.SUGARCAT, "markwu", "toddlee", "wuxudong", "solomonlee", "liuzhankun");
+    addBus(BusinessUnit.MARKETING, "ligang");
+    addProjects(Arrays.asList(Project.NEWS), "lizhi");
+    addProjects(Arrays.asList(Project.CHINESE_MEDICINE), "buhailiang");
+    addProjects(Arrays.asList(Project.PEDIA), "guoqi");
+    addProjects(Arrays.asList(Project.PC_INPUT, Project.MOBILE_INPUT, Project.QQ_INPUT), "yanglei");
+    addProjects(Arrays.asList(Project.QQ_INPUT, Project.MOBILE_INPUT), "lilin");
+    addProjects(Arrays.asList(Project.PC_BROWSER, Project.MOBILE_BROWSER), "wujian");
+    addProjects(Arrays.asList(Project.NAVIGATION), "kaiwang");
+    addProjects(Arrays.asList(Project.APP_MARKET, Project.MOBILE_BROWSER), "wuzhiqiang");
+    addProjects(Arrays.asList(Project.NAVIGATION, Project.APP_MARKET), "casperwang");
+    addProjects(Arrays.asList(Project.NAVIGATION, Project.APP_MARKET, Project.MOBILE_BROWSER), "yuanzhijun");
+    addProjects(Arrays.asList(Project.VOICE), "wangyanfeng");
+    addProjects(Arrays.asList(Project.NOVEL_SEARCH, Project.APP_SEARCH), "gaopeng");
+    addProjects(Arrays.asList(Project.PICTURE_SEARCH, Project.SHOPPING_SEARCH), "huangxiaofeng");
+    addProjects(Arrays.asList(Project.VEDIO_SEARCH), "jiangfeng");
+    addProjects(Arrays.asList(Project.NOVEL_SEARCH, Project.APP_SEARCH, Project.PICTURE_SEARCH, Project.SHOPPING_SEARCH,
+        Project.VEDIO_SEARCH), "tongzijian");
+    addProjects(Arrays.asList(Project.SEARCH_APP), "wangxun", "yuhao");
+    addProjects(Arrays.asList(Project.MAP), "zhouzhaoying", "kongxianglai");
+    addProjects(Arrays.asList(Project.PC_SEARCH, Project.WIRELESS_SEARCH), "hanyifan");
+    addProjects(Arrays.asList(Project.MOBILE_INPUT), "tianyamin");
+    addProjects(Arrays.asList(Project.MOBILE_INPUT), "leiyu", "hulu");
   }
 
-  private void clear() {
-    WHITE_LIST.clear();
-    MAP.clear();
+  private static void addBus(BusinessUnit bu, String... users) {
+    addProjects(bu.getProjects(), users);
+  }
+
+  private static void addProjects(List<Project> projects, String... users) {
+    addKpiIds(projects.stream().flatMap(project -> project.getKpis().stream().map(kpi -> kpi.getKpiId()))
+        .collect(Collectors.toList()), users);
+  }
+
+  private static void addKpiIds(List<Integer> kpiIds, String... users) {
+    Arrays.stream(users).forEach(user -> MAP.put(user, new HashSet<>(kpiIds)));
   }
 
   public static String getManagerList() {
@@ -113,30 +138,8 @@ public class PermissionManager implements InitializingBean {
     return company;
   }
 
-  @Override
-  public void afterPropertiesSet() throws Exception {
-    init();
-  }
-
-  public ApiResult<?> add(List<String> names, List<String> projects, Role role) {
-    names.forEach(name -> {
-      try {
-        Permission permission = new Permission();
-        permission.setName(name);
-        permission.setRole(role);
-        if (CollectionUtils.isNotEmpty(projects)) permission.setKpiIds(String.join(",",
-            projects.stream()
-                .flatMap(p -> getProject(p).getKpis().stream().map(kpi -> kpi.getKpiId().toString()).sorted())
-                .collect(Collectors.toList())));
-        permissionMapper.add(permission);
-      } catch (DuplicateKeyException e) {
-      }
-    });
-    init();
-    return ApiResult.ok();
-  }
-
-  private Project getProject(String name) {
-    return Project.PROJECTS.stream().filter(p -> name.equalsIgnoreCase(p.getProjectName())).findFirst().orElse(null);
+  public Set<String> getSet(Environment env, String regex, String... keys) {
+    return Arrays.stream(keys).flatMap(key -> Arrays.stream(env.getRequiredProperty(key).split(regex)))
+        .collect(Collectors.toSet());
   }
 }
