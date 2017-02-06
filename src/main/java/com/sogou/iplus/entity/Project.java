@@ -35,8 +35,11 @@ public class Project {
 
   static {
     PROJECTS.add(new Project(0, "i4zqbwchh23igzwe", "test", new ArrayList<>(), null));
-    PROJECTS.add(PC_INPUT = new Project(70, "j0a37izra1v4n4k0", "输入法-PC输入法",
-        Lists.newArrayList(new Kpi(1, "PC输入法日活跃用户数(万)"), new Kpi(2, "PC输入法灵犀日搜索量(万)")), BusinessUnit.DESKTOP));
+    PROJECTS
+        .add(PC_INPUT = new Project(70,
+            "j0a37izra1v4n4k0", "输入法-PC输入法", Lists.newArrayList(new Kpi(1, "PC输入法日活跃用户数(万)"),
+                new Kpi(2, "PC输入法灵犀日搜索量(万)"), new Kpi(10, "PC输入法第7日留存率"), new Kpi(18, "PC输入法第30日留存率")),
+            BusinessUnit.DESKTOP));
     PROJECTS.add(MOBILE_INPUT = new Project(78, "mxvqf109b7kbyfad", "输入法-手机输入法",
         Lists.newArrayList(new Kpi(3, "手机输入法日活跃用户数(万)"), new Kpi(4, "手机输入法iOS版日活跃用户数(万)"),
             new Kpi(5, "手机输入法Android版日活跃用户数(万)"), new Kpi(6, "手机输入法灵犀日搜索量(万)"), new Kpi(7, "手机输入法日激活量(万)"),
@@ -45,7 +48,9 @@ public class Project {
             new Kpi(106, "手机输入法iOS版第30日留存率")),
         BusinessUnit.DESKTOP));
     PROJECTS.add(QQ_INPUT = new Project(157, "u9h63f6k3kxy1qfc", "输入法-QQ输入法",
-        Lists.newArrayList(new Kpi(11, "QQ输入法Windows版日活跃用户数(万)"), new Kpi(12, "QQ输入法Android版日活跃用户数(万)")),
+        Lists.newArrayList(new Kpi(11, "QQ输入法Windows版日活跃用户数(万)"), new Kpi(12, "QQ输入法Android版日活跃用户数(万)"),
+            new Kpi(19, "QQ输入法Windows版第7日留存率"), new Kpi(34, "QQ输入法Windows版第30日留存率"), new Kpi(35, "QQ输入法Android版次日留存率"),
+            new Kpi(55, "QQ输入法Android版第7日留存率")),
         BusinessUnit.DESKTOP));
     PROJECTS.add(PC_BROWSER = new Project(68, "2ej50d9vfy9aa486", "浏览器-PC浏览器",
         Lists.newArrayList(new Kpi(13, "PC浏览器日主动活跃用户数(万)"), new Kpi(14, "搜狗PC浏览器网页搜索量-不含灵犀分流量(万)")),
