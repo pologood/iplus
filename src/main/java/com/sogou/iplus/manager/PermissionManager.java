@@ -50,7 +50,7 @@ public class PermissionManager {
   private static void init() {
     addBus(BusinessUnit.SUGARCAT, "markwu", "toddlee", "wuxudong", "solomonlee", "liuzhankun");
     addBus(BusinessUnit.MARKETING, "ligang");
-    addProjects(Arrays.asList(Project.NEWS), "wangwenlong");
+    addProjects(Arrays.asList(Project.NEWS), "lizhi");
     addProjects(Arrays.asList(Project.CHINESE_MEDICINE), "buhailiang");
     addProjects(Arrays.asList(Project.PEDIA), "guoqi");
     addProjects(Arrays.asList(Project.PC_INPUT, Project.MOBILE_INPUT, Project.QQ_INPUT), "yanglei");
