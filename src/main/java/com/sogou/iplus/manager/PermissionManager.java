@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.collections4.CollectionUtils;
+import org.jsondoc.core.annotation.ApiObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
@@ -141,5 +142,19 @@ public class PermissionManager {
   public Set<String> getSet(Environment env, String regex, String... keys) {
     return Arrays.stream(keys).flatMap(key -> Arrays.stream(env.getRequiredProperty(key).split(regex)))
         .collect(Collectors.toSet());
+  }
+
+  @ApiObject
+  public enum Role {
+    BOSS(1), ADMIN(2), MANAGER(3);
+    private int value;
+
+    private Role(int value) {
+      this.value = value;
+    }
+
+    public int getValue() {
+      return value;
+    }
   }
 }

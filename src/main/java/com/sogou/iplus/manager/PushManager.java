@@ -13,7 +13,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
 import com.google.common.collect.ImmutableMap;
-import com.sogou.iplus.entity.Permission.Role;
+import com.sogou.iplus.manager.PermissionManager.Role;
 import com.sogou.iplus.model.ApiResult;
 
 import commons.saas.XiaopService;
