@@ -53,7 +53,7 @@ public class KpiControllerTest {
   @Mock
   private HttpServletRequest request;
 
-  private final int testId = 70, debugId = 0;
+  private final int testId = 260, debugId = 0;
 
   private final Project testProject = Project.PROJECT_MAP.get(testId), debugProject = Project.PROJECT_MAP.get(debugId);
 
