@@ -180,12 +180,6 @@ public class KpiController {
     return kpiManager.getAverage(xmId, kpiIds.orElse(new ArrayList<>()), date.minusDays(AVERAGE_MAP.get(type)), date);
   }
 
-  @RequestMapping(value = "/kpi/permission", method = RequestMethod.GET)
-  public ApiResult<?> add(@RequestParam @NotEmpty List<String> names, @RequestParam List<String> projects,
-      @RequestParam Optional<Role> role) {
-    return permissionManager.add(names, projects, role.orElse(Role.MANAGER));
-  }
-
   public enum HOST {
     publicWeb(0), privateWeb(1);
 
