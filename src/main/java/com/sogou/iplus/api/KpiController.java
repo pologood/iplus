@@ -40,8 +40,8 @@ import com.sogou.iplus.entity.Kpi;
 import com.sogou.iplus.entity.Project;
 import com.sogou.iplus.manager.KpiManager;
 import com.sogou.iplus.manager.PermissionManager;
+import com.sogou.iplus.manager.PermissionManager.Role;
 import com.sogou.iplus.manager.PushManager;
-import com.sogou.iplus.manager.PushManager.Role;
 import com.sogou.iplus.model.ApiResult;
 
 import commons.spring.RedisRememberMeService.User;

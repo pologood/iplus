@@ -8,12 +8,12 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.commons.lang3.StringUtils;
-import org.jsondoc.core.annotation.ApiObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
 import com.google.common.collect.ImmutableMap;
+import com.sogou.iplus.manager.PermissionManager.Role;
 import com.sogou.iplus.model.ApiResult;
 
 import commons.saas.XiaopService;
@@ -35,11 +35,6 @@ public class PushManager {
 
   @Autowired
   XiaopService pandoraService;
-
-  @ApiObject
-  public enum Role {
-    BOSS, ADMIN, MANAGER;
-  }
 
   private String MESSAGE = "今日搜狗业务指标已更新，请点击查看", TITLE = "数据已更新", COVER, URL, PERMISSION_URL;
 

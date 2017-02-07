@@ -59,7 +59,7 @@ public class KpiManager {
 
   public ApiResult<?> selectWithDateAndXmId(Integer xmId, LocalDate date) {
     List<Kpi> kpis = select(xmId, null, date);
-    return new ApiResult<>(kpis.stream().collect(Collectors.toMap(kpi -> kpi.getKpiId(), kpi -> kpi.getKpi())));
+    return new ApiResult<>(kpis.stream().collect(Collectors.toMap(k -> k.getKpiId(), k -> k.getKpi())));
   }
 
   public ApiResult<?> selectWithDateRangeAndKpiId(Integer xmId, List<Integer> kpiId, LocalDate beginDate,
