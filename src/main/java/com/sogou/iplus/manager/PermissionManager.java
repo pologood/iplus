@@ -70,7 +70,7 @@ public class PermissionManager {
     addProjects(Arrays.asList(Project.MAP), "zhouzhaoying", "kongxianglai");
     addProjects(Arrays.asList(Project.PC_SEARCH, Project.WIRELESS_SEARCH), "hanyifan");
     addProjects(Arrays.asList(Project.MOBILE_INPUT), "tianyamin");
-    addProjects(Arrays.asList(Project.MOBILE_INPUT), "leiyu", "hulu");
+    addProjects(Arrays.asList(Project.MOBILE_INPUT), "leiyu", "hulu", "zhuxiaofang");
   }
 
   private static void addBus(BusinessUnit bu, String... users) {
