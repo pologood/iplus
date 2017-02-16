@@ -71,7 +71,7 @@ public class Kpi {
   @ApiObjectField(description = "shortName")
   private String shortName;
 
-  @ApiObjectField(description = "keySort")
+  @JsonIgnore
   private Integer keySort;
 
   @ApiObjectField(description = "value")
