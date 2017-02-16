@@ -26,19 +26,30 @@ public class Kpi {
   }
 
   public Kpi(Integer xmId, Integer kpiId, String kpiName, BigDecimal kpi, LocalDate kpiDate) {
+    this(xmId, kpiId, kpiName, kpi, kpiDate, null, null);
+  }
+
+  public Kpi(Integer xmId, Integer kpiId, String kpiName, BigDecimal kpi, LocalDate kpiDate, String shortName,
+      Integer keySort) {
     this.xmId = xmId;
     this.kpiId = kpiId;
     this.kpiName = kpiName;
     this.kpi = kpi;
     this.kpiDate = kpiDate;
+    this.shortName = shortName;
+    this.keySort = keySort;
   }
 
   public Kpi(Kpi kpi) {
     this(kpi.getXmId(), kpi.getKpiId(), kpi.getKpiName(), kpi.getKpi(), kpi.getKpiDate());
   }
 
+  public Kpi(int kpiId, String kpiName, String shortName, Integer keySort) {
+    this(null, kpiId, kpiName, null, null, shortName, keySort);
+  }
+
   public Kpi(int kpiId, String kpiName) {
-    this(null, kpiId, kpiName, null, null);
+    this(kpiId, kpiName, null, null);
   }
 
   public Kpi(int xmId, Integer kpiId, BigDecimal kpi, LocalDate kpiDate) {
@@ -56,6 +67,12 @@ public class Kpi {
 
   @ApiObjectField(description = "kpiName")
   private String kpiName;
+
+  @ApiObjectField(description = "shortName")
+  private String shortName;
+
+  @ApiObjectField(description = "keySort")
+  private Integer keySort;
 
   @ApiObjectField(description = "value")
   private BigDecimal kpi;
@@ -99,6 +116,22 @@ public class Kpi {
 
   public void setKpiName(String kpiName) {
     this.kpiName = kpiName;
+  }
+
+  public String getShortName() {
+    return shortName;
+  }
+
+  public void setShortName(String shortName) {
+    this.shortName = shortName;
+  }
+
+  public Integer getKeySort() {
+    return keySort;
+  }
+
+  public void setKeySort(Integer keySort) {
+    this.keySort = keySort;
   }
 
   public BigDecimal getKpi() {
