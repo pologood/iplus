@@ -58,7 +58,8 @@ public class PermissionManager {
     addProjects(Arrays.asList(Project.PC_BROWSER, Project.MOBILE_BROWSER), "wujian");
     addProjects(Arrays.asList(Project.NAVIGATION), "kaiwang");
     addProjects(Arrays.asList(Project.APP_MARKET, Project.MOBILE_BROWSER), "wuzhiqiang");
-    addProjects(Arrays.asList(Project.NAVIGATION, Project.APP_MARKET), "casperwang");
+    addProjects(Arrays.asList(Project.NAVIGATION, Project.APP_MARKET, Project.PC_BROWSER, Project.MOBILE_BROWSER),
+        "casperwang");
     addProjects(Arrays.asList(Project.NAVIGATION, Project.APP_MARKET, Project.MOBILE_BROWSER), "yuanzhijun");
     addProjects(Arrays.asList(Project.VOICE), "wangyanfeng");
     addProjects(Arrays.asList(Project.NOVEL_SEARCH, Project.APP_SEARCH), "gaopeng");
