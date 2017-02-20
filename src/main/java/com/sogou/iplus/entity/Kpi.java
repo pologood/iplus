@@ -41,7 +41,8 @@ public class Kpi {
   }
 
   public Kpi(Kpi kpi) {
-    this(kpi.getXmId(), kpi.getKpiId(), kpi.getKpiName(), kpi.getKpi(), kpi.getKpiDate());
+    this(kpi.getXmId(), kpi.getKpiId(), kpi.getKpiName(), kpi.getKpi(), kpi.getKpiDate(), kpi.getShortName(),
+        kpi.getKeySort());
   }
 
   public Kpi(int kpiId, String kpiName, String shortName, Integer keySort) {
