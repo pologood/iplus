@@ -77,8 +77,8 @@ public class Project {
             new Kpi(113, "手机地图Android版次日留存率"), new Kpi(114, "手机地图Android版7日留存率"), new Kpi(115, "手机地图Android版30日留存率"),
             new Kpi(116, "手机地图iOS版次日留存率"), new Kpi(117, "手机地图iOS版7日留存率"), new Kpi(118, "手机地图iOS版30日留存率")),
         BusinessUnit.DESKTOP));
-    PROJECTS.add(APP_MARKET = new Project(11, "ljy4vpeq567fejbj", "应用市场", Lists
-        .newArrayList(new Kpi(8, "应用分发(市场+手机助手)日活跃用户数(万)", "活跃用户", 1), new Kpi(9, "应用分发(市场+手机助手)日下载量(万)", "下载量", 2)),
+    PROJECTS.add(APP_MARKET = new Project(11, "ljy4vpeq567fejbj", "手机助手", Lists
+        .newArrayList(new Kpi(8, "手机助手日活跃用户数(万)", "活跃用户", 1), new Kpi(9, "手机助手日下载量(万)", "下载量", 2)),
         BusinessUnit.DESKTOP));
     PROJECTS.add(PC_SEARCH = new Project(137, "sp6jmm92s2p1u8qn", "PC网页搜索",
         Lists.newArrayList(new Kpi(37, "PC搜狗自有渠道日搜索量(万)", "PC搜索量", 1), new Kpi(38, "PC腾讯渠道日搜索量(万)", "PC腾讯", 2),
