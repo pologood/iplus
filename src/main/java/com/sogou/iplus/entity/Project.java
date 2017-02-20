@@ -32,7 +32,7 @@ public class Project {
 
   public static final Project PC_INPUT, MOBILE_INPUT, QQ_INPUT, PC_BROWSER, MOBILE_BROWSER, NAVIGATION, VOICE, NEWS,
       PEDIA, CHINESE_MEDICINE, MAP, APP_MARKET, PC_SEARCH, WIRELESS_SEARCH, SEARCH_APP, VEDIO_SEARCH, PICTURE_SEARCH,
-      SHOPPING_SEARCH, NOVEL_SEARCH, APP_SEARCH;
+      SHOPPING_SEARCH, NOVEL_SEARCH, APP_SEARCH, SUGAR_CAT;
 
   static {
     PROJECTS.add(new Project(0, "i4zqbwchh23igzwe", "test", new ArrayList<>(), null));
@@ -122,7 +122,7 @@ public class Project {
             new Kpi(73, "PC搜狗浏览器起始页RPM(元/千次)"), new Kpi(74, "无线QQ浏览器RPM(元/千次)"), new Kpi(75, "PC搜索RPM(优质)(元/千次)"),
             new Kpi(76, "无线搜索RPM(元/千次)", "无线RPM", 2)),
         BusinessUnit.MARKETING));
-    PROJECTS.add(new Project(42, "qfysv8ha64crrdsc", "糖猫",
+    PROJECTS.add(SUGAR_CAT = new Project(42, "qfysv8ha64crrdsc", "糖猫",
         Lists.newArrayList(new Kpi(77, "糖猫日新激活(个)", "新增用户", 1), new Kpi(88, "糖猫T1日新激活(个)"), new Kpi(89, "糖猫T2日新激活(个)"),
             new Kpi(90, "糖猫E1日新激活(个)"), new Kpi(91, "糖猫M1日新激活(个)"), new Kpi(92, "糖猫BASIC日新激活(个)"),
             new Kpi(78, "糖猫日活跃用户(个)", "活跃用户", 2), new Kpi(83, "糖猫T1日活跃用户(个)"), new Kpi(84, "糖猫T2日活跃用户(个)"),

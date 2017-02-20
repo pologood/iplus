@@ -48,6 +48,9 @@ public class PermissionManager {
   public static final Map<String, Set<Integer>> MAP = new HashMap<>();
 
   private static void init() {
+    //test
+    addProjects(Arrays.asList(Project.MOBILE_INPUT, Project.SUGAR_CAT), "tianyamin");
+
     addBus(BusinessUnit.SUGARCAT, "markwu", "toddlee", "wuxudong", "solomonlee", "liuzhankun");
     addBus(BusinessUnit.MARKETING, "ligang");
     addProjects(Arrays.asList(Project.NEWS), "lizhi");
@@ -70,7 +73,6 @@ public class PermissionManager {
     addProjects(Arrays.asList(Project.SEARCH_APP), "wangxun", "yuhao");
     addProjects(Arrays.asList(Project.MAP), "zhouzhaoying", "kongxianglai");
     addProjects(Arrays.asList(Project.PC_SEARCH, Project.WIRELESS_SEARCH), "hanyifan");
-    addProjects(Arrays.asList(Project.MOBILE_INPUT), "tianyamin");
     addProjects(Arrays.asList(Project.MOBILE_INPUT), "leiyu", "hulu", "zhuxiaofang");
   }
 
