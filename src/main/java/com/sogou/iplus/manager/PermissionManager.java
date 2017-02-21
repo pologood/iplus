@@ -48,6 +48,9 @@ public class PermissionManager {
   public static final Map<String, Set<Integer>> MAP = new HashMap<>();
 
   private static void init() {
+    //test
+    addProjects(Arrays.asList(Project.MOBILE_INPUT, Project.SUGAR_CAT), "tianyamin");
+
     addBus(BusinessUnit.SUGARCAT, "markwu", "toddlee", "wuxudong", "solomonlee", "liuzhankun");
     addBus(BusinessUnit.MARKETING, "ligang");
     addProjects(Arrays.asList(Project.NEWS), "lizhi");
@@ -58,7 +61,8 @@ public class PermissionManager {
     addProjects(Arrays.asList(Project.PC_BROWSER, Project.MOBILE_BROWSER), "wujian");
     addProjects(Arrays.asList(Project.NAVIGATION), "kaiwang");
     addProjects(Arrays.asList(Project.APP_MARKET, Project.MOBILE_BROWSER), "wuzhiqiang");
-    addProjects(Arrays.asList(Project.NAVIGATION, Project.APP_MARKET), "casperwang");
+    addProjects(Arrays.asList(Project.NAVIGATION, Project.APP_MARKET, Project.PC_BROWSER, Project.MOBILE_BROWSER),
+        "casperwang");
     addProjects(Arrays.asList(Project.NAVIGATION, Project.APP_MARKET, Project.MOBILE_BROWSER), "yuanzhijun");
     addProjects(Arrays.asList(Project.VOICE), "wangyanfeng");
     addProjects(Arrays.asList(Project.NOVEL_SEARCH, Project.APP_SEARCH), "gaopeng");
@@ -69,7 +73,6 @@ public class PermissionManager {
     addProjects(Arrays.asList(Project.SEARCH_APP), "wangxun", "yuhao");
     addProjects(Arrays.asList(Project.MAP), "zhouzhaoying", "kongxianglai");
     addProjects(Arrays.asList(Project.PC_SEARCH, Project.WIRELESS_SEARCH), "hanyifan");
-    addProjects(Arrays.asList(Project.MOBILE_INPUT), "tianyamin");
     addProjects(Arrays.asList(Project.MOBILE_INPUT), "leiyu", "hulu", "zhuxiaofang");
   }
 

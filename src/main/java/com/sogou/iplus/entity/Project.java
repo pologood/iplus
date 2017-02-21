@@ -32,7 +32,7 @@ public class Project {
 
   public static final Project PC_INPUT, MOBILE_INPUT, QQ_INPUT, PC_BROWSER, MOBILE_BROWSER, NAVIGATION, VOICE, NEWS,
       PEDIA, CHINESE_MEDICINE, MAP, APP_MARKET, PC_SEARCH, WIRELESS_SEARCH, SEARCH_APP, VEDIO_SEARCH, PICTURE_SEARCH,
-      SHOPPING_SEARCH, NOVEL_SEARCH, APP_SEARCH;
+      SHOPPING_SEARCH, NOVEL_SEARCH, APP_SEARCH, SUGAR_CAT;
 
   static {
     PROJECTS.add(new Project(0, "i4zqbwchh23igzwe", "test", new ArrayList<>(), null));
@@ -77,8 +77,8 @@ public class Project {
             new Kpi(113, "手机地图Android版次日留存率"), new Kpi(114, "手机地图Android版7日留存率"), new Kpi(115, "手机地图Android版30日留存率"),
             new Kpi(116, "手机地图iOS版次日留存率"), new Kpi(117, "手机地图iOS版7日留存率"), new Kpi(118, "手机地图iOS版30日留存率")),
         BusinessUnit.DESKTOP));
-    PROJECTS.add(APP_MARKET = new Project(11, "ljy4vpeq567fejbj", "应用市场", Lists
-        .newArrayList(new Kpi(8, "应用分发(市场+手机助手)日活跃用户数(万)", "活跃用户", 1), new Kpi(9, "应用分发(市场+手机助手)日下载量(万)", "下载量", 2)),
+    PROJECTS.add(APP_MARKET = new Project(11, "ljy4vpeq567fejbj", "手机助手", Lists
+        .newArrayList(new Kpi(8, "手机助手日活跃用户数(万)", "活跃用户", 1), new Kpi(9, "手机助手日下载量(万)", "下载量", 2)),
         BusinessUnit.DESKTOP));
     PROJECTS.add(PC_SEARCH = new Project(137, "sp6jmm92s2p1u8qn", "PC网页搜索",
         Lists.newArrayList(new Kpi(37, "PC搜狗自有渠道日搜索量(万)", "PC搜索量", 1), new Kpi(38, "PC腾讯渠道日搜索量(万)", "PC腾讯", 2),
@@ -122,7 +122,7 @@ public class Project {
             new Kpi(73, "PC搜狗浏览器起始页RPM(元/千次)"), new Kpi(74, "无线QQ浏览器RPM(元/千次)"), new Kpi(75, "PC搜索RPM(优质)(元/千次)"),
             new Kpi(76, "无线搜索RPM(元/千次)", "无线RPM", 2)),
         BusinessUnit.MARKETING));
-    PROJECTS.add(new Project(42, "qfysv8ha64crrdsc", "糖猫",
+    PROJECTS.add(SUGAR_CAT = new Project(42, "qfysv8ha64crrdsc", "糖猫",
         Lists.newArrayList(new Kpi(77, "糖猫日新激活(个)", "新增用户", 1), new Kpi(88, "糖猫T1日新激活(个)"), new Kpi(89, "糖猫T2日新激活(个)"),
             new Kpi(90, "糖猫E1日新激活(个)"), new Kpi(91, "糖猫M1日新激活(个)"), new Kpi(92, "糖猫BASIC日新激活(个)"),
             new Kpi(78, "糖猫日活跃用户(个)", "活跃用户", 2), new Kpi(83, "糖猫T1日活跃用户(个)"), new Kpi(84, "糖猫T2日活跃用户(个)"),

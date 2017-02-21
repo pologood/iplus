@@ -25,10 +25,6 @@ public class Kpi {
   public Kpi() {
   }
 
-  public Kpi(Integer xmId, Integer kpiId, String kpiName, BigDecimal kpi, LocalDate kpiDate) {
-    this(xmId, kpiId, kpiName, kpi, kpiDate, null, null);
-  }
-
   public Kpi(Integer xmId, Integer kpiId, String kpiName, BigDecimal kpi, LocalDate kpiDate, String shortName,
       Integer keySort) {
     this.xmId = xmId;
@@ -41,7 +37,8 @@ public class Kpi {
   }
 
   public Kpi(Kpi kpi) {
-    this(kpi.getXmId(), kpi.getKpiId(), kpi.getKpiName(), kpi.getKpi(), kpi.getKpiDate());
+    this(kpi.getXmId(), kpi.getKpiId(), kpi.getKpiName(), kpi.getKpi(), kpi.getKpiDate(), kpi.getShortName(),
+        kpi.getKeySort());
   }
 
   public Kpi(int kpiId, String kpiName, String shortName, Integer keySort) {
@@ -53,7 +50,7 @@ public class Kpi {
   }
 
   public Kpi(int xmId, Integer kpiId, BigDecimal kpi, LocalDate kpiDate) {
-    this(xmId, kpiId, null, kpi, kpiDate);
+    this(xmId, kpiId, null, kpi, kpiDate, null, null);
   }
 
   @JsonIgnore
@@ -71,7 +68,7 @@ public class Kpi {
   @ApiObjectField(description = "shortName")
   private String shortName;
 
-  @ApiObjectField(description = "keySort")
+  @JsonIgnore
   private Integer keySort;
 
   @ApiObjectField(description = "value")
