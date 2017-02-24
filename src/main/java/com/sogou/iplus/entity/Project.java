@@ -103,7 +103,7 @@ public class Project {
     PROJECTS.add(SHOPPING_SEARCH = new Project(142, "hxuuaa7ylg2tizpp", "购物搜索",
         Lists.newArrayList(new Kpi(53, "PC+无线购物搜索用户量(万)", "活跃用户", 1)), BusinessUnit.SEARCH));
     PROJECTS.add(NOVEL_SEARCH = new Project(31, "1k5rg0vny4y1htl2", "小说搜索",
-        Lists.newArrayList(new Kpi(54, "小说搜索搜索量(万)"), new Kpi(207, "阅读APPAndroid版日活跃用户数(万)", "Android日活", 1),
+        Lists.newArrayList(new Kpi(54, "WAP书城用户量(万)"), new Kpi(207, "阅读APPAndroid版日活跃用户数(万)", "Android日活", 1),
             new Kpi(208, "阅读APPiOS版日活跃用户数(万)", "iOS日活", 2), new Kpi(201, "阅读APPAndroid版次日留存率"),
             new Kpi(202, "阅读APPAndroid版第7日留存率"), new Kpi(203, "阅读APPAndroid版第30日留存率"), new Kpi(204, "阅读APPiOS版次日留存率"),
             new Kpi(205, "阅读APPiOS版第7日留存率"), new Kpi(206, "阅读APPiOS版第30日留存率")),
