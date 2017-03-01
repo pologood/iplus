@@ -41,11 +41,15 @@ public class PushManager {
   public ApiResult<?> push(Set<Role> roles) {
     String result1 = null, result2 = null, result;
 
-    if (roles.remove(Role.MANAGER)) result1 = push(PermissionManager.getManagerList(), PERMISSION_URL);
-    result2 = push(getList(roles), URL);
+    if (roles.remove(Role.MANAGER)) result1 = push(PermissionManager.getManagerList(), getUrlWithDate(PERMISSION_URL));
+    result2 = push(getList(roles), getUrlWithDate(URL));
     result = String.join("\n", Stream.of(result1, result2).filter(Objects::nonNull).collect(Collectors.toList()));
 
     return StringUtils.isBlank(result) ? ApiResult.ok() : ApiResult.internalError(result);
+  }
+
+  private String getUrlWithDate(String url) {
+    return url + "?baseDate=" + LocalDate.now().toString();
   }
 
   public String push(String list, String url) {
