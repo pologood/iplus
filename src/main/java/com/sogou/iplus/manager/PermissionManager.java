@@ -52,10 +52,10 @@ public class PermissionManager {
     addProjects(Arrays.asList(Project.MOBILE_INPUT, Project.SUGAR_CAT), "tianyamin");
 
     addBus(BusinessUnit.SUGARCAT, "markwu", "toddlee", "wuxudong", "solomonlee", "liuzhankun");
-    addBus(BusinessUnit.MARKETING, "ligang");
+    addBus(BusinessUnit.MARKETING, "ligang", "longchenxu", "zhangjinyi");
     addProjects(Arrays.asList(Project.NEWS), "lizhi");
-    addProjects(Arrays.asList(Project.CHINESE_MEDICINE), "buhailiang");
-    addProjects(Arrays.asList(Project.PEDIA), "guoqi");
+    addProjects(Arrays.asList(Project.CHINESE_MEDICINE), "buhailiang", "wangshanshan");
+    addProjects(Arrays.asList(Project.PEDIA), "guoqi", "yuhongliang");
     addProjects(Arrays.asList(Project.PC_INPUT, Project.MOBILE_INPUT, Project.QQ_INPUT), "yanglei");
     addProjects(Arrays.asList(Project.QQ_INPUT, Project.MOBILE_INPUT), "lilin");
     addProjects(Arrays.asList(Project.PC_BROWSER, Project.MOBILE_BROWSER), "wujian");
@@ -67,13 +67,22 @@ public class PermissionManager {
     addProjects(Arrays.asList(Project.VOICE), "wangyanfeng");
     addProjects(Arrays.asList(Project.NOVEL_SEARCH, Project.APP_SEARCH), "gaopeng");
     addProjects(Arrays.asList(Project.PICTURE_SEARCH, Project.SHOPPING_SEARCH), "huangxiaofeng");
-    addProjects(Arrays.asList(Project.VEDIO_SEARCH), "jiangfeng");
+    addProjects(Arrays.asList(Project.VEDIO_SEARCH), "jiangfeng", "wanggangbj7711");
     addProjects(Arrays.asList(Project.NOVEL_SEARCH, Project.APP_SEARCH, Project.PICTURE_SEARCH, Project.SHOPPING_SEARCH,
         Project.VEDIO_SEARCH), "tongzijian");
-    addProjects(Arrays.asList(Project.SEARCH_APP), "wangxun", "yuhao");
+    addProjects(Arrays.asList(Project.SEARCH_APP), "wangxun", "yuhao", "wangxiaopeng");
     addProjects(Arrays.asList(Project.MAP), "zhouzhaoying", "kongxianglai");
-    addProjects(Arrays.asList(Project.PC_SEARCH, Project.WIRELESS_SEARCH), "hanyifan");
+    addProjects(Arrays.asList(Project.PC_SEARCH, Project.WIRELESS_SEARCH), "hanyifan", "yuhongxue");
     addProjects(Arrays.asList(Project.MOBILE_INPUT), "leiyu", "hulu", "zhuxiaofang");
+
+    addProjects(
+        Arrays.asList(Project.PC_INPUT, Project.MOBILE_INPUT, Project.QQ_INPUT, Project.PC_BROWSER,
+            Project.MOBILE_BROWSER, Project.NAVIGATION, Project.APP_MARKET, Project.VOICE, Project.MAP),
+        "xueyu", "liyangyang");
+    addProjects(Arrays.asList(Project.PICTURE_SEARCH), "yuanshaofei");
+    addProjects(Arrays.asList(Project.SHOPPING_SEARCH), "machao");
+    addProjects(Arrays.asList(Project.APP_SEARCH), "yeming");
+    addProjects(Arrays.asList(Project.NOVEL_SEARCH), "qinying", "zhangjinjing");
   }
 
   private static void addBus(BusinessUnit bu, String... users) {
@@ -86,7 +95,7 @@ public class PermissionManager {
   }
 
   private static void addKpiIds(List<Integer> kpiIds, String... users) {
-    Arrays.stream(users).forEach(user -> MAP.put(user, new HashSet<>(kpiIds)));
+    Arrays.stream(users).forEach(user -> MAP.computeIfAbsent(user, k -> new HashSet<>()).addAll(kpiIds));
   }
 
   public static String getManagerList() {
