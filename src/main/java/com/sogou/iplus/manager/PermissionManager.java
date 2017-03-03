@@ -83,6 +83,8 @@ public class PermissionManager {
     addProjects(Arrays.asList(Project.SHOPPING_SEARCH), "machao");
     addProjects(Arrays.asList(Project.APP_SEARCH), "yeming");
     addProjects(Arrays.asList(Project.NOVEL_SEARCH), "qinying", "zhangjinjing");
+    addProjects(Arrays.asList(Project.WIRELESS_SEARCH, Project.PC_SEARCH, Project.SEARCH_APP, Project.MARKETING),
+        "leiyu");
   }
 
   private static void addBus(BusinessUnit bu, String... users) {
