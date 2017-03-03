@@ -32,7 +32,7 @@ public class Project {
 
   public static final Project PC_INPUT, MOBILE_INPUT, QQ_INPUT, PC_BROWSER, MOBILE_BROWSER, NAVIGATION, VOICE, NEWS,
       PEDIA, CHINESE_MEDICINE, MAP, APP_MARKET, PC_SEARCH, WIRELESS_SEARCH, SEARCH_APP, VEDIO_SEARCH, PICTURE_SEARCH,
-      SHOPPING_SEARCH, NOVEL_SEARCH, APP_SEARCH, SUGAR_CAT;
+      SHOPPING_SEARCH, NOVEL_SEARCH, APP_SEARCH, SUGAR_CAT, MARKETING;
 
   static {
     PROJECTS.add(new Project(0, "i4zqbwchh23igzwe", "test", new ArrayList<>(), null));
@@ -77,8 +77,8 @@ public class Project {
             new Kpi(113, "手机地图Android版次日留存率"), new Kpi(114, "手机地图Android版7日留存率"), new Kpi(115, "手机地图Android版30日留存率"),
             new Kpi(116, "手机地图iOS版次日留存率"), new Kpi(117, "手机地图iOS版7日留存率"), new Kpi(118, "手机地图iOS版30日留存率")),
         BusinessUnit.DESKTOP));
-    PROJECTS.add(APP_MARKET = new Project(11, "ljy4vpeq567fejbj", "手机助手", Lists
-        .newArrayList(new Kpi(8, "手机助手日活跃用户数(万)", "活跃用户", 1), new Kpi(9, "手机助手日下载量(万)", "下载量", 2)),
+    PROJECTS.add(APP_MARKET = new Project(11, "ljy4vpeq567fejbj", "手机助手",
+        Lists.newArrayList(new Kpi(8, "手机助手日活跃用户数(万)", "活跃用户", 1), new Kpi(9, "手机助手日下载量(万)", "下载量", 2)),
         BusinessUnit.DESKTOP));
     PROJECTS.add(PC_SEARCH = new Project(137, "sp6jmm92s2p1u8qn", "PC网页搜索",
         Lists.newArrayList(new Kpi(37, "PC搜狗自有渠道日搜索量(万)", "PC搜索量", 1), new Kpi(38, "PC腾讯渠道日搜索量(万)", "PC腾讯", 2),
@@ -116,7 +116,7 @@ public class Project {
         Lists.newArrayList(new Kpi(63, "中医项目App日活(个)", "活跃用户", 1), new Kpi(64, "中医项目App次日留存率"),
             new Kpi(65, "中医项目App第7日留存率"), new Kpi(66, "中医项目App第30日留存率"), new Kpi(67, "中医项目App总激活数(个)", "累计用户", 2)),
         BusinessUnit.SEARCH));
-    PROJECTS.add(new Project(36, "1ou8k1pdoe4ac3lz", "消耗、RPM",
+    PROJECTS.add(MARKETING = new Project(36, "1ou8k1pdoe4ac3lz", "消耗、RPM",
         Lists.newArrayList(new Kpi(68, "全部竞价日消耗(万元)", "总日消耗", 1), new Kpi(69, "PC搜索日消耗(万元)"),
             new Kpi(70, "无线搜索日消耗(万元)"), new Kpi(71, "网盟日消耗(万元)"), new Kpi(72, "银河皓月日消耗(万元)"),
             new Kpi(73, "PC搜狗浏览器起始页RPM(元/千次)"), new Kpi(74, "无线QQ浏览器RPM(元/千次)"), new Kpi(75, "PC搜索RPM(优质)(元/千次)"),
