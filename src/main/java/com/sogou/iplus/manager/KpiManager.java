@@ -6,6 +6,7 @@
 package com.sogou.iplus.manager;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -86,7 +87,7 @@ public class KpiManager {
     if (map.isEmpty()) return sum;
     for (BigDecimal v : map.values())
       sum = sum.add(v);
-    return sum.divide(new BigDecimal(map.size()));
+    return sum.divide(new BigDecimal(map.size()), 4, RoundingMode.HALF_UP);
   }
 
   @Transactional
