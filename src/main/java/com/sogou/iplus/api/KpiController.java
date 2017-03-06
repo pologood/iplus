@@ -177,7 +177,8 @@ public class KpiController {
       @ApiQueryParam(name = "date", description = "kpi日期", format = "yyyy-MM-dd") @RequestParam @DateTimeFormat(iso = ISO.DATE) LocalDate date,
       @ApiQueryParam(name = "type", description = "平均时间范围类型") @RequestParam AVERAGE type) {
     if (!isValid(xmId, xmKey, kpiIds.orElse(new ArrayList<>()))) return ApiResult.forbidden();
-    return kpiManager.getAverage(xmId, kpiIds.orElse(new ArrayList<>()), date.minusDays(AVERAGE_MAP.get(type)), date);
+    return kpiManager.getAverage(xmId, kpiIds.orElse(new ArrayList<>()), date.minusDays(AVERAGE_MAP.get(type) - 1),
+        date);
   }
 
   public enum HOST {
@@ -198,5 +199,5 @@ public class KpiController {
     day, week, month;
   }
 
-  private Map<AVERAGE, Integer> AVERAGE_MAP = ImmutableMap.of(AVERAGE.day, 0, AVERAGE.week, 7, AVERAGE.month, 30);
+  private Map<AVERAGE, Integer> AVERAGE_MAP = ImmutableMap.of(AVERAGE.day, 1, AVERAGE.week, 7, AVERAGE.month, 30);
 }
