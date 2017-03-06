@@ -198,5 +198,5 @@ public class KpiController {
     day, week, month;
   }
 
-  private Map<AVERAGE, Integer> AVERAGE_MAP = ImmutableMap.of(AVERAGE.day, 0, AVERAGE.week, 7, AVERAGE.month, 30);
+  private Map<AVERAGE, Integer> AVERAGE_MAP = ImmutableMap.of(AVERAGE.day, 0, AVERAGE.week, 6, AVERAGE.month, 29);
 }
