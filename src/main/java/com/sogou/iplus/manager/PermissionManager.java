@@ -52,7 +52,7 @@ public class PermissionManager {
     addProjects(Arrays.asList(Project.MOBILE_INPUT, Project.SUGAR_CAT), "tianyamin");
 
     addBus(BusinessUnit.SUGARCAT, "markwu", "toddlee", "wuxudong", "solomonlee", "liuzhankun");
-    addBus(BusinessUnit.MARKETING, "ligang", "longchenxu", "zhangjinyi");
+    addBus(BusinessUnit.MARKETING, "ligang", "longchenxu", "zhangjinyi", "mapengfei");
     addProjects(Arrays.asList(Project.NEWS), "lizhi");
     addProjects(Arrays.asList(Project.CHINESE_MEDICINE), "buhailiang", "wangshanshan");
     addProjects(Arrays.asList(Project.PEDIA), "guoqi", "yuhongliang");
