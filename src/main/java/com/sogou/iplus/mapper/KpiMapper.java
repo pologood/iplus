@@ -59,7 +59,7 @@ public interface KpiMapper {
         sql.WHERE(sb.append(')').toString());
       }
       if (0 != MapUtils.getIntValue(map, "xmId")) sql.WHERE("xmId = #{xmId}");
-      if (MapUtils.getBooleanValue(map, "isValid")) sql.WHERE(String.format("kpi != %s", Integer.MIN_VALUE));
+      if (MapUtils.getBooleanValue(map, "isValid")) sql.WHERE("kpi >= 0");
       return sql.toString();
     }
   }

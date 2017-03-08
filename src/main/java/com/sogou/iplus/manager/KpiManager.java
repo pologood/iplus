@@ -94,8 +94,7 @@ public class KpiManager {
   public ApiResult<?> addAll(LocalDate date) {
     Project.PROJECTS.forEach(project -> project.getKpis().forEach(kpi -> {
       try {
-        Kpi toAdd = new Kpi(project.getXmId(), kpi.getKpiId(), new BigDecimal(Integer.MIN_VALUE),
-            getKpiDate(kpi, date));
+        Kpi toAdd = new Kpi(project.getXmId(), kpi.getKpiId(), new BigDecimal(-1), getKpiDate(kpi, date));
         toAdd.setCreateDate(date);
         kpiMapper.add(toAdd);
       } catch (DuplicateKeyException e) {
