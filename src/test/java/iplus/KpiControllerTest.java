@@ -111,7 +111,6 @@ public class KpiControllerTest {
     ApiResult<?> result = controller.selectProjectsDoNotSubmitKpiOnNamedDate(Optional.empty());
     Assert.assertTrue(ApiResult.isOk(result));
     List<?> list = (List<?>) result.getData();
-    Assert.assertFalse(CollectionUtils.isEmpty(list));
     Assert.assertTrue(list.stream().map(o -> (Project) o).noneMatch(p -> Objects.equals(testId, p.getXmId())));
   }
 
