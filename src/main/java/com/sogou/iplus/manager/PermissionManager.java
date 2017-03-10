@@ -116,7 +116,21 @@ public class PermissionManager {
   public boolean isAuthorized(User user, List<Integer> kpiIds) {
     if (Objects.isNull(user)) return false;
     String userId = user.getId().substring(6);
-    return WHITE_LIST.contains(userId) || MAP.getOrDefault(userId, new HashSet<>()).containsAll(kpiIds);
+    return WHITE_LIST.contains(userId) || getValidKpiIdsFromUser(user).containsAll(kpiIds)
+        || MAP.getOrDefault(userId, new HashSet<>()).containsAll(kpiIds);
+  }
+
+  private Set<Integer> getValidKpiIdsFromUser(User user) {
+    Set<Integer> result = new HashSet<>();
+    if (Objects.isNull(user) || CollectionUtils.isEmpty(user.getPerms())) return result;
+    user.getPerms().stream().filter(Objects::nonNull)
+        .map(perm -> Project.PROJECT_MAP.get(getXmIdFromAppId(perm.getEntity()))).filter(Objects::nonNull)
+        .forEach(project -> project.getKpis().forEach(kpi -> result.add(kpi.getKpiId())));
+    return result;
+  }
+
+  private Integer getXmIdFromAppId(String appId) {
+    return APPID_MAP.get(appId);
   }
 
   public Company getCompany(User user) {
@@ -157,6 +171,8 @@ public class PermissionManager {
     return Arrays.stream(keys).flatMap(key -> Arrays.stream(env.getRequiredProperty(key).split(regex)))
         .collect(Collectors.toSet());
   }
+
+  public static final Map<String, Integer> APPID_MAP = new HashMap<>();
 
   @ApiObject
   public enum Role {
