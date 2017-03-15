@@ -72,14 +72,19 @@ public class KpiManager {
     return new ApiResult<>(result);
   }
 
-  public ApiResult<?> getAverage(Integer xmId, List<Integer> kpiId, LocalDate beginDate, LocalDate endDate) {
-    List<Kpi> kpis = select(xmId, kpiId, beginDate, endDate);
-    Map<Integer, Map<LocalDate, BigDecimal>> map = new HashMap<>();
-    kpis.forEach(
-        kpi -> map.computeIfAbsent(kpi.getKpiId(), k -> new HashMap<>()).put(kpi.getCreateDate(), kpi.getKpi()));
-    Map<Integer, BigDecimal> result = new TreeMap<>();
+  public ApiResult<?> getAverage(List<Integer> list, Integer xmId, List<String> kpiIds, LocalDate beginDate,
+      LocalDate endDate) {
+    List<Kpi> kpis = select(xmId, list, beginDate, endDate);
+    Map<String, Map<LocalDate, BigDecimal>> map = new HashMap<>();
+    kpis.forEach(kpi -> map.computeIfAbsent(getUnionKpi(kpi.getKpiId().toString(), kpiIds), k -> new HashMap<>())
+        .put(kpi.getCreateDate(), kpi.getKpi()));
+    Map<String, BigDecimal> result = new TreeMap<>();
     map.entrySet().forEach(e -> result.put(e.getKey(), getAverage(e.getValue())));
     return new ApiResult<>(result);
+  }
+
+  private String getUnionKpi(String kpiId, List<String> kpiIds) {
+    return kpiIds.stream().filter(id -> id.contains(kpiId)).findAny().get();
   }
 
   private BigDecimal getAverage(Map<LocalDate, BigDecimal> map) {
@@ -97,8 +102,7 @@ public class KpiManager {
         Kpi toAdd = new Kpi(project.getXmId(), kpi.getKpiId(), new BigDecimal(-1), getKpiDate(kpi, date));
         toAdd.setCreateDate(date);
         kpiMapper.add(toAdd);
-      } catch (DuplicateKeyException e) {
-      }
+      } catch (DuplicateKeyException e) {}
     }));
     return ApiResult.ok();
   }

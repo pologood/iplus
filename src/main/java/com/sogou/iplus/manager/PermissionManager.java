@@ -2,6 +2,7 @@ package com.sogou.iplus.manager;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -15,24 +16,36 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.jsondoc.core.annotation.ApiObject;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import com.sogou.iplus.entity.BusinessUnit;
 import com.sogou.iplus.entity.Company;
 import com.sogou.iplus.entity.Kpi;
 import com.sogou.iplus.entity.Project;
 
+import commons.saas.PermService;
+import commons.saas.RestNameService;
 import commons.saas.XiaopLoginService;
 import commons.spring.RedisRememberMeService;
 import commons.spring.RedisRememberMeService.User;
 
 @Service
-public class PermissionManager {
+public class PermissionManager implements InitializingBean {
+
+  @Autowired
+  RestTemplate restTemplate;
+
+  @Autowired
+  RestNameService restNameService;
 
   @Autowired
   RedisRememberMeService redisService;
+
+  static PermService permService;
 
   @Autowired
   public PermissionManager(Environment env) {
@@ -43,7 +56,7 @@ public class PermissionManager {
   @Autowired
   XiaopLoginService pandoraLoginService;
 
-  public Set<String> WHITE_LIST;
+  public static Set<String> WHITE_LIST;
 
   public static final Map<String, Set<Integer>> MAP = new HashMap<>();
 
@@ -101,7 +114,15 @@ public class PermissionManager {
   }
 
   public static String getManagerList() {
-    return String.join(",", MAP.keySet());
+    return String.join(",", getList());
+  }
+
+  public static Collection<String> getList() {
+    Set<String> set = permService.getPerms().stream().map(person -> person.getEmail())
+        .map(email -> email.substring(0, email.length() - 14)).filter(name -> !WHITE_LIST.contains(name))
+        .collect(Collectors.toSet());
+    set.addAll(MAP.keySet());
+    return set;
   }
 
   public User login(Optional<String> token, HttpServletResponse response) {
@@ -186,5 +207,10 @@ public class PermissionManager {
     public int getValue() {
       return value;
     }
+  }
+
+  @Override
+  public void afterPropertiesSet() throws Exception {
+    permService = new PermService(restTemplate, restNameService);
   }
 }

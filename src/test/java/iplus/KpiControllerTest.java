@@ -33,6 +33,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.sogou.iplus.api.KpiController;
+import com.sogou.iplus.api.KpiController.AVERAGE;
 import com.sogou.iplus.api.KpiController.HOST;
 import com.sogou.iplus.config.DaoConfig;
 import com.sogou.iplus.config.RootConfig;
@@ -87,10 +88,15 @@ public class KpiControllerTest {
     selectKpisWithDateAndXmId();
     selectKpisWithDateRangeAndKpiId();
     push();
+    getAverage();
     System.out.println(getRandomString("0123456789abcdefghijklmnopqrstuvwxyz".toCharArray(), 16));
     System.out.println(getDailyActiveUserKpiIds());
     System.out.println(getNewUserKpiIds());
     System.out.println(getRetentionRateKpiIds());
+  }
+
+  private void getAverage() {
+    controller.getAverage(debugId, debugKey, Optional.of(Arrays.asList("21+22", "23+24", "25")), today, AVERAGE.day);
   }
 
   public void getCompany() {
