@@ -36,6 +36,14 @@ public class JsonHelper {
     }
   }
 
+  public static <T> T convertValue(Object src, TypeReference<T> valueTypeRef) {
+    try {
+      return getMapper().convertValue(src, valueTypeRef);
+    } catch (Exception e) {
+      throw new RuntimeException(e.toString());
+    }
+  }
+
   public static byte[] writeValueAsBytes(Object value) {
     try {
       return getMapper().writeValueAsBytes(value);
