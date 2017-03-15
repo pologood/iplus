@@ -173,12 +173,18 @@ public class KpiController {
   @RequestMapping(value = "/kpi/average", method = RequestMethod.GET)
   public ApiResult<?> getAverage(@ApiQueryParam(name = "xmId", description = "项目Id") @RequestParam int xmId,
       @ApiQueryParam(name = "xmKey", description = "项目秘钥") @RequestParam String xmKey,
-      @ApiQueryParam(name = "kpiIds", description = "kpiId list") @RequestParam Optional<List<Integer>> kpiIds,
+      @ApiQueryParam(name = "kpiIds", description = "kpiId list") @RequestParam Optional<List<String>> kpiIds,
       @ApiQueryParam(name = "date", description = "kpi日期", format = "yyyy-MM-dd") @RequestParam @DateTimeFormat(iso = ISO.DATE) LocalDate date,
       @ApiQueryParam(name = "type", description = "平均时间范围类型") @RequestParam AVERAGE type) {
-    if (!isValid(xmId, xmKey, kpiIds.orElse(new ArrayList<>()))) return ApiResult.forbidden();
-    return kpiManager.getAverage(xmId, kpiIds.orElse(new ArrayList<>()), date.minusDays(AVERAGE_MAP.get(type) - 1),
-        date);
+    List<Integer> kpiIdList = splitKpiIds(kpiIds.orElse(new ArrayList<>()));
+    if (!isValid(xmId, xmKey, kpiIdList)) return ApiResult.forbidden();
+    return kpiManager.getAverage(kpiIdList, xmId, kpiIds.orElse(new ArrayList<>()),
+        date.minusDays(AVERAGE_MAP.get(type) - 1), date);
+  }
+
+  List<Integer> splitKpiIds(List<String> kpiIds) {
+    return kpiIds.stream().flatMap(kpiId -> Arrays.stream(kpiId.split("\\+"))).map(Integer::parseInt)
+        .collect(Collectors.toList());
   }
 
   public enum HOST {
