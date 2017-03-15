@@ -1,6 +1,6 @@
-
 package commons.spring;
 
+import java.io.*;
 import java.util.*;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -17,7 +17,7 @@ import commons.utils.StringHelper;
 public class RedisRememberMeService implements RememberMeServices {
   public static class UserPerm {
     private String entity;
-    private long permId;
+    private long   permId;
 
     public static UserPerm fromString(String perm) {
       String part[] = perm.split(":");
@@ -45,7 +45,6 @@ public class RedisRememberMeService implements RememberMeServices {
     public void setEntity(String entity) {
       this.entity = entity;
     }
-
     public String getEntity() {
       return entity;
     }
@@ -53,7 +52,6 @@ public class RedisRememberMeService implements RememberMeServices {
     public void setPermId(long permId) {
       this.permId = permId;
     }
-
     public long getPermId() {
       return permId;
     }
@@ -68,7 +66,7 @@ public class RedisRememberMeService implements RememberMeServices {
 
     public boolean canGrantPerm(long permId, String entity) {
       boolean idOk;
-      if (this.permId <= 101) { // Account.OWNER 101
+      if (this.permId <= 101) {  // Account.OWNER 101
         idOk = this.permId < permId;
       } else if (this.permId < 9_999) { // Account.PERM_EXIST 9_999
         idOk = this.permId <= permId;
@@ -77,12 +75,12 @@ public class RedisRememberMeService implements RememberMeServices {
       }
 
       boolean entityOk = entityEqual(entity);
-      return idOk && entityOk; // TODO
+      return idOk && entityOk;   // TODO
     }
 
     public boolean canRevokePerm(long permId, String entity) {
       boolean idOk = true;
-      if (this.permId < 9_999) { // Account.PERM_EXIST 9_999
+      if (this.permId < 9_999) {  // Account.PERM_EXIST 9_999
         idOk = this.permId < permId;
       }
 
@@ -93,18 +91,24 @@ public class RedisRememberMeService implements RememberMeServices {
       return entity == null ? String.valueOf(permId) : String.valueOf(permId) + ":" + entity;
     }
   }
-
   public static class User {
-    private Optional<Long> uid;
+    private Optional<Long>   uid;
     private Optional<String> openId;
-    private String name;
-    private int incId;
-    private List<UserPerm> perms;
-    private boolean internal;
+    private String           name;
+    private int              incId;
+    private List<UserPerm>   perms;
+    private boolean          internal = false;
+    private boolean          anonymous = false;
 
     public static User internal() {
       User user = new User(0, "__", 0, Arrays.asList(new UserPerm(1L)));
       user.internal = true;
+      return user;
+    }
+
+    public static User anonymous() {
+      User user = new User(-1, "anonymous", -1, null);
+      user.anonymous = true;
       return user;
     }
 
@@ -130,11 +134,11 @@ public class RedisRememberMeService implements RememberMeServices {
 
     public User(long uid, String openId, String name, int incId, List<UserPerm> perms) {
       if (uid > 0) this.uid = Optional.of(uid);
-      if (openId != null) this.openId = Optional.of(openId);
+      if (openId != null) this.openId   = Optional.of(openId);
 
-      this.name = name;
-      this.incId = incId;
-      this.perms = perms;
+      this.name     = name;
+      this.incId    = incId;
+      this.perms  = perms;
       this.internal = false;
     }
 
@@ -149,7 +153,6 @@ public class RedisRememberMeService implements RememberMeServices {
     public String getOpenId() {
       return openId == null ? null : openId.orElse(null);
     }
-
     public void setOpenId(String openId) {
       this.openId = Optional.of(openId);
     }
@@ -157,7 +160,6 @@ public class RedisRememberMeService implements RememberMeServices {
     public void setName(String name) {
       this.name = name;
     }
-
     public String getName() {
       return name;
     }
@@ -193,12 +195,12 @@ public class RedisRememberMeService implements RememberMeServices {
     }
 
     public long getPerm() {
-      if (perms == null) return Long.MAX_VALUE;
+      if (perms == null || perms.isEmpty()) return Long.MAX_VALUE;
       else return perms.get(0).getPermId();
     }
 
     public List<UserPerm> getPerms() {
-      return perms;
+      return perms == null ? Collections.emptyList() : perms;
     }
 
     public boolean hasPerm(String entity) {
@@ -267,8 +269,8 @@ public class RedisRememberMeService implements RememberMeServices {
 
     public boolean beforeExpire(int maxAge) {
       long createAt = Long.parseLong(this.createAt);
-      long now = System.currentTimeMillis() / 1000;
-      if (createAt + maxAge / 2 < now) {
+      long now = System.currentTimeMillis()/1000;
+      if (createAt + maxAge/2 < now) {
         this.createAt = Long.toString(now);
         return true;
       } else {
@@ -282,24 +284,24 @@ public class RedisRememberMeService implements RememberMeServices {
       if (parts.length != PARTS_NUMBER) return null;
 
       CacheEntity entity = new CacheEntity();
-      entity.uid = parts[0];
-      entity.token = parts[1];
-      entity.name = parts[2];
+      entity.uid      = parts[0];
+      entity.token    = parts[1];
+      entity.name     = parts[2];
       entity.createAt = parts[3];
-      entity.incId = parts[4];
-      entity.perms = parts[5];
+      entity.incId    = parts[4];
+      entity.perms    = parts[5];
 
       return entity;
     }
 
     public static CacheEntity buildFromUser(User user) {
       CacheEntity entity = new CacheEntity();
-      entity.uid = user.getId();
-      entity.token = StringHelper.random(32);
-      entity.name = user.getName() == null ? "" : user.getName();
-      entity.createAt = Long.toString(System.currentTimeMillis() / 1000);
-      entity.incId = user.getIncIdString();
-      entity.perms = user.getPermsString();
+      entity.uid      = user.getId();
+      entity.token    = StringHelper.random(32);
+      entity.name     = user.getName() == null ? "" : user.getName();
+      entity.createAt = Long.toString(System.currentTimeMillis()/1000);
+      entity.incId    = user.getIncIdString();
+      entity.perms    = user.getPermsString();
       return entity;
     }
 
@@ -335,42 +337,69 @@ public class RedisRememberMeService implements RememberMeServices {
   }
 
   private Set<String> tokenPool = new HashSet<>();
-  private boolean tokenInnerOnly = false;
-  private JedisPool jedisPool;
-  private String domain;
-  private int maxAge;
+  private boolean     tokenInnerOnly = false;
+  private Set<String> anonymousPool = new HashSet<>();
+  private JedisPool   jedisPool;
+  private String      domain;
+  private int         maxAge;
   private List<String> excludeDomains;
-  private String cookiePrefix = "";
+  private String       cookiePrefix = "";
 
-  private static final String KEY_PREFIX = "RedisRMS_";
+  private static final String KEY_PREFIX   = "RedisRMS_";
+
   private static final User internalUser = User.internal();
-  private static List<GrantedAuthority> internalGrantedAuths = Arrays
-      .asList(new SimpleGrantedAuthority("ROLE_SYSINTERNAL"));
+  private static List<GrantedAuthority> internalGrantedAuths = Arrays.asList(
+    new SimpleGrantedAuthority("ROLE_SYSINTERNAL")
+    );
 
+  private static final User anonymousUser = User.anonymous();
+  private static List<GrantedAuthority> anonymousGrantedAuths = Arrays.asList(
+    new SimpleGrantedAuthority("ROLE_ANONYMOUS")
+    );
+
+  // login provider
   public RedisRememberMeService(JedisPool jedisPool, String domain, int maxAge) {
-    this(jedisPool, "", domain, maxAge);
+    this(jedisPool, "", true, domain, "", maxAge);
   }
 
-  public RedisRememberMeService(JedisPool jedisPool, String tokenPool, String domain, int maxAge) {
-    this(jedisPool, tokenPool, false, domain, maxAge);
+  public RedisRememberMeService(JedisPool jedisPool, String tokenPool, boolean tokenInnerOnly,
+                                String domain, String excludeDomain, int maxAge) {
+    this(jedisPool, tokenPool, tokenInnerOnly, "", domain, excludeDomain, maxAge);
   }
 
-  public RedisRememberMeService(JedisPool jedisPool, String tokenPool, boolean tokenInnerOnly, String domain,
-      int maxAge) {
-    this(jedisPool, tokenPool, tokenInnerOnly, domain, "", maxAge);
+  // login user
+  public RedisRememberMeService(JedisPool jedisPool, String tokenPool, boolean tokenInnerOnly) {
+    this(jedisPool, tokenPool, tokenInnerOnly, "");
   }
 
-  public RedisRememberMeService(JedisPool jedisPool, String tokenPool, boolean tokenInnerOnly, String domain,
-      String excludeDomain, int maxAge) {
+  public RedisRememberMeService(
+    JedisPool jedisPool, String tokenPool, boolean tokenInnerOnly, String anonymousPool) {
+    this(jedisPool, tokenPool, tokenInnerOnly, anonymousPool, "", "", 86400 * 7);
+  }
+
+  public RedisRememberMeService(
+    JedisPool jedisPool, String tokenPool, boolean tokenInnerOnly,
+    String anonymousPool, String domain, String excludeDomain, int maxAge) {
+
     this.jedisPool = jedisPool;
 
     this.domain = domain;
     this.maxAge = maxAge;
 
     this.tokenInnerOnly = tokenInnerOnly;
-    for (String token : tokenPool.split(",")) {
-      this.tokenPool.add(token);
+
+    if (tokenPool != null && !tokenPool.isEmpty()) {
+      for (String token : tokenPool.split(",")) {
+        this.tokenPool.add(token);
+      }
     }
+
+    if (anonymousPool != null && !anonymousPool.isEmpty()) {
+      for (String token : anonymousPool.split(",")) {
+        this.anonymousPool.add(token);
+      }
+    }
+
     if (excludeDomain.isEmpty()) {
       this.excludeDomains = new ArrayList<>();
     } else {
@@ -379,7 +408,9 @@ public class RedisRememberMeService implements RememberMeServices {
   }
 
   public void setCookiePrefix(String cookiePrefix) {
-    this.cookiePrefix = cookiePrefix;
+    if (cookiePrefix != null && !cookiePrefix.isEmpty()) {
+      this.cookiePrefix = cookiePrefix;
+    }
   }
 
   private String cookieKey(String key) {
@@ -389,7 +420,6 @@ public class RedisRememberMeService implements RememberMeServices {
   private Cookie newCookie(String key, String value, int maxAge, boolean httpOnly) {
     return newCookie(key, value, maxAge, httpOnly, domain);
   }
-
   // the cookie's expire is controlled by server, not cookie's expire attribute
   private Cookie newCookie(String key, String value, int maxAge, boolean httpOnly, String domain) {
     Cookie cookie = new Cookie(cookieKey(key), value);
@@ -401,6 +431,10 @@ public class RedisRememberMeService implements RememberMeServices {
 
     if (httpOnly) cookie.setHttpOnly(true);
     return cookie;
+  }
+
+  private String cacheKey(long uid) {
+    return KEY_PREFIX + String.valueOf(uid);
   }
 
   private String cacheKey(String uid) {
@@ -470,7 +504,7 @@ public class RedisRememberMeService implements RememberMeServices {
       cacheEntity = CacheEntity.buildFromString(c.get(key));
       if (cacheEntity == null) return false;
 
-      cacheEntity.name = user.getName();
+      cacheEntity.name  = user.getName();
       cacheEntity.incId = user.getIncIdString();
       cacheEntity.perms = user.getPermsString();
       c.setex(key, maxAge, cacheEntity.toString());
@@ -520,6 +554,13 @@ public class RedisRememberMeService implements RememberMeServices {
     return new RememberMeAuthenticationToken("N/A", internalUser, internalGrantedAuths);
   }
 
+  Authentication autoLoginByAnonymous(HttpServletRequest request) {
+    String anonymous = request.getHeader("x-req-anonymous");
+    if (anonymous == null || !anonymousPool.contains(anonymous)) return null;
+
+    return new RememberMeAuthenticationToken("N/A", anonymousUser, anonymousGrantedAuths);
+  }
+
   Authentication autoLoginByRedisPool(HttpServletRequest request) {
     String token = null;
     String openId = null;
@@ -557,6 +598,8 @@ public class RedisRememberMeService implements RememberMeServices {
   @Override
   public Authentication autoLogin(HttpServletRequest request, HttpServletResponse response) {
     Authentication auth = autoLoginByTokenPool(request);
+    if (auth != null) return auth;
+    auth = autoLoginByAnonymous(request);
     if (auth != null) return auth;
     return autoLoginByRedisPool(request);
   }

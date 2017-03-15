@@ -52,21 +52,22 @@ public class RootConfig {
 
   @Bean
   public JedisPool jedisPool() {
-    String pass = env.getProperty("redis.pass");
-    if (pass != null) {
-      return new JedisPool(new JedisPoolConfig(), env.getRequiredProperty("redis.url"),
-          env.getRequiredProperty("redis.port", Integer.class), 2000, pass); // 2 second
-    } else {
-      return new JedisPool(env.getRequiredProperty("redis.url"), env.getRequiredProperty("redis.port", Integer.class));
-    }
+    return new JedisPool(
+      new JedisPoolConfig(),
+      env.getRequiredProperty("redis.url"),
+      env.getRequiredProperty("redis.port", Integer.class),
+      200,  // default timeout 2000 millisecond is too long, set to 200
+      env.getProperty("redis.pass"));  // if null, ignore pass
   }
 
   @Bean
   public RedisRememberMeService rememberMeServices() {
-    RedisRememberMeService service = new RedisRememberMeService(jedisPool(), env.getProperty("rest.tokenpool", ""), "",
-        86400 * 7);
-    service.setCookiePrefix("iplus");
-    return service;
+    RedisRememberMeService rms = new RedisRememberMeService(
+      jedisPool(), env.getProperty("rest.tokenpool", ""),
+      env.getProperty("rest.inner", Boolean.class, false),
+      env.getProperty("rest.anonymous", ""));
+    rms.setCookiePrefix(env.getProperty("login.cookieprefix", ""));
+    return rms;
   }
 
   @Bean
