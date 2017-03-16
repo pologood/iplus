@@ -16,11 +16,9 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.jsondoc.core.annotation.ApiObject;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 
 import com.sogou.iplus.entity.BusinessUnit;
 import com.sogou.iplus.entity.Company;
@@ -28,24 +26,18 @@ import com.sogou.iplus.entity.Kpi;
 import com.sogou.iplus.entity.Project;
 
 import commons.saas.PermService;
-import commons.saas.RestNameService;
 import commons.saas.XiaopLoginService;
 import commons.spring.RedisRememberMeService;
 import commons.spring.RedisRememberMeService.User;
 
 @Service
-public class PermissionManager implements InitializingBean {
-
-  @Autowired
-  RestTemplate restTemplate;
-
-  @Autowired
-  RestNameService restNameService;
+public class PermissionManager {
 
   @Autowired
   RedisRememberMeService redisService;
 
-  static PermService permService;
+  @Autowired
+  PermService permService;
 
   @Autowired
   public PermissionManager(Environment env) {
@@ -113,14 +105,13 @@ public class PermissionManager implements InitializingBean {
     Arrays.stream(users).forEach(user -> MAP.computeIfAbsent(user, k -> new HashSet<>()).addAll(kpiIds));
   }
 
-  public static String getManagerList() {
+  public String getManagerList() {
     return String.join(",", getList());
   }
 
-  public static Collection<String> getList() {
-    Set<String> set = permService.getPerms().stream().map(person -> person.getEmail())
-        .map(email -> email.substring(0, email.length() - 14)).filter(name -> !WHITE_LIST.contains(name))
-        .collect(Collectors.toSet());
+  public Collection<String> getList() {
+    Set<String> set = permService.getPerms().stream().map(person -> person.getEmailName())
+        .filter(name -> !WHITE_LIST.contains(name)).collect(Collectors.toSet());
     set.addAll(MAP.keySet());
     return set;
   }
@@ -207,10 +198,5 @@ public class PermissionManager implements InitializingBean {
     public int getValue() {
       return value;
     }
-  }
-
-  @Override
-  public void afterPropertiesSet() throws Exception {
-    permService = new PermService(restTemplate, restNameService);
   }
 }
