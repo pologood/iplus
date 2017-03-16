@@ -111,9 +111,11 @@ public class PermissionManager {
   }
 
   public Collection<String> getList() {
-    Set<String> set = permService.getPerms().stream().map(person -> person.getEmailName())
-        .filter(name -> !WHITE_LIST.contains(name)).collect(Collectors.toSet());
-    set.addAll(MAP.keySet());
+    Set<String> set = MAP.keySet();
+    try {
+      permService.getPerms().stream().map(person -> person.getEmailName()).filter(name -> !WHITE_LIST.contains(name))
+          .forEach(name -> set.add(name));;
+    } catch (Exception e) {}
     return set;
   }
 
