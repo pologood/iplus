@@ -33,21 +33,21 @@ public class PermService {
   }
 
   public static class Person {
-    private Integer id;
+    private Long id;
     private String email;
     private String name;
     private String headImg;
-    private Integer incId;
-    private Integer perm;
+    private Long incId;
+    private Long perm;
     private List<PersonPerm> grantPerms;
     private LocalDateTime createTime;
-    private Map<String, List<Integer>> permsMap;
+    private Map<String, List<Long>> permsMap;
 
-    public Integer getId() {
+    public Long getId() {
       return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(Long id) {
       this.id = id;
     }
 
@@ -75,19 +75,19 @@ public class PermService {
       this.headImg = headImg;
     }
 
-    public Integer getIncId() {
+    public Long getIncId() {
       return incId;
     }
 
-    public void setIncId(Integer incId) {
+    public void setIncId(Long incId) {
       this.incId = incId;
     }
 
-    public Integer getPerm() {
+    public Long getPerm() {
       return perm;
     }
 
-    public void setPerm(Integer perm) {
+    public void setPerm(Long perm) {
       this.perm = perm;
     }
 
@@ -107,18 +107,22 @@ public class PermService {
       this.createTime = LocalDateTime.parse(createTime, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
     }
 
-    public Map<String, List<Integer>> getPermsMap() {
+    public Map<String, List<Long>> getPermsMap() {
       return permsMap;
     }
 
-    public void setPermsMap(Map<String, List<Integer>> permsMap) {
+    public void setPermsMap(Map<String, List<Long>> permsMap) {
       this.permsMap = permsMap;
+    }
+
+    public String getEmailName() {
+      return email.substring(0, email.length() - 14);
     }
   }
 
   public static final class PersonPerm {
     private String entity;
-    private Integer permId;
+    private Long permId;
 
     public String getEntity() {
       return entity;
@@ -128,11 +132,11 @@ public class PermService {
       this.entity = entity;
     }
 
-    public Integer getPermId() {
+    public Long getPermId() {
       return permId;
     }
 
-    public void setPermId(Integer permId) {
+    public void setPermId(Long permId) {
       this.permId = permId;
     }
   }
