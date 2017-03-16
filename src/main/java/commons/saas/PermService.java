@@ -25,15 +25,30 @@ public class PermService {
   }
 
   @SuppressWarnings("rawtypes")
+  public Person getPerm(long uid) {
+    try {
+      ResponseEntity<ApiResult> response = restTemplate.exchange(restNameService.lookup("GET_PERM"), HttpMethod.GET,
+          null, ApiResult.class, uid);
+      return JsonHelper.convertValue(response.getBody().getData(), Person.class);
+    } catch (Exception e) {
+      return null;
+    }
+  }
+
+  @SuppressWarnings("rawtypes")
   public List<Person> getPerms() {
-    ResponseEntity<ApiResult> response = restTemplate.exchange(restNameService.lookup("GET_PERMS"), HttpMethod.GET,
-        null, ApiResult.class);
-    List<Person> persons = JsonHelper.convertValue(response.getBody().getData(), new TypeReference<List<Person>>() {});
-    return persons;
+    try {
+      ResponseEntity<ApiResult> response = restTemplate.exchange(restNameService.lookup("GET_PERMS"), HttpMethod.GET,
+          null, ApiResult.class);
+      return JsonHelper.convertValue(response.getBody().getData(), new TypeReference<List<Person>>() {});
+    } catch (Exception e) {
+      return null;
+    }
   }
 
   public static class Person {
     private Long id;
+    private String phone;
     private String email;
     private String name;
     private String headImg;
@@ -49,6 +64,14 @@ public class PermService {
 
     public void setId(Long id) {
       this.id = id;
+    }
+
+    public String getPhone() {
+      return phone;
+    }
+
+    public void setPhone(String phone) {
+      this.phone = phone;
     }
 
     public String getEmail() {
@@ -117,6 +140,11 @@ public class PermService {
 
     public String getEmailName() {
       return email.substring(0, email.length() - 14);
+    }
+
+    @Override
+    public String toString() {
+      return JsonHelper.writeValueAsString(this);
     }
   }
 
