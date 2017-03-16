@@ -14,6 +14,7 @@ import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.Jedis;
 import commons.utils.StringHelper;
 
+@SuppressWarnings("unused")
 public class RedisRememberMeService implements RememberMeServices {
   public static class UserPerm {
     private String entity;
