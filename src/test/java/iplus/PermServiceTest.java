@@ -8,14 +8,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.client.RestTemplate;
 
 import com.sogou.iplus.config.DaoConfig;
 import com.sogou.iplus.config.RootConfig;
 
 import commons.saas.PermService.Person;
 import commons.saas.PermService;
-import commons.saas.RestNameService;
 
 @ContextConfiguration(classes = { RootConfig.class, DaoConfig.class })
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -23,15 +21,15 @@ import commons.saas.RestNameService;
 public class PermServiceTest {
 
   @Autowired
-  RestNameService restNameService;
-
-  @Autowired
-  RestTemplate restTemplate;
+  PermService permService;
 
   @Test
   public void test() {
-    List<Person> persons = new PermService(restTemplate, restNameService).getPerms();
+    List<Person> persons = permService.getPerms();
     System.out.println(persons);
+
+    Person person = permService.getPerm(210637);
+    System.out.println(person);
   }
 
 }
