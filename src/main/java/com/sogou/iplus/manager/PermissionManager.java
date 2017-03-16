@@ -27,6 +27,7 @@ import com.sogou.iplus.entity.Project;
 
 import commons.saas.PermService;
 import commons.saas.XiaopLoginService;
+import commons.saas.PermService.Person;
 import commons.spring.RedisRememberMeService;
 import commons.spring.RedisRememberMeService.User;
 
@@ -134,10 +135,12 @@ public class PermissionManager {
 
   private Set<Integer> getValidKpiIdsFromUser(User user) {
     Set<Integer> result = new HashSet<>();
-    if (Objects.isNull(user) || CollectionUtils.isEmpty(user.getPerms())) return result;
-    user.getPerms().stream().filter(Objects::nonNull)
-        .map(perm -> Project.PROJECT_MAP.get(getXmIdFromAppId(perm.getEntity()))).filter(Objects::nonNull)
-        .forEach(project -> project.getKpis().forEach(kpi -> result.add(kpi.getKpiId())));
+    Person person;
+    if (Objects.isNull(user) || CollectionUtils.isEmpty(user.getPerms())
+        || Objects.isNull(person = permService.getPerm(user.getUid())))
+      return result;
+    person.getPermsMap().keySet().stream().map(appId -> Project.PROJECT_MAP.get(getXmIdFromAppId(appId)))
+        .filter(Objects::nonNull).forEach(project -> project.getKpis().forEach(kpi -> result.add(kpi.getKpiId())));
     return result;
   }
 
