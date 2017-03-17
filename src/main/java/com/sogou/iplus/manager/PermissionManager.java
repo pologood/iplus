@@ -16,6 +16,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.jsondoc.core.annotation.ApiObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
@@ -33,6 +35,8 @@ import commons.spring.RedisRememberMeService.User;
 
 @Service
 public class PermissionManager {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(PermissionManager.class);
 
   @Autowired
   RedisRememberMeService redisService;
@@ -115,7 +119,9 @@ public class PermissionManager {
     try {
       permService.getPerms().stream().map(person -> person.getEmailName()).filter(name -> !WHITE_LIST.contains(name))
           .forEach(name -> set.add(name));;
-    } catch (Exception e) {}
+    } catch (Exception e) {
+      LOGGER.error("get perm list error {}", e);
+    }
     return set;
   }
 
@@ -137,12 +143,16 @@ public class PermissionManager {
 
   private Set<Integer> getValidKpiIdsFromUser(User user) {
     Set<Integer> result = new HashSet<>();
-    Person person;
-    if (Objects.isNull(user) || CollectionUtils.isEmpty(user.getPerms())
-        || Objects.isNull(person = permService.getPerm(user.getUid())))
-      return result;
-    person.getPermsMap().keySet().stream().map(appId -> Project.PROJECT_MAP.get(getXmIdFromAppId(appId)))
-        .filter(Objects::nonNull).forEach(project -> project.getKpis().forEach(kpi -> result.add(kpi.getKpiId())));
+    try {
+      Person person;
+      if (Objects.isNull(user) || CollectionUtils.isEmpty(user.getPerms())
+          || Objects.isNull(person = permService.getPerm(user.getUid())))
+        return result;
+      person.getPermsMap().keySet().stream().map(appId -> Project.PROJECT_MAP.get(getXmIdFromAppId(appId)))
+          .filter(Objects::nonNull).forEach(project -> project.getKpis().forEach(kpi -> result.add(kpi.getKpiId())));
+    } catch (Exception e) {
+      LOGGER.error("get personal permission error {}", e);
+    }
     return result;
   }
 
