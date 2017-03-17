@@ -120,7 +120,7 @@ public class PermissionManager {
       permService.getPerms().stream().map(person -> person.getEmailName()).filter(name -> !WHITE_LIST.contains(name))
           .forEach(name -> set.add(name));;
     } catch (Exception e) {
-      LOGGER.error("get perm list error {}", e);
+      LOGGER.error("get perm list error", e);
     }
     return set;
   }
@@ -151,7 +151,7 @@ public class PermissionManager {
       person.getPermsMap().keySet().stream().map(appId -> Project.PROJECT_MAP.get(getXmIdFromAppId(appId)))
           .filter(Objects::nonNull).forEach(project -> project.getKpis().forEach(kpi -> result.add(kpi.getKpiId())));
     } catch (Exception e) {
-      LOGGER.error("get personal permission error {}", e);
+      LOGGER.error("get personal permission error", e);
     }
     return result;
   }
