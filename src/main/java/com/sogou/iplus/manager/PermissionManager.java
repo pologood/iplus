@@ -2,6 +2,7 @@ package com.sogou.iplus.manager;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -15,6 +16,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.jsondoc.core.annotation.ApiObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
@@ -24,15 +27,22 @@ import com.sogou.iplus.entity.Company;
 import com.sogou.iplus.entity.Kpi;
 import com.sogou.iplus.entity.Project;
 
+import commons.saas.PermService;
 import commons.saas.XiaopLoginService;
+import commons.saas.PermService.Person;
 import commons.spring.RedisRememberMeService;
 import commons.spring.RedisRememberMeService.User;
 
 @Service
 public class PermissionManager {
 
+  private static final Logger LOGGER = LoggerFactory.getLogger(PermissionManager.class);
+
   @Autowired
   RedisRememberMeService redisService;
+
+  @Autowired
+  PermService permService;
 
   @Autowired
   public PermissionManager(Environment env) {
@@ -43,7 +53,7 @@ public class PermissionManager {
   @Autowired
   XiaopLoginService pandoraLoginService;
 
-  public Set<String> WHITE_LIST;
+  public static Set<String> WHITE_LIST;
 
   public static final Map<String, Set<Integer>> MAP = new HashMap<>();
 
@@ -100,8 +110,19 @@ public class PermissionManager {
     Arrays.stream(users).forEach(user -> MAP.computeIfAbsent(user, k -> new HashSet<>()).addAll(kpiIds));
   }
 
-  public static String getManagerList() {
-    return String.join(",", MAP.keySet());
+  public String getManagerList() {
+    return String.join(",", getList());
+  }
+
+  public Collection<String> getList() {
+    Set<String> set = MAP.keySet();
+    try {
+      permService.getPerms().stream().map(person -> person.getEmailName()).filter(name -> !WHITE_LIST.contains(name))
+          .forEach(name -> set.add(name));;
+    } catch (Exception e) {
+      LOGGER.error("get perm list error", e);
+    }
+    return set;
   }
 
   public User login(Optional<String> token, HttpServletResponse response) {
@@ -116,7 +137,27 @@ public class PermissionManager {
   public boolean isAuthorized(User user, List<Integer> kpiIds) {
     if (Objects.isNull(user)) return false;
     String userId = user.getId().substring(6);
-    return WHITE_LIST.contains(userId) || MAP.getOrDefault(userId, new HashSet<>()).containsAll(kpiIds);
+    return WHITE_LIST.contains(userId) || getValidKpiIdsFromUser(user).containsAll(kpiIds)
+        || MAP.getOrDefault(userId, new HashSet<>()).containsAll(kpiIds);
+  }
+
+  private Set<Integer> getValidKpiIdsFromUser(User user) {
+    Set<Integer> result = new HashSet<>();
+    try {
+      Person person;
+      if (Objects.isNull(user) || CollectionUtils.isEmpty(user.getPerms())
+          || Objects.isNull(person = permService.getPerm(user.getUid())))
+        return result;
+      person.getPermsMap().keySet().stream().map(appId -> Project.PROJECT_MAP.get(getXmIdFromAppId(appId)))
+          .filter(Objects::nonNull).forEach(project -> project.getKpis().forEach(kpi -> result.add(kpi.getKpiId())));
+    } catch (Exception e) {
+      LOGGER.error("get personal permission error", e);
+    }
+    return result;
+  }
+
+  private Integer getXmIdFromAppId(String appId) {
+    return APPID_MAP.get(appId);
   }
 
   public Company getCompany(User user) {
@@ -157,6 +198,8 @@ public class PermissionManager {
     return Arrays.stream(keys).flatMap(key -> Arrays.stream(env.getRequiredProperty(key).split(regex)))
         .collect(Collectors.toSet());
   }
+
+  public static final Map<String, Integer> APPID_MAP = new HashMap<>();
 
   @ApiObject
   public enum Role {

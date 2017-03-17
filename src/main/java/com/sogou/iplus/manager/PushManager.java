@@ -23,6 +23,9 @@ import commons.saas.XiaopService.PushParam;
 public class PushManager {
 
   @Autowired
+  PermissionManager permissionManager;
+
+  @Autowired
   public PushManager(Environment env) {
     LIST_MAP = ImmutableMap.of(Role.BOSS, env.getRequiredProperty("boss"), Role.ADMIN,
         env.getRequiredProperty("admin"));
@@ -41,7 +44,7 @@ public class PushManager {
   public ApiResult<?> push(Set<Role> roles) {
     String result1 = null, result2 = null, result;
 
-    if (roles.remove(Role.MANAGER)) result1 = push(PermissionManager.getManagerList(), getUrlWithDate(PERMISSION_URL));
+    if (roles.remove(Role.MANAGER)) result1 = push(permissionManager.getManagerList(), getUrlWithDate(PERMISSION_URL));
     result2 = push(getList(roles), getUrlWithDate(URL));
     result = String.join("\n", Stream.of(result1, result2).filter(Objects::nonNull).collect(Collectors.toList()));
 

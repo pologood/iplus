@@ -13,6 +13,7 @@ import org.springframework.jmx.support.MBeanServerFactoryBean;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
 import commons.spring.*;
+import commons.saas.PermService;
 import commons.saas.RestNameService;
 import commons.saas.XiaopLoginService;
 import commons.saas.XiaopService;
@@ -52,20 +53,15 @@ public class RootConfig {
 
   @Bean
   public JedisPool jedisPool() {
-    return new JedisPool(
-      new JedisPoolConfig(),
-      env.getRequiredProperty("redis.url"),
-      env.getRequiredProperty("redis.port", Integer.class),
-      200,  // default timeout 2000 millisecond is too long, set to 200
-      env.getProperty("redis.pass"));  // if null, ignore pass
+    return new JedisPool(new JedisPoolConfig(), env.getRequiredProperty("redis.url"),
+        env.getRequiredProperty("redis.port", Integer.class), 200, // default timeout 2000 millisecond is too long, set to 200
+        env.getProperty("redis.pass")); // if null, ignore pass
   }
 
   @Bean
   public RedisRememberMeService rememberMeServices() {
-    RedisRememberMeService rms = new RedisRememberMeService(
-      jedisPool(), env.getProperty("rest.tokenpool", ""),
-      env.getProperty("rest.inner", Boolean.class, false),
-      env.getProperty("rest.anonymous", ""));
+    RedisRememberMeService rms = new RedisRememberMeService(jedisPool(), env.getProperty("rest.tokenpool", ""),
+        env.getProperty("rest.inner", Boolean.class, false), env.getProperty("rest.anonymous", ""));
     rms.setCookiePrefix(env.getProperty("login.cookieprefix", ""));
     return rms;
   }
@@ -107,6 +103,11 @@ public class RootConfig {
     service.setAppId(env.getRequiredProperty("pandora.message.publicid"));
     service.setAppKey(env.getRequiredProperty("pandora.message.token"));
     return service;
+  }
+
+  @Bean
+  public PermService permService() {
+    return new PermService(restTemplate(), restNameService());
   }
 
 }

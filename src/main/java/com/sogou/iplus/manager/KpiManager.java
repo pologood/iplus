@@ -97,8 +97,7 @@ public class KpiManager {
         Kpi toAdd = new Kpi(project.getXmId(), kpi.getKpiId(), new BigDecimal(-1), getKpiDate(kpi, date));
         toAdd.setCreateDate(date);
         kpiMapper.add(toAdd);
-      } catch (DuplicateKeyException e) {
-      }
+      } catch (DuplicateKeyException e) {}
     }));
     return ApiResult.ok();
   }

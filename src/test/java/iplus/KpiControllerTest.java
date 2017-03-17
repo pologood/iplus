@@ -33,6 +33,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.sogou.iplus.api.KpiController;
+import com.sogou.iplus.api.KpiController.AVERAGE;
 import com.sogou.iplus.api.KpiController.HOST;
 import com.sogou.iplus.config.DaoConfig;
 import com.sogou.iplus.config.RootConfig;
@@ -41,6 +42,7 @@ import com.sogou.iplus.entity.Project;
 import com.sogou.iplus.model.ApiResult;
 
 import commons.spring.RedisRememberMeService.User;
+import commons.spring.RedisRememberMeService.UserPerm;
 
 //--------------------- Change Logs----------------------
 //@author wangwenlong Initial Created at 2016年10月14日;
@@ -64,6 +66,8 @@ public class KpiControllerTest {
 
   private LocalDate today = LocalDate.now(), yesterday = today.minusDays(1), tomorrow = today.plusDays(1);
 
+  private User testUser = new User("xiaop_testUser", "testUser", -1, Arrays.asList(new UserPerm("10055", 123)));
+
   @Autowired
   private KpiController controller;
 
@@ -84,10 +88,15 @@ public class KpiControllerTest {
     selectKpisWithDateAndXmId();
     selectKpisWithDateRangeAndKpiId();
     push();
+    getAverage();
     System.out.println(getRandomString("0123456789abcdefghijklmnopqrstuvwxyz".toCharArray(), 16));
     System.out.println(getDailyActiveUserKpiIds());
     System.out.println(getNewUserKpiIds());
     System.out.println(getRetentionRateKpiIds());
+  }
+
+  private void getAverage() {
+    controller.getAverage(debugId, debugKey, Optional.of(Arrays.asList("21+22", "23+24", "25")), today, AVERAGE.day);
   }
 
   public void getCompany() {
@@ -115,6 +124,7 @@ public class KpiControllerTest {
   }
 
   public void selectKpisWithDateAndXmId() {
+    validateResultOfSelectKpisWithDateAndXmId(selectKpisWithDateAndXmId(testId, testUser));
     validateResultOfSelectKpisWithDateAndXmId(selectKpisWithDateAndXmId(testId, testKey));
     validateResultOfSelectKpisWithDateAndXmId(selectKpisWithDateAndXmId(debugId, debugKey));
   }
@@ -131,6 +141,11 @@ public class KpiControllerTest {
   private ApiResult<?> selectKpisWithDateAndXmId(int xmId, String xmKey) {
     return controller.selectKpisWithDateAndXmId(HOST.privateWeb.getValue(), null, null, Optional.empty(),
         Optional.of(xmId), Optional.of(xmKey), today);
+  }
+
+  private ApiResult<?> selectKpisWithDateAndXmId(int xmId, User user) {
+    return controller.selectKpisWithDateAndXmId(HOST.publicWeb.getValue(), null, user, Optional.empty(),
+        Optional.of(xmId), Optional.empty(), today);
   }
 
   public void selectKpisWithDateRangeAndKpiId() {
