@@ -9,6 +9,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.sogou.iplus.model.ApiResult;
 
@@ -138,6 +139,7 @@ public class PermService {
       this.permsMap = permsMap;
     }
 
+    @JsonIgnore
     public String getEmailName() {
       return email.substring(0, email.length() - 14);
     }
