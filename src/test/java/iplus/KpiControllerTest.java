@@ -96,8 +96,8 @@ public class KpiControllerTest {
   }
 
   private void getAverage() {
-    controller.getAverage(testId, testKey,
-        testProject.getKpis().stream().map(kpi -> kpi.getKpiId()).collect(Collectors.toList()), today, AVERAGE.day);
+    System.out.println(controller
+        .getAverage(testId, testKey, Optional.of(Arrays.asList("21+22", "23+24", "25")), today, AVERAGE.day).getData());
   }
 
   public void getCompany() {
