@@ -8,6 +8,10 @@ import javax.validation.constraints.NotNull;
 import org.jsondoc.core.annotation.ApiObject;
 import org.jsondoc.core.annotation.ApiObjectField;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
+import commons.utils.LocalDateJsonDeserializer;
+
 @ApiObject(name = "MarketingBill", description = "营销记账")
 public class MarketingBill {
   @NotNull
@@ -24,9 +28,11 @@ public class MarketingBill {
   private String invoice;
   @NotNull
   @ApiObjectField(name = "invoiceDate", description = "发票日期", order = 5, required = true, format = "yyyy-MM-dd")
+  @JsonDeserialize(using = LocalDateJsonDeserializer.class)
   private LocalDate invoiceDate;
   @NotNull
   @ApiObjectField(name = "accountDate", description = "记账日期", order = 6, required = true, format = "yyyy-MM-dd")
+  @JsonDeserialize(using = LocalDateJsonDeserializer.class)
   private LocalDate accountDate;
   @NotNull
   @ApiObjectField(name = "currency", description = "币种", order = 7, required = true)
@@ -54,6 +60,7 @@ public class MarketingBill {
   private BigDecimal userExchangeRate;
   @NotNull
   @ApiObjectField(name = "exchangeRateDate", description = "汇率日期", order = 15, required = true, format = "yyyy-MM-dd")
+  @JsonDeserialize(using = LocalDateJsonDeserializer.class)
   private LocalDate exchangeRateDate;
   @NotNull
   @ApiObjectField(name = "exchangeRate", description = "汇率", order = 16, required = true)
@@ -78,9 +85,11 @@ public class MarketingBill {
   private BigDecimal orderDiscountRate;
   @NotNull
   @ApiObjectField(name = "orderExecutionStartDate", description = "合同执行开始日期", order = 23, required = true, format = "yyyy-MM-dd")
+  @JsonDeserialize(using = LocalDateJsonDeserializer.class)
   private LocalDate orderExecutionStartDate;
   @NotNull
   @ApiObjectField(name = "orderExecutionEndDate", description = "合同执行结束日期", order = 24, required = true, format = "yyyy-MM-dd")
+  @JsonDeserialize(using = LocalDateJsonDeserializer.class)
   private LocalDate orderExecutionEndDate;
   @NotNull
   @ApiObjectField(name = "isExpired", description = "合同是否跨期", order = 25, required = true)
@@ -99,9 +108,11 @@ public class MarketingBill {
   private String industry;
   @NotNull
   @ApiObjectField(name = "accountAgeGLDate", description = "账龄GL日期", order = 30, required = true, format = "yyyy-MM-dd")
+  @JsonDeserialize(using = LocalDateJsonDeserializer.class)
   private LocalDate accountAgeGLDate;
   @NotNull
   @ApiObjectField(name = "accountAgeTransactionOperationDate", description = "账龄事务处理日期", order = 31, required = true, format = "yyyy-MM-dd")
+  @JsonDeserialize(using = LocalDateJsonDeserializer.class)
   private LocalDate accountAgeTransactionOperationDate;
   @NotNull
   @ApiObjectField(name = "actualInvoiceNo", description = "实际发票编号", order = 32, required = true)
