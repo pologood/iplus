@@ -8,151 +8,151 @@ import javax.validation.constraints.NotNull;
 import org.jsondoc.core.annotation.ApiObject;
 import org.jsondoc.core.annotation.ApiObjectField;
 
-@ApiObject
+@ApiObject(name = "MarketingBill", description = "营销记账")
 public class MarketingBill {
   @NotNull
-  @ApiObjectField(name = "interfaceKeyWord", description = "接口关键字", order = 1)
+  @ApiObjectField(name = "interfaceKeyWord", description = "接口关键字", order = 1, required = true)
   private String interfaceKeyWord;
   @NotNull
-  @ApiObjectField(name = "batchSource", description = "批来源", order = 2)
+  @ApiObjectField(name = "batchSource", description = "批来源", order = 2, required = true)
   private String batchSource;
   @NotNull
-  @ApiObjectField(name = "businessUnit", description = "业务实体名称", order = 3)
+  @ApiObjectField(name = "businessUnit", description = "业务实体名称", order = 3, required = true)
   private String businessUnit;
   @NotNull
-  @ApiObjectField(name = "invoice", description = "发票编号", order = 4)
+  @ApiObjectField(name = "invoice", description = "发票编号", order = 4, required = true)
   private String invoice;
   @NotNull
-  @ApiObjectField(name = "invoiceDate", description = "发票日期", order = 5)
+  @ApiObjectField(name = "invoiceDate", description = "发票日期", order = 5, required = true, format = "yyyy-MM-dd")
   private LocalDate invoiceDate;
   @NotNull
-  @ApiObjectField(name = "accountDate", description = "记账日期", order = 6)
+  @ApiObjectField(name = "accountDate", description = "记账日期", order = 6, required = true, format = "yyyy-MM-dd")
   private LocalDate accountDate;
   @NotNull
-  @ApiObjectField(name = "currency", description = "币种", order = 7)
+  @ApiObjectField(name = "currency", description = "币种", order = 7, required = true)
   private String currency;
   @NotNull
-  @ApiObjectField(name = "transactionType", description = "事务处理类型", order = 8)
+  @ApiObjectField(name = "transactionType", description = "事务处理类型", order = 8, required = true)
   private String transactionType;
   @NotNull
-  @ApiObjectField(name = "saler", description = "销售人员", order = 9)
+  @ApiObjectField(name = "saler", description = "销售人员", order = 9, required = true)
   private String saler;
   @NotNull
-  @ApiObjectField(name = "orderReceiver", description = "收单方客户名称", order = 10)
+  @ApiObjectField(name = "orderReceiver", description = "收单方客户名称", order = 10, required = true)
   private String orderReceiver;
   @NotNull
-  @ApiObjectField(name = "orderReceiverLocation", description = "收单方客户地点", order = 11)
+  @ApiObjectField(name = "orderReceiverLocation", description = "收单方客户地点", order = 11, required = true)
   private String orderReceiverLocation;
   @NotNull
-  @ApiObjectField(name = "goodsReceiver", description = "收获方客户名称", order = 12)
+  @ApiObjectField(name = "goodsReceiver", description = "收获方客户名称", order = 12, required = true)
   private String goodsReceiver;
   @NotNull
-  @ApiObjectField(name = "goodsReceiverLocation", description = "收货方客户地点", order = 13)
+  @ApiObjectField(name = "goodsReceiverLocation", description = "收货方客户地点", order = 13, required = true)
   private String goodsReceiverLocation;
   @NotNull
-  @ApiObjectField(name = "userExchangeRate", description = "用户汇率", order = 14)
+  @ApiObjectField(name = "userExchangeRate", description = "用户汇率", order = 14, required = true)
   private BigDecimal userExchangeRate;
   @NotNull
-  @ApiObjectField(name = "exchangeRateDate", description = "汇率日期", order = 15)
+  @ApiObjectField(name = "exchangeRateDate", description = "汇率日期", order = 15, required = true, format = "yyyy-MM-dd")
   private LocalDate exchangeRateDate;
   @NotNull
-  @ApiObjectField(name = "exchangeRate", description = "汇率", order = 16)
+  @ApiObjectField(name = "exchangeRate", description = "汇率", order = 16, required = true)
   private BigDecimal exchangeRate;
   @NotNull
-  @ApiObjectField(name = "restricts", description = "付款条件", order = 17)
+  @ApiObjectField(name = "restricts", description = "付款条件", order = 17, required = true)
   private String restricts;
   @NotNull
-  @ApiObjectField(name = "reference", description = "参考", order = 18)
+  @ApiObjectField(name = "reference", description = "参考", order = 18, required = true)
   private String reference;
   @NotNull
-  @ApiObjectField(name = "transactionOperation", description = "事务处理说明", order = 19)
+  @ApiObjectField(name = "transactionOperation", description = "事务处理说明", order = 19, required = true)
   private String transactionOperation;
   @NotNull
-  @ApiObjectField(name = "orderExecutionId", description = "合同执行单号", order = 20)
+  @ApiObjectField(name = "orderExecutionId", description = "合同执行单号", order = 20, required = true)
   private String orderExecutionId;
   @NotNull
-  @ApiObjectField(name = "orderAmount", description = "合同金额", order = 21)
+  @ApiObjectField(name = "orderAmount", description = "合同金额", order = 21, required = true)
   private BigDecimal orderAmount;
   @NotNull
-  @ApiObjectField(name = "orderDiscountRate", description = "合同折扣率", order = 22)
+  @ApiObjectField(name = "orderDiscountRate", description = "合同折扣率", order = 22, required = true)
   private BigDecimal orderDiscountRate;
   @NotNull
-  @ApiObjectField(name = "orderExecutionStartDate", description = "合同执行开始日期", order = 23)
+  @ApiObjectField(name = "orderExecutionStartDate", description = "合同执行开始日期", order = 23, required = true, format = "yyyy-MM-dd")
   private LocalDate orderExecutionStartDate;
   @NotNull
-  @ApiObjectField(name = "orderExecutionEndDate", description = "合同执行结束日期", order = 24)
+  @ApiObjectField(name = "orderExecutionEndDate", description = "合同执行结束日期", order = 24, required = true, format = "yyyy-MM-dd")
   private LocalDate orderExecutionEndDate;
   @NotNull
-  @ApiObjectField(name = "isExpired", description = "合同是否跨期", order = 25)
+  @ApiObjectField(name = "isExpired", description = "合同是否跨期", order = 25, required = true)
   private Integer isExpired;
   @NotNull
-  @ApiObjectField(name = "orderReceiveRange", description = "合同收到期间", order = 26)
+  @ApiObjectField(name = "orderReceiveRange", description = "合同收到期间", order = 26, required = true)
   private String orderReceiveRange;
   @NotNull
-  @ApiObjectField(name = "orderType", description = "合同类型", order = 27)
+  @ApiObjectField(name = "orderType", description = "合同类型", order = 27, required = true)
   private String orderType;
   @NotNull
-  @ApiObjectField(name = "orderNo", description = "合同号", order = 28)
+  @ApiObjectField(name = "orderNo", description = "合同号", order = 28, required = true)
   private String orderNo;
   @NotNull
-  @ApiObjectField(name = "industry", description = "大行业", order = 29)
+  @ApiObjectField(name = "industry", description = "大行业", order = 29, required = true)
   private String industry;
   @NotNull
-  @ApiObjectField(name = "accountAgeGLDate", description = "账龄GL日期", order = 30)
+  @ApiObjectField(name = "accountAgeGLDate", description = "账龄GL日期", order = 30, required = true, format = "yyyy-MM-dd")
   private LocalDate accountAgeGLDate;
   @NotNull
-  @ApiObjectField(name = "accountAgeTransactionOperationDate", description = "账龄事务处理日期", order = 31)
+  @ApiObjectField(name = "accountAgeTransactionOperationDate", description = "账龄事务处理日期", order = 31, required = true, format = "yyyy-MM-dd")
   private LocalDate accountAgeTransactionOperationDate;
   @NotNull
-  @ApiObjectField(name = "actualInvoiceNo", description = "实际发票编号", order = 32)
+  @ApiObjectField(name = "actualInvoiceNo", description = "实际发票编号", order = 32, required = true)
   private String actualInvoiceNo;
   @NotNull
-  @ApiObjectField(name = "notice", description = "贷项通知单核销发票", order = 33)
+  @ApiObjectField(name = "notice", description = "贷项通知单核销发票", order = 33, required = true)
   private String notice;
   @NotNull
-  @ApiObjectField(name = "channelSaler", description = "渠道销售人员", order = 34)
+  @ApiObjectField(name = "channelSaler", description = "渠道销售人员", order = 34, required = true)
   private String channelSaler;
   @NotNull
-  @ApiObjectField(name = "channelSalerId", description = "渠道销售人员编号", order = 35)
+  @ApiObjectField(name = "channelSalerId", description = "渠道销售人员编号", order = 35, required = true)
   private String channelSalerId;
   @NotNull
-  @ApiObjectField(name = "directSaler", description = "直客销售人员", order = 36)
+  @ApiObjectField(name = "directSaler", description = "直客销售人员", order = 36, required = true)
   private String directSaler;
   @NotNull
-  @ApiObjectField(name = "directSalerId", description = "直客销售人员编号", order = 37)
+  @ApiObjectField(name = "directSalerId", description = "直客销售人员编号", order = 37, required = true)
   private String directSalerId;
   @NotNull
-  @ApiObjectField(name = "column", description = "行号", order = 38)
+  @ApiObjectField(name = "column", description = "行号", order = 38, required = true)
   private String column;
   @NotNull
-  @ApiObjectField(name = "transactionAmount", description = "事务处理行金额", order = 39)
+  @ApiObjectField(name = "transactionAmount", description = "事务处理行金额", order = 39, required = true)
   private BigDecimal transactionAmount;
   @NotNull
-  @ApiObjectField(name = "orderCount", description = "订单数量", order = 40)
+  @ApiObjectField(name = "orderCount", description = "订单数量", order = 40, required = true)
   private Integer orderCount;
   @NotNull
-  @ApiObjectField(name = "price", description = "价格", order = 41)
+  @ApiObjectField(name = "price", description = "价格", order = 41, required = true)
   private BigDecimal price;
   @NotNull
-  @ApiObjectField(name = "noticeAbstract", description = "通知单行摘要", order = 42)
+  @ApiObjectField(name = "noticeAbstract", description = "通知单行摘要", order = 42, required = true)
   private String noticeAbstract;
   @NotNull
-  @ApiObjectField(name = "taxAmount", description = "税额", order = 43)
+  @ApiObjectField(name = "taxAmount", description = "税额", order = 43, required = true)
   private BigDecimal taxAmount;
   @NotNull
-  @ApiObjectField(name = "taxCode", description = "税码", order = 44)
+  @ApiObjectField(name = "taxCode", description = "税码", order = 44, required = true)
   private String taxCode;
   @NotNull
-  @ApiObjectField(name = "costAndTax", description = "价税合计", order = 45)
+  @ApiObjectField(name = "costAndTax", description = "价税合计", order = 45, required = true)
   private BigDecimal costAndTax;
   @NotNull
-  @ApiObjectField(name = "cost", description = "价", order = 46)
+  @ApiObjectField(name = "cost", description = "价", order = 46, required = true)
   private BigDecimal cost;
   @NotNull
-  @ApiObjectField(name = "tax", description = "税", order = 47)
+  @ApiObjectField(name = "tax", description = "税", order = 47, required = true)
   private BigDecimal tax;
   @NotNull
-  @ApiObjectField(name = "cultureTax", description = "文化事业建设税", order = 48)
+  @ApiObjectField(name = "cultureTax", description = "文化事业建设税", order = 48, required = true)
   private BigDecimal cultureTax;
 
   public String getInterfaceKeyWord() {

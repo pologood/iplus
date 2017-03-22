@@ -25,7 +25,7 @@ public class MarketingBillController {
   private @Autowired MarketingBillManager marketingBillManager;
 
   @ApiMethod(description = "add record")
-  @RequestMapping(value = "/bill", method = RequestMethod.POST)
+  @RequestMapping(value = "/bill", method = RequestMethod.POST, consumes = { "application/json" })
   public ApiResult<?> add(@ApiBodyObject @RequestBody @Valid List<MarketingBill> list) {
     return marketingBillManager.add(list);
   }
