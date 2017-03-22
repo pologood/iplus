@@ -66,7 +66,7 @@ public class KpiControllerTest {
 
   private LocalDate today = LocalDate.now(), yesterday = today.minusDays(1), tomorrow = today.plusDays(1);
 
-  private User testUser = new User("xiaop_testUser", "testUser", -1, Arrays.asList(new UserPerm("10055", 123)));
+  private User testUser = new User(210679, "xiaop_liteng", "liteng", -1, Arrays.asList(new UserPerm("10055", 123)));
 
   @Autowired
   private KpiController controller;
@@ -96,11 +96,12 @@ public class KpiControllerTest {
   }
 
   private void getAverage() {
-    controller.getAverage(debugId, debugKey, Optional.of(Arrays.asList("21+22", "23+24", "25")), today, AVERAGE.day);
+    System.out.println(controller
+        .getAverage(testId, testKey, Optional.of(Arrays.asList("21+22", "23+24", "25")), today, AVERAGE.day).getData());
   }
 
   public void getCompany() {
-    ApiResult<?> result = controller.getCompany(null, new User("xiaop_liteng", "李腾"), Optional.empty());
+    ApiResult<?> result = controller.getCompany(null, testUser, Optional.empty());
     Assert.assertTrue(ApiResult.isOk(result));
     Company sogou = (Company) result.getData();
     Assert.assertNotNull(sogou);
@@ -151,8 +152,8 @@ public class KpiControllerTest {
   public void selectKpisWithDateRangeAndKpiId() {
     validateResultOfSelectKpisWithDateRangeAndKpiId(
         selectKpisWithDateRangeAndKpiId(HOST.privateWeb, null, testId, testKey));
-    User user = new User("xiaop_liteng", "李腾");
-    validateResultOfSelectKpisWithDateRangeAndKpiId(selectKpisWithDateRangeAndKpiId(HOST.publicWeb, user, null, null));
+    validateResultOfSelectKpisWithDateRangeAndKpiId(
+        selectKpisWithDateRangeAndKpiId(HOST.publicWeb, testUser, null, null));
   }
 
   private ApiResult<?> selectKpisWithDateRangeAndKpiId(HOST host, User user, Integer xmId, String xmKey) {

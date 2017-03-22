@@ -136,7 +136,7 @@ public class PermissionManager {
 
   public boolean isAuthorized(User user, List<Integer> kpiIds) {
     if (Objects.isNull(user)) return false;
-    String userId = user.getId().substring(6);
+    String userId = user.getOpenId().substring(6);
     return WHITE_LIST.contains(userId) || getValidKpiIdsFromUser(user).containsAll(kpiIds)
         || MAP.getOrDefault(userId, new HashSet<>()).containsAll(kpiIds);
   }
