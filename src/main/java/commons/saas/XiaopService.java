@@ -56,6 +56,8 @@ public class XiaopService {
 
     private String url;
 
+    private boolean isHTML;
+
     public PushParam setOpenId(String openId) {
       this.openId = openId;
       return this;
@@ -100,6 +102,14 @@ public class XiaopService {
     public String getUrl() {
       return this.url;
     }
+
+    public boolean isHTML() {
+      return isHTML;
+    }
+
+    public void setHTML(boolean isHTML) {
+      this.isHTML = isHTML;
+    }
   }
 
   public String push(PushParam param) {
@@ -112,7 +122,8 @@ public class XiaopService {
     map.add("title", param.getTitle());
     map.add("summary", param.getMessage());
     map.add("content", param.getMessage());
-    if (param.getImage() != null) {
+    if (param.isHTML()) map.add("tp", "8");
+    else if (param.getImage() != null) {
       map.add("cover", param.getImage());
       map.add("tp", "1");
     } else {
