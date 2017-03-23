@@ -5,7 +5,11 @@
  */
 package com.sogou.iplus.entity;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.ListIterator;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.jsondoc.core.annotation.ApiObject;
 import org.jsondoc.core.annotation.ApiObjectField;
@@ -74,6 +78,22 @@ public class Company {
   @Override
   public String toString() {
     return JsonHelper.writeValueAsString(this);
+  }
+
+  public Company() {}
+
+  public Company(Company company) {
+    this.id = company.getId();
+    this.name = company.getName();
+    this.kpis = new ArrayList<>(company.getKpis());
+    this.businessUnits = company.getBusinessUnits().stream().map(bu -> new BusinessUnit(bu))
+        .collect(Collectors.toList());
+  }
+
+  public void remove(Set<Integer> kpiIds) {
+    businessUnits.forEach(bu -> bu.remove(kpiIds));
+    for (ListIterator<BusinessUnit> iterator = businessUnits.listIterator(); iterator.hasNext();)
+      if (iterator.next().getProjects().isEmpty()) iterator.remove();
   }
 
 }

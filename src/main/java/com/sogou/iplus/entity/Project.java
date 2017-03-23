@@ -9,8 +9,10 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.jsondoc.core.annotation.ApiObject;
@@ -18,7 +20,6 @@ import org.jsondoc.core.annotation.ApiObjectField;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.common.collect.Lists;
-import com.sogou.iplus.manager.PermissionManager;
 
 import commons.utils.JsonHelper;
 
@@ -30,6 +31,7 @@ public class Project {
   public @JsonIgnore transient static final List<Project> PROJECTS = new ArrayList<>();
   public @JsonIgnore transient static final Map<Integer, Project> PROJECT_MAP;
   public @JsonIgnore transient static final Map<Integer, Kpi> KPI_MAP = new HashMap<>();
+  public @JsonIgnore transient static final Map<String, Integer> APPID_MAP = new HashMap<>();
 
   public static final Project PC_INPUT, MOBILE_INPUT, QQ_INPUT, PC_BROWSER, MOBILE_BROWSER, NAVIGATION, VOICE, NEWS,
       PEDIA, CHINESE_MEDICINE, MAP, APP_MARKET, PC_SEARCH, WIRELESS_SEARCH, SEARCH_APP, VEDIO_SEARCH, PICTURE_SEARCH,
@@ -139,8 +141,11 @@ public class Project {
 
     PROJECTS.forEach(project -> project.getKpis().forEach(kpi -> KPI_MAP.put(kpi.getKpiId(), kpi)));
 
-    PROJECTS
-        .forEach(project -> PermissionManager.APPID_MAP.put(Integer.toString(project.getAppId()), project.getXmId()));
+    PROJECTS.forEach(project -> APPID_MAP.put(Integer.toString(project.getAppId()), project.getXmId()));
+  }
+
+  public static List<Project> getProjects() {
+    return PROJECTS.stream().map(p -> new Project(p)).collect(Collectors.toList());
   }
 
   public static Map<Integer, Project> getProjectMap() {
@@ -247,5 +252,15 @@ public class Project {
 
   public void setKeyKpis(List<Kpi> keyKpis) {
     this.keyKpis = keyKpis;
+  }
+
+  @JsonIgnore
+  public List<Integer> getKpiList() {
+    return kpis.stream().map(kpi -> kpi.getKpiId()).collect(Collectors.toList());
+  }
+
+  public void remove(Set<Integer> kpiIds, boolean inKpiIds) {
+    for (ListIterator<Kpi> iterator = kpis.listIterator(); iterator.hasNext();)
+      if (!(kpiIds.contains(iterator.next().getKpiId()) ^ inKpiIds)) iterator.remove();
   }
 }
