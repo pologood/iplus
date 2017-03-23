@@ -63,8 +63,8 @@ public class KpiManager {
     return new ApiResult<>(kpis.stream().collect(Collectors.toMap(k -> k.getKpiId(), k -> k.getKpi())));
   }
 
-  public ApiResult<?> selectWithDateRangeAndKpiId(Integer xmId, List<Integer> kpiId, LocalDate beginDate,
-      LocalDate endDate) {
+  public ApiResult<Map<Integer, Map<LocalDate, Kpi>>> selectWithDateRangeAndKpiId(Integer xmId, List<Integer> kpiId,
+      LocalDate beginDate, LocalDate endDate) {
     List<Kpi> kpis = kpiMapper.select(xmId, kpiId, beginDate, endDate, false);
     Map<Integer, Map<LocalDate, Kpi>> result = new TreeMap<>();
     kpis.forEach(kpi -> result.computeIfAbsent(kpi.getKpiId(), k -> new TreeMap<>(Comparator.reverseOrder()))
@@ -77,7 +77,7 @@ public class KpiManager {
     List<Kpi> kpis = select(xmId, list, beginDate, endDate);
     Map<String, Map<LocalDate, BigDecimal>> map = new HashMap<>();
     kpis.forEach(kpi -> map.computeIfAbsent(getUnionKpi(kpi.getKpiId().toString(), kpiIds), k -> new HashMap<>())
-        .put(kpi.getCreateDate(), kpi.getKpi()));
+        .compute(kpi.getCreateDate(), (k, v) -> kpi.getKpi().add((Objects.isNull(v) ? BigDecimal.ZERO : v))));
     Map<String, BigDecimal> result = new TreeMap<>();
     map.entrySet().forEach(e -> result.put(e.getKey(), getAverage(e.getValue())));
     return new ApiResult<>(result);
