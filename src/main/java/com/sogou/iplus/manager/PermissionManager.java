@@ -2,7 +2,6 @@ package com.sogou.iplus.manager;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -15,6 +14,7 @@ import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.jsondoc.core.annotation.ApiObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,7 +24,6 @@ import org.springframework.stereotype.Service;
 
 import com.sogou.iplus.entity.BusinessUnit;
 import com.sogou.iplus.entity.Company;
-import com.sogou.iplus.entity.Kpi;
 import com.sogou.iplus.entity.Project;
 
 import commons.saas.PermService;
@@ -45,15 +44,16 @@ public class PermissionManager {
   PermService permService;
 
   @Autowired
+  XiaopLoginService pandoraLoginService;
+
+  @Autowired
   public PermissionManager(Environment env) {
-    WHITE_LIST = getSet(env, ",", "boss", "admin");
+    BOSS_SET = Arrays.stream(env.getRequiredProperty("boss").split(",")).collect(Collectors.toSet());
+    ADMIN_SET = Arrays.stream(env.getRequiredProperty("admin").split(",")).collect(Collectors.toSet());
     init();
   }
 
-  @Autowired
-  XiaopLoginService pandoraLoginService;
-
-  public static Set<String> WHITE_LIST;
+  public static Set<String> BOSS_SET, ADMIN_SET;
 
   public static final Map<String, Set<Integer>> MAP = new HashMap<>();
 
@@ -102,27 +102,24 @@ public class PermissionManager {
   }
 
   private static void addProjects(List<Project> projects, String... users) {
-    addKpiIds(projects.stream().flatMap(project -> project.getKpis().stream().map(kpi -> kpi.getKpiId()))
-        .collect(Collectors.toList()), users);
+    addKpiIds(projects.stream().flatMap(project -> project.getKpiList().stream()).collect(Collectors.toList()), users);
   }
 
   private static void addKpiIds(List<Integer> kpiIds, String... users) {
     Arrays.stream(users).forEach(user -> MAP.computeIfAbsent(user, k -> new HashSet<>()).addAll(kpiIds));
   }
 
-  public String getManagerList() {
-    return String.join(",", getList());
+  public List<Person> getPeople(Set<Role> roles, List<Person> people) {
+    if (CollectionUtils.isEmpty(people) || CollectionUtils.isEmpty(roles)) return new ArrayList<>();
+    return people.stream()
+        .filter(p -> StringUtils.isNotBlank(p.getEmail()) && roles.contains(getRole(p.getEmailName())))
+        .collect(Collectors.toList());
   }
 
-  public Collection<String> getList() {
-    Set<String> set = MAP.keySet();
-    try {
-      permService.getPerms().stream().map(person -> person.getEmailName()).filter(name -> !WHITE_LIST.contains(name))
-          .forEach(name -> set.add(name));;
-    } catch (Exception e) {
-      LOGGER.error("get perm list error", e);
-    }
-    return set;
+  private Role getRole(String name) {
+    if (BOSS_SET.contains(name)) return Role.BOSS;
+    if (ADMIN_SET.contains(name)) return Role.ADMIN;
+    return Role.MANAGER;
   }
 
   public User login(Optional<String> token, HttpServletResponse response) {
@@ -135,71 +132,39 @@ public class PermissionManager {
   }
 
   public boolean isAuthorized(User user, List<Integer> kpiIds) {
-    if (Objects.isNull(user)) return false;
-    String userId = user.getOpenId().substring(6);
-    return WHITE_LIST.contains(userId) || getValidKpiIdsFromUser(user).containsAll(kpiIds)
-        || MAP.getOrDefault(userId, new HashSet<>()).containsAll(kpiIds);
+    if (Objects.isNull(user) || Objects.isNull(user.getOpenId()) || user.getOpenId().length() < 7) return false;
+    String userName = user.getOpenId().substring(6);
+    return isInWhiteList(userName) || getValidKpiIdsFromUser(user).containsAll(kpiIds)
+        || MAP.getOrDefault(userName, new HashSet<>()).containsAll(kpiIds);
   }
 
-  private Set<Integer> getValidKpiIdsFromUser(User user) {
-    Set<Integer> result = new HashSet<>();
+  public boolean isInWhiteList(String name) {
+    return BOSS_SET.contains(name) || ADMIN_SET.contains(name);
+  }
+
+  public Set<Integer> getValidKpiIdsFromUser(User user) {
+    Person person;
+    if (Objects.isNull(user) || !user.isOpen() || Objects.isNull(person = permService.getPerm(user.getUid())))
+      return new HashSet<>();
+    return getValidKpiIdsFromUser(person);
+  }
+
+  public Set<Integer> getValidKpiIdsFromUser(Person person) {
     try {
-      Person person;
-      if (Objects.isNull(user) || CollectionUtils.isEmpty(user.getPerms())
-          || Objects.isNull(person = permService.getPerm(user.getUid())))
-        return result;
-      person.getPermsMap().keySet().stream().map(appId -> Project.PROJECT_MAP.get(getXmIdFromAppId(appId)))
-          .filter(Objects::nonNull).forEach(project -> project.getKpis().forEach(kpi -> result.add(kpi.getKpiId())));
+      return person.getPermsMap().keySet().stream().map(appId -> Project.getProjectWithAppId(appId))
+          .filter(Objects::nonNull).flatMap(p -> p.getKpiList().stream()).collect(Collectors.toSet());
     } catch (Exception e) {
       LOGGER.error("get personal permission error", e);
+      return new HashSet<>();
     }
-    return result;
   }
 
-  private Integer getXmIdFromAppId(String appId) {
-    return APPID_MAP.get(appId);
-  }
-
-  public Company getCompany(User user) {
-    Set<Integer> set;
-    if (Objects.isNull(user) || CollectionUtils.isEmpty(set = MAP.get(user.getId().substring(6)))) return Company.SOGOU;
-    Company company = new Company(), sogou = Company.SOGOU;
-
-    company.setId(sogou.getId());
-    company.setName(sogou.getName());
-    company.setKpis(sogou.getKpis());
-    company.setBusinessUnits(new ArrayList<>());
-
-    for (BusinessUnit sogouBu : sogou.getBusinessUnits()) {
-      BusinessUnit bu = new BusinessUnit();
-
-      bu.setId(sogouBu.getId());
-      bu.setName(sogouBu.getName());
-      bu.setKpis(sogouBu.getKpis());
-      bu.setProjects(new ArrayList<>());
-
-      for (Project sogouProject : sogouBu.getProjects()) {
-        Project project = new Project(sogouProject);
-
-        for (Kpi kpi : sogouProject.getKpis())
-          if (!set.contains(kpi.getKpiId()))
-            project.getKpis().removeIf(k -> Objects.equals(k.getKpiId(), kpi.getKpiId()));
-
-        if (!project.getKpis().isEmpty()) bu.getProjects().add(project);
-      }
-
-      if (!bu.getProjects().isEmpty()) company.getBusinessUnits().add(bu);
-    }
-
+  public Company getCompany(Set<Integer> kpiIds) {
+    if (CollectionUtils.isEmpty(kpiIds)) return Company.SOGOU;
+    Company company = new Company(Company.SOGOU);
+    company.remove(kpiIds);
     return company;
   }
-
-  public Set<String> getSet(Environment env, String regex, String... keys) {
-    return Arrays.stream(keys).flatMap(key -> Arrays.stream(env.getRequiredProperty(key).split(regex)))
-        .collect(Collectors.toSet());
-  }
-
-  public static final Map<String, Integer> APPID_MAP = new HashMap<>();
 
   @ApiObject
   public enum Role {

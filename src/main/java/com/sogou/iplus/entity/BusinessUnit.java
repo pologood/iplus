@@ -8,6 +8,8 @@ package com.sogou.iplus.entity;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.jsondoc.core.annotation.ApiObject;
 import org.jsondoc.core.annotation.ApiObjectField;
@@ -80,5 +82,21 @@ public class BusinessUnit {
   @Override
   public String toString() {
     return JsonHelper.writeValueAsString(this);
+  }
+
+  public BusinessUnit() {}
+
+  public BusinessUnit(BusinessUnit bu) {
+    this.id = bu.getId();
+    this.name = bu.getName();
+    this.kpis = new ArrayList<>(bu.getKpis());
+    this.projects = bu.getProjects().stream().map(p -> new Project(p)).collect(Collectors.toList());
+  }
+
+  public void remove(Set<Integer> kpiIds) {
+    projects.forEach(p -> p.remove(kpiIds, false));
+    List<Project> list = new ArrayList<>();
+    projects.stream().filter(p -> p.getKpis().size() > 0).forEach(p -> list.add(p));
+    projects = list;
   }
 }

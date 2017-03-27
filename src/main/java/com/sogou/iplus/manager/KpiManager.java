@@ -10,14 +10,17 @@ import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,22 +53,25 @@ public class KpiManager {
   }
 
   public ApiResult<?> selectProjectsDoNotSubmitKpiOnNamedDate(LocalDate date) {
-    Map<Integer, Project> projectMap = Project.getProjectMap();
-    List<Kpi> kpis = select(null, null, date);
-    kpis.forEach(already -> projectMap.get(already.getXmId()).getKpis()
-        .removeIf(kpi -> Objects.equals(already.getKpiId(), kpi.getKpiId())));
-    return new ApiResult<>(
-        projectMap.values().stream().filter(project -> !project.getKpis().isEmpty()).collect(Collectors.toList()));
+    List<Project> projects = Project.getProjects();
+    Set<Integer> kpis = select(null, null, date).stream().map(kpi -> kpi.getKpiId()).collect(Collectors.toSet());
+    projects.stream().forEach(project -> project.remove(kpis, true));
+    return new ApiResult<>(projects.stream().filter(p -> !p.getKpis().isEmpty()).collect(Collectors.toList()));
   }
 
   public ApiResult<?> selectWithDateAndXmId(Integer xmId, LocalDate date) {
-    List<Kpi> kpis = select(xmId, null, date);
-    return new ApiResult<>(kpis.stream().collect(Collectors.toMap(k -> k.getKpiId(), k -> k.getKpi())));
+    return new ApiResult<>(
+        select(xmId, null, date).stream().collect(Collectors.toMap(k -> k.getKpiId(), k -> k.getKpi())));
   }
 
   public ApiResult<Map<Integer, Map<LocalDate, Kpi>>> selectWithDateRangeAndKpiId(Integer xmId, List<Integer> kpiId,
       LocalDate beginDate, LocalDate endDate) {
-    List<Kpi> kpis = kpiMapper.select(xmId, kpiId, beginDate, endDate, false);
+    return selectWithDateRangeAndKpiId(xmId, kpiId, beginDate, endDate, false);
+  }
+
+  public ApiResult<Map<Integer, Map<LocalDate, Kpi>>> selectWithDateRangeAndKpiId(Integer xmId, List<Integer> kpiId,
+      LocalDate beginDate, LocalDate endDate, boolean isValid) {
+    List<Kpi> kpis = kpiMapper.select(xmId, kpiId, beginDate, endDate, isValid);
     Map<Integer, Map<LocalDate, Kpi>> result = new TreeMap<>();
     kpis.forEach(kpi -> result.computeIfAbsent(kpi.getKpiId(), k -> new TreeMap<>(Comparator.reverseOrder()))
         .put(kpi.getCreateDate(), kpi));
@@ -97,7 +103,7 @@ public class KpiManager {
 
   @Transactional
   public ApiResult<?> addAll(LocalDate date) {
-    Project.PROJECTS.forEach(project -> project.getKpis().forEach(kpi -> {
+    Project.getProjects().forEach(project -> project.getKpis().forEach(kpi -> {
       try {
         Kpi toAdd = new Kpi(project.getXmId(), kpi.getKpiId(), new BigDecimal(-1), getKpiDate(kpi, date));
         toAdd.setCreateDate(date);
@@ -121,6 +127,21 @@ public class KpiManager {
 
   List<Kpi> select(Integer xmId, List<Integer> kpiId, LocalDate begin, LocalDate end) {
     return kpiMapper.select(xmId, kpiId, begin, end, true);
+  }
+
+  public List<Pair<Kpi, BigDecimal>> getChange() {
+    LocalDate today = LocalDate.now(), yesterday = today.minusDays(1);
+    ApiResult<Map<Integer, Map<LocalDate, Kpi>>> apiResult = selectWithDateRangeAndKpiId(null, null, yesterday, today,
+        true);
+    return apiResult.getData().values().stream().filter(map -> map.size() == 2).map(map -> getChange(map))
+        .collect(Collectors.toList());
+  }
+
+  private Pair<Kpi, BigDecimal> getChange(Map<LocalDate, Kpi> map) {
+    Iterator<Entry<LocalDate, Kpi>> iterator = map.entrySet().iterator();
+    Kpi today = iterator.next().getValue(), yesterday = iterator.next().getValue();
+    return Pair.of(today,
+        today.getKpi().subtract(yesterday.getKpi()).divide(yesterday.getKpi(), 4, RoundingMode.HALF_UP));
   }
 
 }

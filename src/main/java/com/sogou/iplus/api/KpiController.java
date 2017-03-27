@@ -5,6 +5,8 @@
  */
 package com.sogou.iplus.api;
 
+import static com.sogou.iplus.entity.Project.getProjectWithXmIdAndXmKey;
+
 import java.util.List;
 import java.util.Map;
 import java.math.BigDecimal;
@@ -69,19 +71,14 @@ public class KpiController {
       @ApiQueryParam(name = "xmId", description = "项目id") @RequestParam int xmId,
       @ApiQueryParam(name = "xmKey", description = "项目秘钥") @RequestParam String xmKey,
       @ApiQueryParam(name = "date", description = "kpi日期", format = "yyyy-MM-dd") @RequestParam @DateTimeFormat(iso = ISO.DATE) LocalDate date) {
-    Project project = getProject(xmId, xmKey);
+    Project project = getProjectWithXmIdAndXmKey(xmId, xmKey);
     if (Objects.isNull(project)) return ApiResult.forbidden();
     Set<Kpi> kpis = new HashSet<>();
     String kpiStr;
-    for (Kpi kpi : project.getKpis())
-      if (NumberUtils.isNumber(kpiStr = request.getParameter(kpi.getKpiId().toString())))
-        kpis.add(new Kpi(xmId, kpi.getKpiId(), new BigDecimal(kpiStr), date));
+    for (Integer kpiId : project.getKpiList())
+      if (NumberUtils.isNumber(kpiStr = request.getParameter(kpiId.toString())))
+        kpis.add(new Kpi(xmId, kpiId, new BigDecimal(kpiStr), date));
     return kpiManager.update(kpis);
-  }
-
-  private Project getProject(int xmId, String xmKey) {
-    Project project = Project.PROJECT_MAP.get(xmId);
-    return Objects.nonNull(project) && Objects.equals(xmKey, project.getXmKey()) ? project : null;
   }
 
   @ApiMethod(description = "select projects do not submit kpi on named date")
@@ -116,8 +113,8 @@ public class KpiController {
   @RequestMapping(value = "/company", method = RequestMethod.GET)
   public ApiResult<?> getCompany(HttpServletResponse response, @AuthenticationPrincipal User user,
       @ApiQueryParam(name = "token", description = "pandora token") @RequestParam Optional<String> token) {
-    return new ApiResult<>(
-        permissionManager.getCompany(Objects.isNull(user) ? permissionManager.login(token, response) : user));
+    return new ApiResult<>(permissionManager.getCompany(permissionManager
+        .getValidKpiIdsFromUser(Objects.isNull(user) ? permissionManager.login(token, response) : user)));
   }
 
   @ApiMethod(description = "list company kpi")
@@ -137,9 +134,8 @@ public class KpiController {
       @ApiQueryParam(name = "xmId", description = "项目Id") @RequestParam Optional<Integer> xmId,
       @ApiQueryParam(name = "xmKey", description = "项目秘钥") @RequestParam Optional<String> xmKey,
       @ApiQueryParam(name = "date", description = "kpi日期", format = "yyyy-MM-dd") @RequestParam @DateTimeFormat(iso = ISO.DATE) LocalDate date) {
-    Project project = Project.PROJECT_MAP.get(xmId.orElse(null));
-    List<Integer> kpiIds = Objects.isNull(project) ? new ArrayList<>()
-        : project.getKpis().stream().map(kpi -> kpi.getKpiId()).collect(Collectors.toList());
+    Project project = Project.getProjectWithXmId(xmId.orElse(null));
+    List<Integer> kpiIds = Objects.isNull(project) ? new ArrayList<>() : project.getKpiList();
     if (!isValid(from, user, token, xmId, xmKey, response, kpiIds)) return ApiResult.forbidden();
     return kpiManager.selectWithDateAndXmId(xmId.orElse(null), date);
   }
@@ -150,9 +146,8 @@ public class KpiController {
   }
 
   private boolean isValid(int xmId, String xmKey, List<Integer> kpiIds) {
-    Project project = getProject(xmId, xmKey);
-    return Objects.nonNull(project) && (xmId == 0
-        || project.getKpis().stream().map(kpi -> kpi.getKpiId()).collect(Collectors.toSet()).containsAll(kpiIds));
+    Project project = getProjectWithXmIdAndXmKey(xmId, xmKey);
+    return Objects.nonNull(project) && (xmId == 0 || project.getKpiList().containsAll(kpiIds));
   }
 
   @ApiMethod(description = "add kpi record")

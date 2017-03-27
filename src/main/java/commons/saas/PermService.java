@@ -5,6 +5,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
@@ -16,6 +18,8 @@ import com.sogou.iplus.model.ApiResult;
 import commons.utils.JsonHelper;
 
 public class PermService {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(PermService.class);
 
   private RestTemplate restTemplate;
   private RestNameService restNameService;
@@ -32,6 +36,7 @@ public class PermService {
           null, ApiResult.class, uid);
       return JsonHelper.convertValue(response.getBody().getData(), Person.class);
     } catch (Exception e) {
+      LOGGER.error("get perm error!", e);
       return null;
     }
   }
@@ -43,6 +48,7 @@ public class PermService {
           null, ApiResult.class);
       return JsonHelper.convertValue(response.getBody().getData(), new TypeReference<List<Person>>() {});
     } catch (Exception e) {
+      LOGGER.error("get perms error!", e);
       return null;
     }
   }

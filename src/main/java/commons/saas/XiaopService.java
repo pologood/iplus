@@ -7,6 +7,7 @@ package commons.saas;
 
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
@@ -120,7 +121,7 @@ public class XiaopService {
     map.add("ts", now);
     map.add("to", param.getOpenId());
     map.add("title", param.getTitle());
-    map.add("summary", param.getMessage());
+    map.add("summary", /*param.getMessage()*/"test");
     map.add("content", param.getMessage());
     if (param.isHTML()) map.add("tp", "8");
     else if (param.getImage() != null) {
@@ -129,7 +130,7 @@ public class XiaopService {
     } else {
       map.add("tp", "3");
     }
-    map.add("url", param.getUrl());
+    if (StringUtils.isNotBlank(param.getUrl())) map.add("url", param.getUrl());
 
     try {
       @SuppressWarnings("unchecked")
