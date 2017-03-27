@@ -22,11 +22,10 @@ import commons.utils.JsonHelper;
 @ApiObject(name = "kpi", description = "关键绩效指标")
 public class Kpi {
 
-  public Kpi() {
-  }
+  public Kpi() {}
 
   public Kpi(Integer xmId, Integer kpiId, String kpiName, BigDecimal kpi, LocalDate kpiDate, String shortName,
-      Integer keySort) {
+      Integer keySort, String shortName1) {
     this.xmId = xmId;
     this.kpiId = kpiId;
     this.kpiName = kpiName;
@@ -34,23 +33,32 @@ public class Kpi {
     this.kpiDate = kpiDate;
     this.shortName = shortName;
     this.keySort = keySort;
+    this.shortName1 = shortName1;
   }
 
   public Kpi(Kpi kpi) {
     this(kpi.getXmId(), kpi.getKpiId(), kpi.getKpiName(), kpi.getKpi(), kpi.getKpiDate(), kpi.getShortName(),
-        kpi.getKeySort());
+        kpi.getKeySort(), kpi.getShortName1());
+  }
+
+  public Kpi(int kpiId, String kpiName, String shortName, Integer keySort, String shortName1) {
+    this(null, kpiId, kpiName, null, null, shortName, keySort, shortName1);
   }
 
   public Kpi(int kpiId, String kpiName, String shortName, Integer keySort) {
-    this(null, kpiId, kpiName, null, null, shortName, keySort);
+    this(kpiId, kpiName, shortName, keySort, null);
   }
 
   public Kpi(int kpiId, String kpiName) {
-    this(kpiId, kpiName, null, null);
+    this(kpiId, kpiName, null);
+  }
+
+  public Kpi(int kpiId, String kpiName, String shortName1) {
+    this(kpiId, kpiName, null, null, shortName1);
   }
 
   public Kpi(int xmId, Integer kpiId, BigDecimal kpi, LocalDate kpiDate) {
-    this(xmId, kpiId, null, kpi, kpiDate, null, null);
+    this(xmId, kpiId, null, kpi, kpiDate, null, null, null);
   }
 
   @JsonIgnore
@@ -70,6 +78,9 @@ public class Kpi {
 
   @JsonIgnore
   private Integer keySort;
+
+  @JsonIgnore
+  private String shortName1;
 
   @ApiObjectField(description = "value")
   private BigDecimal kpi;
@@ -161,6 +172,14 @@ public class Kpi {
 
   public void setUpdateTime(LocalDateTime updateTime) {
     this.updateTime = updateTime;
+  }
+
+  public String getShortName1() {
+    return shortName1;
+  }
+
+  public void setShortName1(String shortName1) {
+    this.shortName1 = shortName1;
   }
 
   @Override

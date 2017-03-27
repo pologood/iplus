@@ -7,7 +7,6 @@ package com.sogou.iplus.entity;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -92,8 +91,9 @@ public class Company {
 
   public void remove(Set<Integer> kpiIds) {
     businessUnits.forEach(bu -> bu.remove(kpiIds));
-    for (ListIterator<BusinessUnit> iterator = businessUnits.listIterator(); iterator.hasNext();)
-      if (iterator.next().getProjects().isEmpty()) iterator.remove();
+    List<BusinessUnit> list = new ArrayList<>();
+    businessUnits.stream().filter(bu -> bu.getProjects().size() > 0).forEach(bu -> list.add(bu));
+    businessUnits = list;
   }
 
 }

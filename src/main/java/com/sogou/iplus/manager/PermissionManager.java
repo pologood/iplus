@@ -1,7 +1,5 @@
 package com.sogou.iplus.manager;
 
-import static com.sogou.iplus.entity.Project.APPID_MAP;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -16,6 +14,7 @@ import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.jsondoc.core.annotation.ApiObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -112,7 +111,9 @@ public class PermissionManager {
 
   public List<Person> getPeople(Set<Role> roles, List<Person> people) {
     if (CollectionUtils.isEmpty(people) || CollectionUtils.isEmpty(roles)) return new ArrayList<>();
-    return people.stream().filter(p -> roles.contains(getRole(p.getEmailName()))).collect(Collectors.toList());
+    return people.stream()
+        .filter(p -> StringUtils.isNotBlank(p.getEmail()) && roles.contains(getRole(p.getEmailName())))
+        .collect(Collectors.toList());
   }
 
   private Role getRole(String name) {
@@ -131,7 +132,7 @@ public class PermissionManager {
   }
 
   public boolean isAuthorized(User user, List<Integer> kpiIds) {
-    if (Objects.isNull(user)) return false;
+    if (Objects.isNull(user) || Objects.isNull(user.getOpenId()) || user.getOpenId().length() < 7) return false;
     String userName = user.getOpenId().substring(6);
     return isInWhiteList(userName) || getValidKpiIdsFromUser(user).containsAll(kpiIds)
         || MAP.getOrDefault(userName, new HashSet<>()).containsAll(kpiIds);
@@ -142,20 +143,20 @@ public class PermissionManager {
   }
 
   public Set<Integer> getValidKpiIdsFromUser(User user) {
-    Set<Integer> result = new HashSet<>();
-    try {
-      Person person;
-      if (Objects.isNull(user) || Objects.isNull(person = permService.getPerm(user.getUid()))) return result;
-      result.addAll(getValidKpiIdsFromUser(person));
-    } catch (Exception e) {
-      LOGGER.error("get personal permission error", e);
-    }
-    return result;
+    Person person;
+    if (Objects.isNull(user) || !user.isOpen() || Objects.isNull(person = permService.getPerm(user.getUid())))
+      return new HashSet<>();
+    return getValidKpiIdsFromUser(person);
   }
 
   public Set<Integer> getValidKpiIdsFromUser(Person person) {
-    return person.getPermsMap().keySet().stream().map(appId -> Project.PROJECT_MAP.get(APPID_MAP.get(appId)))
-        .filter(Objects::nonNull).flatMap(p -> p.getKpiList().stream()).collect(Collectors.toSet());
+    try {
+      return person.getPermsMap().keySet().stream().map(appId -> Project.getProjectWithAppId(appId))
+          .filter(Objects::nonNull).flatMap(p -> p.getKpiList().stream()).collect(Collectors.toSet());
+    } catch (Exception e) {
+      LOGGER.error("get personal permission error", e);
+      return new HashSet<>();
+    }
   }
 
   public Company getCompany(Set<Integer> kpiIds) {

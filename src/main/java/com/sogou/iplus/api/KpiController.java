@@ -5,6 +5,8 @@
  */
 package com.sogou.iplus.api;
 
+import static com.sogou.iplus.entity.Project.getProjectWithXmIdAndXmKey;
+
 import java.util.List;
 import java.util.Map;
 import java.math.BigDecimal;
@@ -69,7 +71,7 @@ public class KpiController {
       @ApiQueryParam(name = "xmId", description = "项目id") @RequestParam int xmId,
       @ApiQueryParam(name = "xmKey", description = "项目秘钥") @RequestParam String xmKey,
       @ApiQueryParam(name = "date", description = "kpi日期", format = "yyyy-MM-dd") @RequestParam @DateTimeFormat(iso = ISO.DATE) LocalDate date) {
-    Project project = getProject(xmId, xmKey);
+    Project project = getProjectWithXmIdAndXmKey(xmId, xmKey);
     if (Objects.isNull(project)) return ApiResult.forbidden();
     Set<Kpi> kpis = new HashSet<>();
     String kpiStr;
@@ -77,11 +79,6 @@ public class KpiController {
       if (NumberUtils.isNumber(kpiStr = request.getParameter(kpiId.toString())))
         kpis.add(new Kpi(xmId, kpiId, new BigDecimal(kpiStr), date));
     return kpiManager.update(kpis);
-  }
-
-  private Project getProject(int xmId, String xmKey) {
-    Project project = Project.PROJECT_MAP.get(xmId);
-    return Objects.nonNull(project) && Objects.equals(xmKey, project.getXmKey()) ? project : null;
   }
 
   @ApiMethod(description = "select projects do not submit kpi on named date")
@@ -137,7 +134,7 @@ public class KpiController {
       @ApiQueryParam(name = "xmId", description = "项目Id") @RequestParam Optional<Integer> xmId,
       @ApiQueryParam(name = "xmKey", description = "项目秘钥") @RequestParam Optional<String> xmKey,
       @ApiQueryParam(name = "date", description = "kpi日期", format = "yyyy-MM-dd") @RequestParam @DateTimeFormat(iso = ISO.DATE) LocalDate date) {
-    Project project = Project.PROJECT_MAP.get(xmId.orElse(null));
+    Project project = Project.getProjectWithXmId(xmId.orElse(null));
     List<Integer> kpiIds = Objects.isNull(project) ? new ArrayList<>() : project.getKpiList();
     if (!isValid(from, user, token, xmId, xmKey, response, kpiIds)) return ApiResult.forbidden();
     return kpiManager.selectWithDateAndXmId(xmId.orElse(null), date);
@@ -149,7 +146,7 @@ public class KpiController {
   }
 
   private boolean isValid(int xmId, String xmKey, List<Integer> kpiIds) {
-    Project project = getProject(xmId, xmKey);
+    Project project = getProjectWithXmIdAndXmKey(xmId, xmKey);
     return Objects.nonNull(project) && (xmId == 0 || project.getKpiList().containsAll(kpiIds));
   }
 

@@ -5,11 +5,14 @@
  */
 package com.sogou.iplus.entity;
 
+import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -28,10 +31,10 @@ import commons.utils.JsonHelper;
 //-------------------------------------------------------
 @ApiObject(name = "project", description = "项目")
 public class Project {
-  public @JsonIgnore transient static final List<Project> PROJECTS = new ArrayList<>();
-  public @JsonIgnore transient static final Map<Integer, Project> PROJECT_MAP;
-  public @JsonIgnore transient static final Map<Integer, Kpi> KPI_MAP = new HashMap<>();
-  public @JsonIgnore transient static final Map<String, Integer> APPID_MAP = new HashMap<>();
+  private @JsonIgnore transient static final List<Project> PROJECTS = new ArrayList<>();
+  private @JsonIgnore transient static final Map<Integer, Project> PROJECT_MAP = new HashMap<>();
+  private @JsonIgnore transient static final Map<Integer, Kpi> KPI_MAP = new HashMap<>();
+  private @JsonIgnore transient static final Map<String, Integer> APPID_MAP = new HashMap<>();
 
   public static final Project PC_INPUT, MOBILE_INPUT, QQ_INPUT, PC_BROWSER, MOBILE_BROWSER, NAVIGATION, VOICE, NEWS,
       PEDIA, CHINESE_MEDICINE, MAP, APP_MARKET, PC_SEARCH, WIRELESS_SEARCH, SEARCH_APP, VEDIO_SEARCH, PICTURE_SEARCH,
@@ -44,29 +47,31 @@ public class Project {
             new Kpi(2, "PC输入法灵犀日搜索量(万)", "灵犀搜索量", 2), new Kpi(10, "PC输入法第7日留存率"), new Kpi(18, "PC输入法第30日留存率")),
         BusinessUnit.DESKTOP));
     PROJECTS.add(MOBILE_INPUT = new Project(78, 10039, "mxvqf109b7kbyfad", "输入法-手机输入法",
-        Lists.newArrayList(new Kpi(3, "手机输入法日活跃用户数(万)", "活跃用户", 1), new Kpi(4, "手机输入法iOS版日活跃用户数(万)"),
-            new Kpi(5, "手机输入法Android版日活跃用户数(万)"), new Kpi(6, "手机输入法灵犀日搜索量(万)"), new Kpi(7, "手机输入法日激活量(万)", "新增用户", 2),
-            new Kpi(101, "手机输入法Android版次日留存率"), new Kpi(102, "手机输入法Android版第7日留存率"),
-            new Kpi(103, "手机输入法Android版第30日留存率"), new Kpi(104, "手机输入法iOS版次日留存率"), new Kpi(105, "手机输入法iOS版第7日留存率"),
-            new Kpi(106, "手机输入法iOS版第30日留存率")),
+        Lists.newArrayList(new Kpi(3, "手机输入法日活跃用户数(万)", "活跃用户", 1), new Kpi(4, "手机输入法iOS版日活跃用户数(万)", "手机输入法iOS日活"),
+            new Kpi(5, "手机输入法Android版日活跃用户数(万)", "手机输入法Android日活"), new Kpi(6, "手机输入法灵犀日搜索量(万)"),
+            new Kpi(7, "手机输入法日激活量(万)", "新增用户", 2), new Kpi(101, "手机输入法Android版次日留存率"),
+            new Kpi(102, "手机输入法Android版第7日留存率"), new Kpi(103, "手机输入法Android版第30日留存率"), new Kpi(104, "手机输入法iOS版次日留存率"),
+            new Kpi(105, "手机输入法iOS版第7日留存率"), new Kpi(106, "手机输入法iOS版第30日留存率")),
         BusinessUnit.DESKTOP));
     PROJECTS.add(QQ_INPUT = new Project(157, 10049, "u9h63f6k3kxy1qfc", "输入法-QQ输入法",
-        Lists.newArrayList(new Kpi(11, "QQ输入法Windows版日活跃用户数(万)", "Windows日活", 1),
-            new Kpi(12, "QQ输入法Android版日活跃用户数(万)", "Android日活", 2), new Kpi(19, "QQ输入法Windows版第7日留存率"),
+        Lists.newArrayList(new Kpi(11, "QQ输入法Windows版日活跃用户数(万)", "Windows日活", 1, "QQ输入法Windows日活"),
+            new Kpi(12, "QQ输入法Android版日活跃用户数(万)", "Android日活", 2, "QQ输入法Android日活"), new Kpi(19, "QQ输入法Windows版第7日留存率"),
             new Kpi(34, "QQ输入法Windows版第30日留存率"), new Kpi(35, "QQ输入法Android版次日留存率"), new Kpi(55, "QQ输入法Android版第7日留存率")),
         BusinessUnit.DESKTOP));
-    PROJECTS.add(PC_BROWSER = new Project(68, 10053, "2ej50d9vfy9aa486", "浏览器-PC浏览器", Lists
-        .newArrayList(new Kpi(13, "PC浏览器日主动活跃用户数(万)", "活跃用户", 1), new Kpi(14, "搜狗PC浏览器网页搜索量-不含灵犀分流量(万)", "PC搜索量", 2)),
+    PROJECTS.add(PC_BROWSER = new Project(68, 10053, "2ej50d9vfy9aa486", "浏览器-PC浏览器",
+        Lists.newArrayList(new Kpi(13, "PC浏览器日主动活跃用户数(万)", "活跃用户", 1),
+            new Kpi(14, "搜狗PC浏览器网页搜索量-不含灵犀分流量(万)", "PC搜索量", 2, "搜狗PC浏览器网页(不含灵犀)")),
         BusinessUnit.DESKTOP));
     PROJECTS.add(MOBILE_BROWSER = new Project(76, 10054, "423ftqdz3cyjpa14", "浏览器-手机浏览器",
-        Lists.newArrayList(new Kpi(15, "手机浏览器日活跃用户数(万)", "活跃用户", 1), new Kpi(16, "手机浏览器给搜索带去的日搜索量(万)"),
+        Lists.newArrayList(new Kpi(15, "手机浏览器日活跃用户数(万)", "活跃用户", 1), new Kpi(16, "手机浏览器给搜索带去的日搜索量(万)", "手机浏览器日搜索量"),
             new Kpi(17, "手机浏览器日激活量(万)", "新增用户", 2), new Kpi(107, "手机浏览器Android版次日留存率"),
             new Kpi(108, "手机浏览器Android版第7日留存率"), new Kpi(109, "手机浏览器Android版第30日留存率"), new Kpi(110, "手机浏览器iOS版次日留存率"),
             new Kpi(111, "手机浏览器iOS版第7日留存率"), new Kpi(112, "手机浏览器iOS版第30日留存率")),
         BusinessUnit.DESKTOP));
     PROJECTS.add(NAVIGATION = new Project(260, 10055, "zmit8fzhdlyqj5hd", "导航",
         Lists.newArrayList(new Kpi(21, "导航合计用户数(万)", "活跃用户", 1), new Kpi(22, "搜狗导航自有活跃用户数(万)", "自有日活", 2),
-            new Kpi(23, "搜狗导航外购活跃用户数(万)"), new Kpi(24, "QQ独立导航活跃用户数(万)"), new Kpi(25, "QQ浏览器中QQ导航活跃用户数(万)")),
+            new Kpi(23, "搜狗导航外购活跃用户数(万)"), new Kpi(24, "QQ独立导航活跃用户数(万)"),
+            new Kpi(25, "QQ浏览器中QQ导航活跃用户数(万)", "QQ浏览器-QQ导航日活")),
         BusinessUnit.DESKTOP));
     PROJECTS.add(VOICE = new Project(82, 10050, "95lykq31ci0fw5p7", "语音",
         Lists.newArrayList(new Kpi(26, "语音日请求量(万)", "日请求量", 1)), BusinessUnit.DESKTOP));
@@ -106,7 +111,8 @@ public class Project {
     PROJECTS.add(SHOPPING_SEARCH = new Project(142, 10063, "hxuuaa7ylg2tizpp", "购物搜索",
         Lists.newArrayList(new Kpi(53, "PC+无线购物搜索用户量(万)", "活跃用户", 1)), BusinessUnit.SEARCH));
     PROJECTS.add(NOVEL_SEARCH = new Project(31, 10064, "1k5rg0vny4y1htl2", "小说搜索",
-        Lists.newArrayList(new Kpi(54, "WAP书城用户量(万)"), new Kpi(207, "阅读APPAndroid版日活跃用户数(万)", "Android日活", 1),
+        Lists.newArrayList(new Kpi(54, "WAP书城用户量(万)"),
+            new Kpi(207, "阅读APPAndroid版日活跃用户数(万)", "Android日活", 1, "阅读APP-Android日活"),
             new Kpi(208, "阅读APPiOS版日活跃用户数(万)", "iOS日活", 2), new Kpi(201, "阅读APPAndroid版次日留存率"),
             new Kpi(202, "阅读APPAndroid版第7日留存率"), new Kpi(203, "阅读APPAndroid版第30日留存率"), new Kpi(204, "阅读APPiOS版次日留存率"),
             new Kpi(205, "阅读APPiOS版第7日留存率"), new Kpi(206, "阅读APPiOS版第30日留存率")),
@@ -134,14 +140,13 @@ public class Project {
             new Kpi(82, "糖猫APP第30日留存率")),
         BusinessUnit.SUGARCAT));
 
-    PROJECT_MAP = getProjectMap();
-
-    PROJECTS.stream().filter(p -> Objects.nonNull(p.getBusinessUnit()))
-        .forEach(project -> project.getBusinessUnit().getProjects().add(project));
-
-    PROJECTS.forEach(project -> project.getKpis().forEach(kpi -> KPI_MAP.put(kpi.getKpiId(), kpi)));
-
-    PROJECTS.forEach(project -> APPID_MAP.put(Integer.toString(project.getAppId()), project.getXmId()));
+    PROJECTS.forEach(project -> {
+      project.setKeyKpis(project.getKeyKpis(project.getKpis()));
+      project.getKpis().forEach(kpi -> KPI_MAP.put(kpi.getKpiId(), kpi));
+      APPID_MAP.put(Integer.toString(project.getAppId()), project.getXmId());
+      if (nonNull(project.getBusinessUnit())) project.getBusinessUnit().getProjects().add(project);
+      PROJECT_MAP.put(project.getXmId(), project);
+    });
   }
 
   public static List<Project> getProjects() {
@@ -149,11 +154,25 @@ public class Project {
   }
 
   public static Map<Integer, Project> getProjectMap() {
-    return PROJECTS.stream().collect(Collectors.toMap(p -> p.getXmId(), p -> new Project(p)));
+    return PROJECT_MAP.entrySet().stream().collect(Collectors.toMap(e -> e.getKey(), e -> new Project(e.getValue())));
   }
 
   public static Kpi getKpi(Integer kpiId) {
     return KPI_MAP.get(kpiId);
+  }
+
+  public static Project getProjectWithXmId(Integer xmId) {
+    return getProjectWithXmIdAndXmKey(xmId, null);
+  }
+
+  public static Project getProjectWithAppId(String appId) {
+    return getProjectWithXmId(APPID_MAP.get(appId));
+  }
+
+  public static Project getProjectWithXmIdAndXmKey(Integer xmId, String xmKey) {
+    Project project = PROJECT_MAP.get(xmId);
+    return isNull(project) || (isNotBlank(xmKey) && !Objects.equals(xmKey, project.getXmKey())) ? null
+        : new Project(project);
   }
 
   @Override
@@ -169,8 +188,7 @@ public class Project {
     this.projectName = projectName;
     this.kpis = kpis;
     this.businessUnit = businessUnit;
-    this.keyKpis = this.kpis.stream().filter(kpi -> Objects.nonNull(kpi.getShortName()))
-        .sorted(Comparator.comparingInt(k -> k.getKeySort())).collect(Collectors.toList());
+    setKeyKpis(getKeyKpis(kpis));
   }
 
   public Project(Project project) {
@@ -247,7 +265,13 @@ public class Project {
   }
 
   public List<Kpi> getKeyKpis() {
-    return keyKpis;
+    return this.keyKpis;
+  }
+
+  @JsonIgnore
+  public List<Kpi> getKeyKpis(List<Kpi> list) {
+    return kpis.stream().filter(kpi -> Objects.nonNull(kpi.getKeySort()))
+        .sorted(Comparator.comparing(kpi -> kpi.getKeySort())).collect(Collectors.toList());
   }
 
   public void setKeyKpis(List<Kpi> keyKpis) {
@@ -260,7 +284,8 @@ public class Project {
   }
 
   public void remove(Set<Integer> kpiIds, boolean inKpiIds) {
-    for (ListIterator<Kpi> iterator = kpis.listIterator(); iterator.hasNext();)
-      if (!(kpiIds.contains(iterator.next().getKpiId()) ^ inKpiIds)) iterator.remove();
+    List<Kpi> list = new ArrayList<>();
+    kpis.stream().filter(kpi -> (kpiIds.contains(kpi.getKpiId()) ^ inKpiIds)).forEach(kpi -> list.add(kpi));
+    kpis = list;
   }
 }

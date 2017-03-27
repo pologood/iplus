@@ -39,6 +39,8 @@ import com.sogou.iplus.config.DaoConfig;
 import com.sogou.iplus.config.RootConfig;
 import com.sogou.iplus.entity.Company;
 import com.sogou.iplus.entity.Project;
+import com.sogou.iplus.manager.PushManager;
+import com.sogou.iplus.manager.PermissionManager.Role;
 import com.sogou.iplus.model.ApiResult;
 
 import commons.spring.RedisRememberMeService.User;
@@ -57,7 +59,8 @@ public class KpiControllerTest {
 
   private final int testId = 260, debugId = 0;
 
-  private final Project testProject = Project.PROJECT_MAP.get(testId), debugProject = Project.PROJECT_MAP.get(debugId);
+  private final Project testProject = Project.getProjectWithXmId(testId),
+      debugProject = Project.getProjectWithXmId(debugId);
 
   private final String testKey = testProject.getXmKey(), debugKey = debugProject.getXmKey();
 
@@ -168,8 +171,11 @@ public class KpiControllerTest {
     System.out.println(map);
   }
 
+  @Autowired
+  PushManager pushManager;
+
   public void push() {
-    controller.pushPandoraMessage(Optional.empty());
+    controller.pushPandoraMessage(Optional.of(Arrays.asList(Role.MANAGER)));
   }
 
   public String getRandomString(char[] chars, int len) {
@@ -180,29 +186,29 @@ public class KpiControllerTest {
   }
 
   public List<Integer> getDailyActiveUserKpiIds() {
-    return Project.KPI_MAP.values().stream()
+    return Project.getProjects().stream().flatMap(p -> p.getKpis().stream())
         .filter(kpi -> Arrays.asList("日活", "活跃").stream().anyMatch(regex -> -1 != kpi.getKpiName().indexOf(regex)))
         .map(kpi -> kpi.getKpiId()).collect(Collectors.toList());
   }
 
   public List<Integer> getNewUserKpiIds() {
-    return Project.KPI_MAP.values().stream().filter(kpi -> -1 != kpi.getKpiName().indexOf("激活"))
-        .map(kpi -> kpi.getKpiId()).collect(Collectors.toList());
+    return Project.getProjects().stream().flatMap(p -> p.getKpis().stream())
+        .filter(kpi -> -1 != kpi.getKpiName().indexOf("激活")).map(kpi -> kpi.getKpiId()).collect(Collectors.toList());
   }
 
   public Map<Integer, List<Integer>> getRetentionRateKpiIds() {
     Map<Integer, List<Integer>> result = new HashMap<>();
 
     result.put(1,
-        Project.KPI_MAP.values().stream()
+        Project.getProjects().stream().flatMap(p -> p.getKpis().stream())
             .filter(kpi -> Arrays.asList("留存", "次").stream().allMatch(regex -> -1 != kpi.getKpiName().indexOf(regex)))
             .map(kpi -> kpi.getKpiId()).collect(Collectors.toList()));
     result.put(7,
-        Project.KPI_MAP.values().stream()
+        Project.getProjects().stream().flatMap(p -> p.getKpis().stream())
             .filter(kpi -> Arrays.asList("留存", "7").stream().allMatch(regex -> -1 != kpi.getKpiName().indexOf(regex)))
             .map(kpi -> kpi.getKpiId()).collect(Collectors.toList()));
     result.put(30,
-        Project.KPI_MAP.values().stream()
+        Project.getProjects().stream().flatMap(p -> p.getKpis().stream())
             .filter(kpi -> Arrays.asList("留存", "30").stream().allMatch(regex -> -1 != kpi.getKpiName().indexOf(regex)))
             .map(kpi -> kpi.getKpiId()).collect(Collectors.toList()));
 

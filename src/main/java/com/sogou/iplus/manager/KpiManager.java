@@ -103,7 +103,7 @@ public class KpiManager {
 
   @Transactional
   public ApiResult<?> addAll(LocalDate date) {
-    Project.PROJECTS.forEach(project -> project.getKpis().forEach(kpi -> {
+    Project.getProjects().forEach(project -> project.getKpis().forEach(kpi -> {
       try {
         Kpi toAdd = new Kpi(project.getXmId(), kpi.getKpiId(), new BigDecimal(-1), getKpiDate(kpi, date));
         toAdd.setCreateDate(date);

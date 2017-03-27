@@ -25,9 +25,9 @@ public class PushTest {
   public void test() {
     PushParam param = new PushParam();
     param.setHTML(true);
-    String text = "<font color=\"red\">hello</font><font color=\"green\"> world</font>";
+    String text = "<h1><font color=\"#000000\">今日数据波动幅度较大的产品</font></h1><p>输入法&nbsp;&nbsp;<b><font color='#ff5b1a'>【上升了】</font></b>&nbsp;&nbsp;<font color='#ff5b1a'>10%</font></p>";
     param.setMessage(text);
-    param.setOpenId("fengjin,zhengzhiyong,wangwenlong,liteng");
+    param.setOpenId("fengjin,zhengzhiyong,wangwenlong,liteng,wangjialin");
     param.setTitle("test");
     pandoraService.push(param);
   }
