@@ -21,7 +21,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.math.NumberUtils;
 import org.hibernate.validator.constraints.NotEmpty;
@@ -109,7 +108,7 @@ public class KpiController {
 
   @ApiMethod(description = "get company structure information")
   @RequestMapping(value = "/company", method = RequestMethod.GET)
-  public ApiResult<?> getCompany(HttpServletResponse response, @AuthenticationPrincipal User user) {
+  public ApiResult<?> getCompany(@AuthenticationPrincipal User user) {
     return new ApiResult<>(permissionManager.getCompany(permissionManager.getValidKpiIdsFromUser(user)));
   }
 
