@@ -144,7 +144,7 @@ public class PermissionManager {
 
   public Set<Integer> getValidKpiIdsFromUser(User user) {
     Person person;
-    if (Objects.isNull(user) || !user.isOpen() || Objects.isNull(person = permService.getPerm(user.getUid())))
+    if (Objects.isNull(user) || user.isOpen() || Objects.isNull(person = permService.getPerm(user.getUid())))
       return new HashSet<>();
     return getValidKpiIdsFromUser(person);
   }
