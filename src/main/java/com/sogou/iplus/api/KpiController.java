@@ -21,7 +21,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.math.NumberUtils;
 import org.hibernate.validator.constraints.NotEmpty;
@@ -92,30 +91,25 @@ public class KpiController {
   @ApiMethod(description = "select kpis with date range and kpiId")
   @RequestMapping(value = "/kpi/range", method = RequestMethod.GET)
   public ApiResult<?> selectKpisWithDateRangeAndKpiId(@RequestParam(defaultValue = "0") int from,
-      HttpServletResponse response, @AuthenticationPrincipal User user,
-      @ApiQueryParam(name = "token", description = "pandora token") @RequestParam Optional<String> token,
+      @AuthenticationPrincipal User user,
       @ApiQueryParam(name = "xmId", description = "项目Id") @RequestParam Optional<Integer> xmId,
       @ApiQueryParam(name = "xmKey", description = "项目秘钥") @RequestParam Optional<String> xmKey,
       @ApiQueryParam(name = "kpiId", description = "kpiId") @RequestParam @NotEmpty List<Integer> kpiId,
       @ApiQueryParam(name = "beginDate", description = "起始日期", format = "yyyy-MM-dd") @RequestParam @DateTimeFormat(iso = ISO.DATE) LocalDate beginDate,
       @ApiQueryParam(name = "endDate", description = "结束日期", format = "yyyy-MM-dd") @RequestParam @DateTimeFormat(iso = ISO.DATE) LocalDate endDate) {
-    if (!isValid(from, user, token, xmId, xmKey, response, kpiId)) return ApiResult.forbidden();
+    if (!isValid(from, user, xmId, xmKey, kpiId)) return ApiResult.forbidden();
     return kpiManager.selectWithDateRangeAndKpiId(xmId.orElse(null), kpiId, beginDate, endDate);
   }
 
-  private boolean isValid(int from, User user, Optional<String> token, Optional<Integer> xmId, Optional<String> xmKey,
-      HttpServletResponse response, List<Integer> kpiIds) {
+  private boolean isValid(int from, User user, Optional<Integer> xmId, Optional<String> xmKey, List<Integer> kpiIds) {
     return permissionManager.isAuthorized(user, kpiIds)
-        || permissionManager.isAuthorized(permissionManager.login(token, response), kpiIds)
         || (Objects.equals(from, HOST.privateWeb.getValue()) && isValid(xmId, xmKey, kpiIds));
   }
 
   @ApiMethod(description = "get company structure information")
   @RequestMapping(value = "/company", method = RequestMethod.GET)
-  public ApiResult<?> getCompany(HttpServletResponse response, @AuthenticationPrincipal User user,
-      @ApiQueryParam(name = "token", description = "pandora token") @RequestParam Optional<String> token) {
-    return new ApiResult<>(permissionManager.getCompany(permissionManager
-        .getValidKpiIdsFromUser(Objects.isNull(user) ? permissionManager.login(token, response) : user)));
+  public ApiResult<?> getCompany(@AuthenticationPrincipal User user) {
+    return new ApiResult<>(permissionManager.getCompany(permissionManager.getValidKpiIdsFromUser(user)));
   }
 
   @ApiMethod(description = "list company kpi")
@@ -130,14 +124,13 @@ public class KpiController {
   @ApiMethod(description = "select kpis with xmId on named date")
   @RequestMapping(value = "/kpi", method = RequestMethod.GET)
   public ApiResult<?> selectKpisWithDateAndXmId(@RequestParam(defaultValue = "0") int from,
-      HttpServletResponse response, @AuthenticationPrincipal User user,
-      @ApiQueryParam(name = "token", description = "pandora token") @RequestParam Optional<String> token,
+      @AuthenticationPrincipal User user,
       @ApiQueryParam(name = "xmId", description = "项目Id") @RequestParam Optional<Integer> xmId,
       @ApiQueryParam(name = "xmKey", description = "项目秘钥") @RequestParam Optional<String> xmKey,
       @ApiQueryParam(name = "date", description = "kpi日期", format = "yyyy-MM-dd") @RequestParam @DateTimeFormat(iso = ISO.DATE) LocalDate date) {
     Project project = getProjectWithXmId(xmId.orElse(null));
     List<Integer> kpiIds = Objects.isNull(project) ? new ArrayList<>() : project.getKpiList();
-    if (!isValid(from, user, token, xmId, xmKey, response, kpiIds)) return ApiResult.forbidden();
+    if (!isValid(from, user, xmId, xmKey, kpiIds)) return ApiResult.forbidden();
     return kpiManager.selectWithDateAndXmId(xmId.orElse(null), date);
   }
 

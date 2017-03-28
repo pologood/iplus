@@ -103,7 +103,7 @@ public class KpiControllerTest {
   }
 
   public void getCompany() {
-    ApiResult<?> result = controller.getCompany(null, testUser, Optional.empty());
+    ApiResult<?> result = controller.getCompany(testUser);
     Assert.assertTrue(ApiResult.isOk(result));
     Company sogou = (Company) result.getData();
     Assert.assertNotNull(sogou);
@@ -142,13 +142,13 @@ public class KpiControllerTest {
   }
 
   private ApiResult<?> selectKpisWithDateAndXmId(int xmId, String xmKey) {
-    return controller.selectKpisWithDateAndXmId(HOST.privateWeb.getValue(), null, null, Optional.empty(),
-        Optional.of(xmId), Optional.of(xmKey), today);
+    return controller.selectKpisWithDateAndXmId(HOST.privateWeb.getValue(), null, Optional.of(xmId), Optional.of(xmKey),
+        today);
   }
 
   private ApiResult<?> selectKpisWithDateAndXmId(int xmId, User user) {
-    return controller.selectKpisWithDateAndXmId(HOST.publicWeb.getValue(), null, user, Optional.empty(),
-        Optional.of(xmId), Optional.empty(), today);
+    return controller.selectKpisWithDateAndXmId(HOST.publicWeb.getValue(), user, Optional.of(xmId), Optional.empty(),
+        today);
   }
 
   public void selectKpisWithDateRangeAndKpiId() {
@@ -159,8 +159,8 @@ public class KpiControllerTest {
   }
 
   private ApiResult<?> selectKpisWithDateRangeAndKpiId(HOST host, User user, Integer xmId, String xmKey) {
-    return controller.selectKpisWithDateRangeAndKpiId(host.getValue(), null, user, Optional.empty(),
-        Optional.ofNullable(xmId), Optional.ofNullable(xmKey), kpiIds, today, tomorrow);
+    return controller.selectKpisWithDateRangeAndKpiId(host.getValue(), user, Optional.ofNullable(xmId),
+        Optional.ofNullable(xmKey), kpiIds, today, tomorrow);
   }
 
   private void validateResultOfSelectKpisWithDateRangeAndKpiId(ApiResult<?> result) {

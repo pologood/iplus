@@ -5,11 +5,8 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-
-import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -43,9 +40,11 @@ public class PermissionManager {
   public PermissionManager(Environment env) {
     BOSS_SET = Arrays.stream(env.getRequiredProperty("boss").split(",")).collect(Collectors.toSet());
     ADMIN_SET = Arrays.stream(env.getRequiredProperty("admin").split(",")).collect(Collectors.toSet());
+    BOSS_IDS = Arrays.stream(env.getRequiredProperty("bossids").split(",")).collect(Collectors.toSet());
+    ADMIN_IDS = Arrays.stream(env.getRequiredProperty("adminids").split(",")).collect(Collectors.toSet());
   }
 
-  public static Set<String> BOSS_SET, ADMIN_SET;
+  public static Set<String> BOSS_SET, ADMIN_SET, BOSS_IDS, ADMIN_IDS;
 
   public List<String> getBossOrAdmin(Set<Role> roles) {
     Set<String> result = new HashSet<>();
@@ -67,23 +66,12 @@ public class PermissionManager {
     return Role.MANAGER;
   }
 
-  public User login(Optional<String> token, HttpServletResponse response) {
-    if (!token.isPresent()) return null;
-    commons.saas.LoginService.User pandoraUser = pandoraLoginService.login(token.get());
-    if (Objects.isNull(pandoraUser)) return null;
-    User user = new User(pandoraUser.getOpenId(), pandoraUser.getName());
-    redisService.login(response, user);
-    return user;
-  }
-
   public boolean isAuthorized(User user, List<Integer> kpiIds) {
-    if (Objects.isNull(user) || Objects.isNull(user.getOpenId()) || user.getOpenId().length() < 7) return false;
-    String userName = user.getOpenId().substring(6);
-    return isInWhiteList(userName) || getValidKpiIdsFromUser(user).containsAll(kpiIds);
+    return Objects.nonNull(user) && (isInWhiteList(user.getId()) || getValidKpiIdsFromUser(user).containsAll(kpiIds));
   }
 
-  public boolean isInWhiteList(String name) {
-    return BOSS_SET.contains(name) || ADMIN_SET.contains(name);
+  public boolean isInWhiteList(String user) {
+    return BOSS_IDS.contains(user) || ADMIN_IDS.contains(user);
   }
 
   public Set<Integer> getValidKpiIdsFromUser(User user) {
