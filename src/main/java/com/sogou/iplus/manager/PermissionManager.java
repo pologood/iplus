@@ -40,8 +40,8 @@ public class PermissionManager {
   public PermissionManager(Environment env) {
     BOSS_SET = Arrays.stream(env.getRequiredProperty("boss").split(",")).collect(Collectors.toSet());
     ADMIN_SET = Arrays.stream(env.getRequiredProperty("admin").split(",")).collect(Collectors.toSet());
-    BOSS_IDS = Arrays.stream(env.getRequiredProperty("boss").split(",")).collect(Collectors.toSet());
-    ADMIN_IDS = Arrays.stream(env.getRequiredProperty("admin").split(",")).collect(Collectors.toSet());
+    BOSS_IDS = Arrays.stream(env.getRequiredProperty("bossids").split(",")).collect(Collectors.toSet());
+    ADMIN_IDS = Arrays.stream(env.getRequiredProperty("adminids").split(",")).collect(Collectors.toSet());
   }
 
   public static Set<String> BOSS_SET, ADMIN_SET, BOSS_IDS, ADMIN_IDS;
@@ -71,7 +71,7 @@ public class PermissionManager {
   }
 
   public boolean isInWhiteList(String user) {
-    return BOSS_IDS.contains(user) || ADMIN_SET.contains(user);
+    return BOSS_IDS.contains(user) || ADMIN_IDS.contains(user);
   }
 
   public Set<Integer> getValidKpiIdsFromUser(User user) {
