@@ -125,7 +125,8 @@ public class PermissionManager {
         .filter(p -> Role.MANAGER == getRole(p.getEmailName()))
         .forEach(p -> map.computeIfAbsent(p.getEmailName(), k -> new HashSet<>()).addAll(getValidKpiIdsFromUser(p)));
     MAP.entrySet().forEach(e -> map.computeIfAbsent(e.getKey(), k -> new HashSet<>()).addAll(e.getValue()));
-    return map.entrySet().stream().map(e -> Pair.of(e.getKey(), e.getValue())).collect(Collectors.toList());
+    return map.entrySet().stream().filter(e -> !e.getValue().isEmpty()).map(e -> Pair.of(e.getKey(), e.getValue()))
+        .collect(Collectors.toList());
   }
 
   private Role getRole(String name) {
