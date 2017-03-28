@@ -57,8 +57,9 @@ public class PushManager {
         .filter(p -> p.getValue().abs().compareTo(new BigDecimal(LIMIT)) >= 0)
         .sorted(Collections.reverseOrder(Comparator.comparing(p -> p.getValue().abs()))).collect(Collectors.toList());
     if (roles.remove(Role.MANAGER)) permissionManager.getManager().stream()
-        .map(person -> push(Arrays.asList(person.getKey()),
-            changes.stream().filter(change -> person.getValue().contains(change.getKey().getKpiId()))
+        .map(person -> push(Arrays.asList(person.getEmailName()),
+            changes.stream()
+                .filter(change -> permissionManager.getValidKpiIdsFromUser(person).contains(change.getKey().getKpiId()))
                 .collect(Collectors.toList()),
             getUrlWithDate(PERMISSION_URL)))
         .filter(StringUtils::isNotBlank).forEach(result::add);
