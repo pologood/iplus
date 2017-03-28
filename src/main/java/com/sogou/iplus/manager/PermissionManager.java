@@ -76,7 +76,9 @@ public class PermissionManager {
 
   public Set<Integer> getValidKpiIdsFromUser(User user) {
     Set<Integer> result = new HashSet<>();
-    if (Objects.nonNull(user) && CollectionUtils.isNotEmpty(user.getPerms()))
+    if (user == null || isInWhiteList(user.getId())) return result;
+
+    if (CollectionUtils.isNotEmpty(user.getPerms()))
       user.getPerms().stream().filter(Objects::nonNull).filter(perm -> StringUtils.isNotBlank(perm.getEntity()))
           .map(perm -> Project.getProjectWithAppId(perm.getEntity())).filter(Objects::nonNull)
           .forEach(p -> p.getKpiList().forEach(id -> result.add(id)));
