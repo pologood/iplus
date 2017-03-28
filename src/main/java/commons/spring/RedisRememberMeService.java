@@ -443,6 +443,7 @@ public class RedisRememberMeService implements RememberMeServices {
   }
 
   public String login(HttpServletResponse response, User user) {
+    if (true) return "useless";   // remove login function
     CacheEntity cacheEntity = CacheEntity.buildFromUser(user);
 
     try (Jedis c = jedisPool.getResource()) {
