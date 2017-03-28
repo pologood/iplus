@@ -121,7 +121,7 @@ public class XiaopService {
     map.add("ts", now);
     map.add("to", param.getOpenId());
     map.add("title", param.getTitle());
-    map.add("summary", /*param.getMessage()*/"test");
+    map.add("summary", param.getMessage());
     map.add("content", param.getMessage());
     if (param.isHTML()) map.add("tp", "8");
     else if (param.getImage() != null) {

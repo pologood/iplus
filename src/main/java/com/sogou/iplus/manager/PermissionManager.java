@@ -15,6 +15,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.jsondoc.core.annotation.ApiObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -109,10 +110,22 @@ public class PermissionManager {
     Arrays.stream(users).forEach(user -> MAP.computeIfAbsent(user, k -> new HashSet<>()).addAll(kpiIds));
   }
 
-  public List<Person> getPeople(Set<Role> roles, List<Person> people) {
-    if (CollectionUtils.isEmpty(people) || CollectionUtils.isEmpty(roles)) return new ArrayList<>();
-    return people.stream()
-        .filter(p -> StringUtils.isNotBlank(p.getEmail()) && roles.contains(getRole(p.getEmailName())))
+  public List<String> getBossOrAdmin(Set<Role> roles) {
+    Set<String> result = new HashSet<>();
+    if (roles.remove(Role.BOSS)) result.addAll(BOSS_SET);
+    if (roles.remove(Role.ADMIN)) result.addAll(ADMIN_SET);
+    if (!roles.isEmpty()) throw new RuntimeException("unknown roles");
+    return new ArrayList<>(result);
+  }
+
+  public List<Pair<String, Set<Integer>>> getManager() {
+    Map<String, Set<Integer>> map = new HashMap<>();
+    List<Person> persons = permService.getPerms();
+    persons.stream().filter(p -> StringUtils.isNotBlank(p.getEmail()))
+        .filter(p -> Role.MANAGER == getRole(p.getEmailName()))
+        .forEach(p -> map.computeIfAbsent(p.getEmailName(), k -> new HashSet<>()).addAll(getValidKpiIdsFromUser(p)));
+    MAP.entrySet().forEach(e -> map.computeIfAbsent(e.getKey(), k -> new HashSet<>()).addAll(e.getValue()));
+    return map.entrySet().stream().filter(e -> !e.getValue().isEmpty()).map(e -> Pair.of(e.getKey(), e.getValue()))
         .collect(Collectors.toList());
   }
 

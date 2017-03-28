@@ -40,7 +40,6 @@ import com.sogou.iplus.config.RootConfig;
 import com.sogou.iplus.entity.Company;
 import com.sogou.iplus.entity.Project;
 import com.sogou.iplus.manager.PushManager;
-import com.sogou.iplus.manager.PermissionManager.Role;
 import com.sogou.iplus.model.ApiResult;
 
 import commons.spring.RedisRememberMeService.User;
@@ -175,7 +174,7 @@ public class KpiControllerTest {
   PushManager pushManager;
 
   public void push() {
-    controller.pushPandoraMessage(Optional.of(Arrays.asList(Role.MANAGER)));
+    controller.pushPandoraMessage(Optional.empty());
   }
 
   public String getRandomString(char[] chars, int len) {
