@@ -14,38 +14,29 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
-import com.google.common.collect.Sets;
 import com.sogou.iplus.entity.Kpi;
 import com.sogou.iplus.entity.Project;
 import com.sogou.iplus.manager.PermissionManager.Role;
 import com.sogou.iplus.model.ApiResult;
+import com.sogou.iplus.model.Errno;
 
-import commons.saas.PermService;
-import commons.saas.PermService.Person;
 import commons.saas.XiaopService;
 import commons.saas.XiaopService.PushParam;
 
 @Service
 public class PushManager {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(PushManager.class);
-
-  private static final String LIMIT = "0.001";
+  private static final String LIMIT = "0.1";
 
   @Autowired
   PermissionManager permissionManager;
 
   @Autowired
   KpiManager kpiManager;
-
-  @Autowired
-  PermService permService;
 
   @Autowired
   public PushManager(Environment env) {
@@ -62,17 +53,23 @@ public class PushManager {
 
   public ApiResult<?> push(Set<Role> roles) {
     List<String> result = new ArrayList<>();
-    List<Person> persons = permService.getPerms();
     List<Pair<Kpi, BigDecimal>> changes = kpiManager.getChange().stream()
         .filter(p -> p.getValue().abs().compareTo(new BigDecimal(LIMIT)) >= 0)
         .sorted(Collections.reverseOrder(Comparator.comparing(p -> p.getValue().abs()))).collect(Collectors.toList());
-    if (roles.remove(Role.MANAGER))
-      result.addAll(pushManager(permissionManager.getPeople(Sets.newHashSet(Role.MANAGER), persons), changes));
-    result.add(push(permissionManager.getPeople(roles, persons), changes, getUrlWithDate(URL)));
-    return result.stream().anyMatch(s -> StringUtils.isNotBlank(s)) ? ApiResult.ok() : new ApiResult<>(result);
+    if (roles.remove(Role.MANAGER)) permissionManager.getManager().stream()
+        .map(person -> push(Arrays.asList(person.getKey()),
+            changes.stream().filter(change -> person.getValue().contains(change.getKey().getKpiId()))
+                .collect(Collectors.toList()),
+            getUrlWithDate(PERMISSION_URL)))
+        .filter(StringUtils::isNotBlank).forEach(result::add);
+    String message;
+    if (!roles.isEmpty() && StringUtils
+        .isNotBlank(message = push(permissionManager.getBossOrAdmin(roles), changes, getUrlWithDate(URL))))
+      result.add(message);
+    return result.isEmpty() ? ApiResult.ok() : new ApiResult<>(Errno.INTERNAL_ERROR, result);
   }
 
-  List<List<Pair<Kpi, BigDecimal>>> split(List<Pair<Kpi, BigDecimal>> changes) {
+  public List<List<Pair<Kpi, BigDecimal>>> split(List<Pair<Kpi, BigDecimal>> changes) {
     List<List<Pair<Kpi, BigDecimal>>> result = Arrays.asList(new ArrayList<>(), new ArrayList<>());
     changes.stream().limit(SIZE).forEach(pair -> {
       if (BigDecimal.ZERO.compareTo(pair.getValue()) > 0) result.get(1).add(pair);
@@ -81,10 +78,9 @@ public class PushManager {
     return result;
   }
 
-  private String push(List<Person> people, List<Pair<Kpi, BigDecimal>> changes, String url) {
+  private String push(List<String> people, List<Pair<Kpi, BigDecimal>> changes, String url) {
     List<List<Pair<Kpi, BigDecimal>>> waves = split(changes);
-    return push(String.format("[%s]数据已更新", LocalDate.now()), getMessage(waves),
-        String.join(",", people.stream().map(p -> p.getEmailName()).collect(Collectors.toList())), url);
+    return push(String.format("[%s]数据已更新", LocalDate.now()), getMessage(waves), String.join(",", people), url);
   }
 
   private String getTitle(List<List<Pair<Kpi, BigDecimal>>> waves) {
@@ -113,20 +109,6 @@ public class PushManager {
     return dayOfWeek == DayOfWeek.SATURDAY || dayOfWeek == DayOfWeek.SUNDAY ? 0 : 1;
   }
 
-  private List<String> pushManager(List<Person> manager, List<Pair<Kpi, BigDecimal>> changes) {
-    List<String> result = new ArrayList<>();
-    for (Person person : manager) {
-      Set<Integer> kpiSet = permissionManager.getValidKpiIdsFromUser(person);
-      changes = changes.stream().filter(p -> kpiSet.contains(p.getKey().getKpiId())).collect(Collectors.toList());
-      String message = push(Arrays.asList(person), changes, getUrlWithDate(PERMISSION_URL));
-      if (StringUtils.isNotBlank(message)) {
-        LOGGER.error("push {} error{}", person.getEmailName(), message);
-        result.add(message);
-      }
-    }
-    return result;
-  }
-
   private String getUrlWithDate(String url) {
     return url + "?baseDate=" + LocalDate.now().toString();
   }
@@ -135,7 +117,7 @@ public class PushManager {
     PushParam param = new PushParam();
     param.setTitle(title);
     param.setMessage(message);
-    param.setOpenId(list + ",wangwenlong");
+    param.setOpenId(list);
     param.setUrl(url);
     return pandoraService.push(param);
   }
