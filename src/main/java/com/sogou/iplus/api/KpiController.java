@@ -5,6 +5,7 @@
  */
 package com.sogou.iplus.api;
 
+import static com.sogou.iplus.entity.Project.getProjectWithXmId;
 import static com.sogou.iplus.entity.Project.getProjectWithXmIdAndXmKey;
 
 import java.util.List;
@@ -134,7 +135,7 @@ public class KpiController {
       @ApiQueryParam(name = "xmId", description = "项目Id") @RequestParam Optional<Integer> xmId,
       @ApiQueryParam(name = "xmKey", description = "项目秘钥") @RequestParam Optional<String> xmKey,
       @ApiQueryParam(name = "date", description = "kpi日期", format = "yyyy-MM-dd") @RequestParam @DateTimeFormat(iso = ISO.DATE) LocalDate date) {
-    Project project = Project.getProjectWithXmId(xmId.orElse(null));
+    Project project = getProjectWithXmId(xmId.orElse(null));
     List<Integer> kpiIds = Objects.isNull(project) ? new ArrayList<>() : project.getKpiList();
     if (!isValid(from, user, token, xmId, xmKey, response, kpiIds)) return ApiResult.forbidden();
     return kpiManager.selectWithDateAndXmId(xmId.orElse(null), date);

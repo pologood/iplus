@@ -18,6 +18,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.jsondoc.core.annotation.ApiObject;
 import org.jsondoc.core.annotation.ApiObjectField;
 
@@ -141,7 +142,6 @@ public class Project {
         BusinessUnit.SUGARCAT));
 
     PROJECTS.forEach(project -> {
-      project.setKeyKpis(project.getKeyKpis(project.getKpis()));
       project.getKpis().forEach(kpi -> KPI_MAP.put(kpi.getKpiId(), kpi));
       APPID_MAP.put(Integer.toString(project.getAppId()), project.getXmId());
       if (nonNull(project.getBusinessUnit())) project.getBusinessUnit().getProjects().add(project);
@@ -188,7 +188,6 @@ public class Project {
     this.projectName = projectName;
     this.kpis = kpis;
     this.businessUnit = businessUnit;
-    setKeyKpis(getKeyKpis(kpis));
   }
 
   public Project(Project project) {
@@ -265,13 +264,8 @@ public class Project {
   }
 
   public List<Kpi> getKeyKpis() {
-    return this.keyKpis;
-  }
-
-  @JsonIgnore
-  public List<Kpi> getKeyKpis(List<Kpi> list) {
-    return kpis.stream().filter(kpi -> Objects.nonNull(kpi.getKeySort()))
-        .sorted(Comparator.comparing(kpi -> kpi.getKeySort())).collect(Collectors.toList());
+    return CollectionUtils.isEmpty(this.keyKpis) ? kpis.stream().filter(kpi -> Objects.nonNull(kpi.getKeySort()))
+        .sorted(Comparator.comparing(kpi -> kpi.getKeySort())).collect(Collectors.toList()) : this.keyKpis;
   }
 
   public void setKeyKpis(List<Kpi> keyKpis) {
